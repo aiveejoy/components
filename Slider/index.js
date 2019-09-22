@@ -34,26 +34,6 @@ class Slider extends Component {
               Hi {state.user.username}!
             </Text> : null}
             <View style={styles.navSectionStyle}>
-              <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Scan')}>
-              Scan
-              </Text>
-            </View>
-            <View style={styles.navSectionStyle}>
-              <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Transfer')}>
-              Transfer
-              </Text>
-            </View>
-            <View style={styles.navSectionStyle}>
-              <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Bundled')}>
-              Bundled
-              </Text>
-            </View>
-            <View style={styles.navSectionStyle}>
-              <Text style={styles.navItemStyle} onPress={this.navigateToScreen('Setting')}>
-              Setting
-              </Text>
-            </View>
-            <View style={styles.navSectionStyle}>
               <Text style={styles.navItemStyle} onPress={() => this.logoutAction()}>
               Logout
               </Text>
