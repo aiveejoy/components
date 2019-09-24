@@ -32,10 +32,22 @@ class Slider extends Component {
           <View>
             {state.user != null ? <Text style={styles.sectionHeadingStyle}>
               Hi {state.user.username}!
-            </Text> : null}
+            </Text> : <Text style={styles.sectionHeadingStyle}>
+              Welcome to {Helper.company}!
+            </Text>}
+            {Helper.DrawerMenu.length > 0 &&
+              Helper.DrawerMenu.map((item, index) => {
+                return(
+                <View style={styles.navSectionStyle}>
+                  <Text style={styles.navItemStyle} onPress={() => this.navigateToScreen(item.route)}>
+                    {item.title}
+                  </Text>
+                </View>)
+              })
+            }
             <View style={styles.navSectionStyle}>
               <Text style={styles.navItemStyle} onPress={() => this.logoutAction()}>
-              Logout
+                Logout
               </Text>
             </View>
           </View>
