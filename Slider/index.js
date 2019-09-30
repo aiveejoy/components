@@ -10,7 +10,7 @@ class Slider extends Component {
   constructor(props){
     super(props);
   }
-  navigateToScreen = (route) => () => {
+  navigateToScreen = (route) => {
     const navigateAction = NavigationActions.navigate({
       routeName: route
     });
@@ -36,7 +36,7 @@ class Slider extends Component {
               Welcome to {Helper.company}!
             </Text>}
             {Helper.DrawerMenu.length > 0 &&
-              Helper.DrawerMenu.map((item, index) => {
+              Helper.DrawerMenu.map((item) => {
                 return(
                 <View style={styles.navSectionStyle}>
                   <Text style={styles.navItemStyle} onPress={() => this.navigateToScreen(item.route)}>
