@@ -31,8 +31,6 @@ export default {
   close: {
     paddingRight: 10
   },
-  icon: {
-  },
   content: {
     width: '100%',
     height: height - (200),

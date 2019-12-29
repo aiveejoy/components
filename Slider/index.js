@@ -15,6 +15,7 @@ class Slider extends Component {
       routeName: route
     });
     this.props.navigation.dispatch(navigateAction);
+    this.props.navigation.toggleDrawer();
   }
 
   logoutAction(){
@@ -36,9 +37,9 @@ class Slider extends Component {
               Welcome to {Helper.company}!
             </Text>}
             {Helper.DrawerMenu.length > 0 &&
-              Helper.DrawerMenu.map((item) => {
+              Helper.DrawerMenu.map((item, index) => {
                 return(
-                <View style={styles.navSectionStyle}>
+                <View style={styles.navSectionStyle} key={index}>
                   <Text style={styles.navItemStyle} onPress={() => this.navigateToScreen(item.route)}>
                     {item.title}
                   </Text>
