@@ -134,6 +134,7 @@ class CustomModal extends Component {
               Helper.currency.map((item, index) => {
                 return (
                   <Picker.Item
+                  key={index}
                   label={item.title} 
                   value={item.value}/>
                 );

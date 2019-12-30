@@ -19,6 +19,7 @@ class Rating extends Component {
         style={{
           color: Color.warning
         }}
+        key={i}
         />
       )
     }
