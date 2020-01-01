@@ -17,6 +17,13 @@ export default {
     borderRadius: 10,
     backgroundColor: Color.white
   },
+  containerSketch: {
+    height: height,
+    width: width,
+    backgroundColor: Color.white,
+    padding: 0,
+    margin: 0
+  },
   header: {
     width: '100%',
     borderBottomColor: Color.gray,
@@ -41,5 +48,13 @@ export default {
     borderTopWidth: 1,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  sketchBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+    borderRadius: 5,
+    marginTop: 10,
+    marginBottom: 10
   }
 }
