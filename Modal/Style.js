@@ -24,6 +24,13 @@ export default {
     padding: 0,
     margin: 0
   },
+  containerImage: {
+    height: '100%',
+    width: '100%',
+    backgroundColor: Color.black,
+    padding: 0,
+    margin: 0
+  },
   header: {
     width: '100%',
     borderBottomColor: Color.gray,

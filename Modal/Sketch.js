@@ -17,9 +17,12 @@ class Sketch extends Component {
     super(props);
   }
 
-  send = () => {
+  getBase64 = () => {
     this.sketch.getBase64('png', false, true, false, false, (err, result) => {
-      console.log('results' , result)
+      if(result){
+        this.props.send(result)
+        this.props.close()
+      }
     })
   }
 
@@ -87,7 +90,7 @@ class Sketch extends Component {
                   }}>Clear</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => this.send()} 
+                  onPress={() => this.getBase64()} 
                   style={[styles.sketchBtn, {
                     width: '25%',
                     backgroundColor: Color.primary
