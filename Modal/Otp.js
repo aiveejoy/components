@@ -3,8 +3,7 @@ import styles from './Style.js';
 import {Text, View, TouchableOpacity, TextInput, Picker, Image} from 'react-native';
 import Modal from "react-native-modal";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTimes, faStar } from '@fortawesome/free-solid-svg-icons';
-import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { connect } from 'react-redux';
 import { Color , BasicStyles, Helper, Routes} from 'common';
 import { Spinner } from 'components';
@@ -30,7 +29,9 @@ class Otp extends Component {
         code: null
       }],
       activeIndex: 0,
-      errorMessage: null
+      errorMessage: null,
+      successMessage: null,
+      successFlag: false
     }
   }
 
@@ -65,15 +66,21 @@ class Otp extends Component {
         clause: '='
       }]
     }
-    console.log('otp', parameter)
-    // Api.request(Routes.notificationSettingsRetrieve, parameter, response => {
-    // });
+    console.log('paramter', parameter)
+    this.setState({isLoading: true})
+    Api.request(Routes.notificationSettingsRetrieve, parameter, response => {
+      this.setState({isLoading: false})
+      if(response.data.length > 0){
+        this.setState({errorMessage: null, successFlag: true})
+        this.setState({successMessage: 'Sucessfully Verified'});
+      }else{
+        // blocked account
+        this.setState({successMessage: null, successFlag: false})
+        this.setState({errorMessage: 'Sorry, you are not authorize to proceed the transaction. Please get back after 30 minutes. Or you can email at ' + Helper.APP_EMAIL + ' as well if you want to resolve the account ASAP.'})
+      }
+    });
   }
 
-  close = () => {
-    this.props.action(false)
-  }
-  
   setText = (code, i) => {
     console.log('i', i)
     let otp = this.state.otp.map((item, index) => {
@@ -90,6 +97,37 @@ class Otp extends Component {
       // disabled here
     }
     console.log('state', this.state);
+  }
+
+  _success = () => {
+    const { successMessage } = this.state;
+    return (
+      <View style={[styles.content, {
+        justifyContent: 'center' 
+      }]}>
+        <Text style={{
+          color: Color.primary,
+          textAlign: 'center'
+        }}>
+        {successMessage}
+        </Text>
+      </View>
+    );
+  }
+
+  _blocked = () => {
+    return (
+      <View style={[styles.content, {
+        justifyContent: 'center' 
+      }]}>
+        <Text style={{
+          color: Color.danger,
+          textAlign: 'center'
+        }}>
+        {this.props.error}
+        </Text>
+      </View>
+    );
   }
 
   _otp = () => {
@@ -162,7 +200,7 @@ class Otp extends Component {
           marginTop: 50
           }}>
           <TouchableOpacity
-            onPress={() => this.transfer()} 
+            onPress={() => this.props.onResend()} 
             style={{
               alignItems: 'center',
               justifyContent: 'center',
@@ -185,9 +223,70 @@ class Otp extends Component {
     );
   }
 
+  footerActions = () => {
+    const { successFlag } = this.state;
+    return (
+      <View style={[styles.action, {flexDirection: 'row'}]}>
+        <View style={{
+          width: '50%',
+          alignItems: 'center'
+        }}>
+          <TouchableOpacity 
+            onPress={() => this.props.onCancel()}
+            underlayColor={Color.gray}
+            >
+            <Text style={[styles.text, {
+              color: Color.danger
+            }]}>{this.props.actionLabel.no}</Text>
+          </TouchableOpacity>
+        </View>
 
+        {
+          successFlag == false && (
+            <View style={{
+              width: '50%',
+              alignItems: 'center',
+              borderLeftColor: Color.gray,
+              borderLeftWidth: 1
+            }}>
+              <TouchableOpacity 
+                onPress={() => this.submit()}
+                underlayColor={Color.gray}
+                >
+                <Text style={[styles.text, {
+                  color: Color.primary
+                }]}>{this.props.actionLabel.yes}</Text>
+              </TouchableOpacity>
+            </View>
+          )
+        }
+
+        {
+          successFlag == true && (
+            <View style={{
+              width: '50%',
+              alignItems: 'center',
+              borderLeftColor: Color.gray,
+              borderLeftWidth: 1
+            }}>
+              <TouchableOpacity 
+                onPress={() => this.props.onSuccess()}
+                underlayColor={Color.gray}
+                >
+                <Text style={[styles.text, {
+                  color: Color.primary
+                }]}>Continue</Text>
+              </TouchableOpacity>
+            </View>
+          )
+        }
+        
+      </View>
+
+    );
+  }
   render(){
-    const { isLoading } = this.state;
+    const { isLoading, successFlag, successMessage } = this.state;
     return (
       <View>
         <Modal isVisible={this.props.visible}>
@@ -205,7 +304,7 @@ class Otp extends Component {
                   alignItems: 'flex-end',
                   justifyContent: 'center'
                 }}>
-                  <TouchableOpacity onPress={() => this.close()} style={styles.close}>
+                  <TouchableOpacity onPress={() => this.props.onCancel()} style={styles.close}>
                     <FontAwesomeIcon icon={ faTimes } style={{
                       color: Color.danger
                     }} size={BasicStyles.iconSize} />
@@ -213,39 +312,15 @@ class Otp extends Component {
                 </View>
               </View>
               <View style={styles.content}>
-                {this._otp()}
+                {this.props.blockedFlag == false && successFlag == false && successMessage == null && (this._otp())}
+                {this.props.blockedFlag == true && (this._blocked())}
+                {successFlag == true && successMessage != null && (this._success())}
               </View>
-              <View style={[styles.action, {flexDirection: 'row'}]}>
-                <View style={{
-                  width: '50%',
-                  alignItems: 'center'
-                }}>
-                  <TouchableOpacity 
-                    onPress={() => this.close()}
-                    underlayColor={Color.gray}
-                    >
-                    <Text style={[styles.text, {
-                      color: Color.danger
-                    }]}>{this.props.actionLabel.no}</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={{
-                  width: '50%',
-                  alignItems: 'center',
-                  borderLeftColor: Color.gray,
-                  borderLeftWidth: 1
-                }}>
-                  <TouchableOpacity 
-                    onPress={() => this.submit()}
-                    underlayColor={Color.gray}
-                    >
-                    <Text style={[styles.text, {
-                      color: Color.primary
-                    }]}>{this.props.actionLabel.yes}</Text>
-                  </TouchableOpacity>
-                </View>
-                
-              </View>
+              {
+                this.props.blockedFlag == false && (
+                  this.footerActions()
+                )
+              }
             </View>
           </View>
           {isLoading ? <Spinner mode="overlay"/> : null }
