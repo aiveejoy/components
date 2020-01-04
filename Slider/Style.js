@@ -13,11 +13,10 @@ export default {
     borderBottomWidth: 1
   },
   sectionHeadingStyle: {
-    paddingTop: 150,
+    paddingTop: 50,
     paddingBottom: 10,
-    paddingLeft: 10,
     backgroundColor: Color.secondary,
-    color: Color.white
+    alignItems: 'center'
   },
   footerContainer: {
     padding: 20,

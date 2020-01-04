@@ -3,9 +3,13 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import styles from './Style';
 import {NavigationActions} from 'react-navigation';
-import {ScrollView, Text, View} from 'react-native';
+import {ScrollView, Text, View, Image} from 'react-native';
 import { connect } from 'react-redux';
-import { Helper } from 'common';
+import { Helper, BasicStyles, Color } from 'common';
+import Config from 'src/config.js';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+
 class Slider extends Component {
   constructor(props){
     super(props);
@@ -26,14 +30,48 @@ class Slider extends Component {
   }
 
   render () {
-    const { state } = this.props;
+    const { user } = this.props.state;
     return (
       <View style={styles.container}>
         <ScrollView>
           <View>
-            {state.user != null ? <Text style={styles.sectionHeadingStyle}>
-              Hi {state.user.username}!
-            </Text> : <Text style={styles.sectionHeadingStyle}>
+            {user != null ? (
+                <View style={styles.sectionHeadingStyle}>
+                  {
+                    user.account_profile != null && user.account_profile.url != null && (
+                      <Image
+                        source={{uri: Config.BACKEND_URL  + user.account_profile.url}}
+                        style={[BasicStyles.profileImageSize, {
+                          height: 100,
+                          width: 100,
+                          borderRadius: 50
+                        }]}/>
+                    )
+                  }
+
+                  {
+                    (user.account_profile == null || (user.account_profile != null && user.account_profile.url == null)) && (
+                      <FontAwesomeIcon
+                        icon={faUserCircle}
+                        size={100}
+                        style={{
+                          color: Color.white
+                        }}
+                      />
+                    )
+                  }
+            
+                  <Text  style={{
+                    color: Color.white,
+                    fontWeight: 'bold',
+                    fontSize: 16
+                  }}>
+                    Hi {user.username}!
+                  </Text>
+                </View>
+              ) : <Text style={[styles.sectionHeadingStyle, {
+              paddingTop: 150
+            }]}>
               Welcome to {Helper.company}!
             </Text>}
             {Helper.DrawerMenu.length > 0 &&
