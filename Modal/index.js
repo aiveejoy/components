@@ -121,10 +121,11 @@ class CustomModal extends Component {
           )
         }
         <View style={{
-          marginTop: 20
+          marginTop: 20,
+          paddingLeft: 10
         }}>
           <Text style={{
-            paddingLeft: '5%'
+            paddingLeft: 10
           }}>Select Currency</Text>
           <Picker selectedValue={this.state.currency}
           onValueChange={(currency) => this.setState({currency})}

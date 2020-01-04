@@ -11,11 +11,11 @@ class Slider extends Component {
     super(props);
   }
   navigateToScreen = (route) => {
+    this.props.navigation.toggleDrawer();
     const navigateAction = NavigationActions.navigate({
       routeName: route
     });
     this.props.navigation.dispatch(navigateAction);
-    this.props.navigation.toggleDrawer();
   }
 
   logoutAction(){

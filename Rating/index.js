@@ -26,7 +26,8 @@ class Rating extends Component {
     return (
       <View style={{flexDirection: 'row', marginBottom: 10}}>
         <Text style={{
-          color: Color.normalGray
+          color: Color.normalGray,
+          lineHeight: BasicStyles.iconSize
         }}>Ratings </Text>
         {
           stars
