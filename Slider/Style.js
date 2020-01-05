@@ -15,7 +15,7 @@ export default {
   sectionHeadingStyle: {
     paddingTop: 50,
     paddingBottom: 10,
-    backgroundColor: Color.secondary,
+    backgroundColor: Color.primary,
     alignItems: 'center'
   },
   footerContainer: {

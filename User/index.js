@@ -27,7 +27,7 @@ class UserImage extends Component{
               icon={faUserCircle}
               size={BasicStyles.profileIconSize}
               style={{
-                color: Color.primary
+                color: this.props.color ? this.props.color : Color.primary
               }}
             />
           )
