@@ -31,8 +31,10 @@ class Otp extends Component {
       activeIndex: 0,
       errorMessage: null,
       successMessage: null,
-      successFlag: false
+      successFlag: false,
+      otpTextInput: []
     }
+    this.otpTextInput = []
   }
 
   submit = () => {
@@ -42,7 +44,7 @@ class Otp extends Component {
     })
     for (var i = 0; i < 6; i++) {
       let item = this.state.otp[i]
-      if(item.code == null){
+      if(item.code == null || item.code == ''){
         this.setState({
           errorMessage: 'Incomplete Code'
         })
@@ -90,8 +92,9 @@ class Otp extends Component {
       return item
     })
     this.setState({otp: otp})
-    if(i < 6){
+    if(i < 5 && (otp[i].code != null || otp[i].code != '')){
       let newIndex = parseInt(i + 1)
+      this.otpTextInput[i + 1].focus();
       this.setState({activeIndex: newIndex})
     }else{
       // disabled here
@@ -148,10 +151,12 @@ class Otp extends Component {
           }}
           onChangeText={(code) => this.setText(code, i)}
           value={this.state.otp[i].code}
+          maxLength={1}
           placeholder={'0'}
           keyboardType={'numeric'}
           key={i}
           autoFocus={this.state.activeIndex == i}
+          ref={ref => this.otpTextInput[i] = ref}
         />
       );
     }
@@ -164,16 +169,19 @@ class Otp extends Component {
           this.state.errorMessage != null && (
             <View style={{
               alignItems: 'center',
-              paddingTop: 20
+              paddingBottom: 20
             }}>
               <Text style={{
-                color: Color.danger
+                color: Color.danger,
+                textAlign: 'center' 
               }}>Opps! {this.state.errorMessage}</Text>
             </View>
           )
         }
         <View>
-          <Text>
+          <Text style={{
+            textAlign: 'center' 
+          }}>
             Please enter the OTP Code sent to your email address.
           </Text>
         </View>
@@ -190,14 +198,16 @@ class Otp extends Component {
         <View style={{
           marginTop: 50
         }}>
-          <Text>
-            Didn't received an email? Click the link below.
+          <Text style={{
+            textAlign: 'center' 
+          }}>
+            Didn't received an email? Click the button below.
           </Text>
         </View>
         <View style={{
           flexDirection: 'row',
           justifyContent: 'center',
-          marginTop: 50
+          marginTop: 10
           }}>
           <TouchableOpacity
             onPress={() => this.props.onResend()} 
@@ -206,15 +216,14 @@ class Otp extends Component {
               justifyContent: 'center',
               height: 40,
               borderRadius: 5,
-              color: Color.primary,
               backgroundColor: Color.white,
-              borderColor: Color.primary,
+              borderColor: Color.danger,
               borderWidth: 1,
               width: '50%'
             }}
             >
             <Text style={{
-              color: Color.primary,
+              color: Color.danger,
               textAlign: 'center'
             }}>Resend</Text>
           </TouchableOpacity>

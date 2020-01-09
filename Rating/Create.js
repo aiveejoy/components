@@ -3,7 +3,7 @@ import styles from './ModalStyle.js';
 import {Text, View, TouchableOpacity, TextInput, Picker, Image} from 'react-native';
 import Modal from "react-native-modal";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTimes, faStar } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faStar, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';
 import { connect } from 'react-redux';
 import { Color , BasicStyles, Helper, Routes} from 'common';
@@ -68,14 +68,30 @@ class CreateRating extends Component {
         <View style={{
           alignItems: 'center'
         }}>
-          <Image
-            source={{uri: Config.BACKEND_URL  + messengerGroup.title.profile.url}}
-            style={{
-              height: 100,
-              width: 100,
-              borderRadius: 50
-            }}/>
-          <Text style={{
+        {
+          messengerGroup.title.profile != null && messengerGroup.title.profile.url != null && (
+            <Image
+              source={{uri: Config.BACKEND_URL  + messengerGroup.title.profile.url}}
+              style={{
+                height: 100,
+                width: 100,
+                borderRadius: 50
+              }}/>
+          )
+        }
+        {
+          (messengerGroup.title.profile == null || (messengerGroup.title.profile != null && messengerGroup.title.profile.url == null)) && (
+            <FontAwesomeIcon
+              icon={faUserCircle}
+              size={100}
+              style={{
+                color: this.props.color ? this.props.color : Color.primary
+              }}
+            />
+          )
+        }
+          
+        <Text style={{
             lineHeight: 30,
             paddingLeft: 10,
             fontWeight: 'bold',
