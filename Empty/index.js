@@ -49,7 +49,7 @@ class Empty extends Component{
                   color: Color.primary,
                   fontSize: 11,
                   textAlign: 'center'
-                }}>Transfer</Text>
+                }}>Reload</Text>
               </TouchableOpacity>
             )
           }

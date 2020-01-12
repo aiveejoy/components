@@ -15,9 +15,10 @@ class Rating extends Component {
       stars.push(
         <FontAwesomeIcon
         icon={(ratings.stars > i) ? faStar : faStarRegular}
-        size={BasicStyles.iconSize}
+        size={20}
         style={{
-          color: Color.warning
+          color: Color.warning,
+          marginTop: 5
         }}
         key={i}
         />
@@ -27,8 +28,9 @@ class Rating extends Component {
       <View style={{flexDirection: 'row', marginBottom: 10}}>
         <Text style={{
           color: Color.normalGray,
-          lineHeight: BasicStyles.iconSize
-        }}>Ratings </Text>
+          lineHeight: 30,
+          fontSize: 12
+        }}>Ratings ({ratings.size})</Text>
         {
           stars
         }
