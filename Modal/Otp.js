@@ -163,7 +163,8 @@ class Otp extends Component {
     return (
       <View style={{
         paddingLeft: 10,
-        paddingTop: 50
+        paddingTop: 50,
+        paddingRight: 10
       }}>
         {
           this.state.errorMessage != null && (
@@ -173,7 +174,7 @@ class Otp extends Component {
             }}>
               <Text style={{
                 color: Color.danger,
-                textAlign: 'center' 
+                textAlign: 'center'
               }}>Opps! {this.state.errorMessage}</Text>
             </View>
           )
