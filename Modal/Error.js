@@ -28,7 +28,7 @@ class ErrorModal extends Component {
                   <Text style={[styles.text, {
                     color: Color.primaryDark,
                     fontWeight: 'bold' 
-                  }]}>Sorry for Inconvenience!</Text>
+                  }]}>{this.props.title ? this.props.title : 'Sorry for Inconvenience!'}</Text>
                 </View>
                 <View style={{
                   width: '30%',
@@ -51,7 +51,9 @@ class ErrorModal extends Component {
                   color: Color.primaryDark,
                   textAlign: 'center'
                 }}>
-                  We are working hard to minimize this to happen again. Please refresh your page.
+                {
+                  this.props.message ? this.props.message : 'We are working hard to minimize this to happen again. Please refresh your page.'
+                }
                 </Text>
               </View>
             </View>
