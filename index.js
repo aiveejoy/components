@@ -6,6 +6,7 @@ import Rating from './Rating';
 import LocationAutoComplete from './Location';
 import Empty from './Empty';
 import UserImage from './User';
+import Tutorial from './Tutorial';
 export {
   Spinner,
   CustomModal,
@@ -13,5 +14,6 @@ export {
   Rating,
   LocationAutoComplete,
   Empty,
-  UserImage
+  UserImage,
+  Tutorial
 }
