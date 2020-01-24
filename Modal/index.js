@@ -64,6 +64,12 @@ class CustomModal extends Component {
     const { data } = this.props;
     const { userLedger } = this.props.state;
     const { currency, charge} = this.state;
+    if(parseInt(charge) < 10){
+      this.setState({
+        errorMessage: 'Charge should not be 0 and must be greater than 10'
+      })
+      return
+    }
     if(data != null && data.type < 101){
       if(data.type == 3){
         if(data.amount > userLedger.amount){
@@ -94,7 +100,9 @@ class CustomModal extends Component {
           errorMessage != null && (
             <View style={{
               alignItems: 'center',
-              paddingTop: 20
+              paddingTop: 20,
+              paddingLeft: 10,
+              paddingRight: 10
             }}>
               <Text style={{
                 color: Color.danger

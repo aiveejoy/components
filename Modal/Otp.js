@@ -92,7 +92,7 @@ class Otp extends Component {
       return item
     })
     this.setState({otp: otp})
-    if(i < 5 && (otp[i].code != null || otp[i].code != '')){
+    if(i < 5 && (otp[i].code != null && otp[i].code != '')){
       let newIndex = parseInt(i + 1)
       this.otpTextInput[i + 1].focus();
       this.setState({activeIndex: newIndex})
