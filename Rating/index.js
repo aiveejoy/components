@@ -30,7 +30,7 @@ class Rating extends Component {
           color: Color.normalGray,
           lineHeight: 30,
           fontSize: 12
-        }}>Ratings ({ratings.size})</Text>
+        }}>Ratings</Text>
         {
           stars
         }
