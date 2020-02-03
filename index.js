@@ -7,6 +7,7 @@ import LocationAutoComplete from './Location';
 import Empty from './Empty';
 import UserImage from './User';
 import Tutorial from './Tutorial';
+import ImageUpload from './Image';
 export {
   Spinner,
   CustomModal,
@@ -15,5 +16,6 @@ export {
   LocationAutoComplete,
   Empty,
   UserImage,
-  Tutorial
+  Tutorial,
+  ImageUpload
 }

@@ -159,7 +159,7 @@ class CustomModal extends Component {
           <TextInput
             style={BasicStyles.formControlModal}
             onChangeText={(charge) => this.setState({charge})}
-            value={this.state.charge}
+            value={`${this.state.charge}`}
             placeholder={'0'}
             keyboardType={'numeric'}
             maxLength={4}
