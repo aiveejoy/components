@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
 })
 
 Spinner.defaultProps = {
-  color: Color.secondary,
+  color: Color.gray,
   size: 'large',
   mode: Mode.normal,
 }
