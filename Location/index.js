@@ -1,13 +1,21 @@
 import React, { Component } from 'react';
-import { View, Text, ToastAndroid } from 'react-native';
+import { View, Text, ToastAndroid, TouchableOpacity } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import Config from 'src/config.js';
-import { Color } from 'common';
+import { Color, Routes } from 'common';
 import Style from './Style.js';
 import { connect } from 'react-redux';
+import Api from 'services/api/index.js';
+import { Spinner } from 'components';
 class LocationAutoComplete extends Component{
   constructor(props){
     super(props);
+    this.state = {
+      errorMessage: null,
+      isLoading: false
+    }
   }
 
   componentDidMount(){
@@ -15,12 +23,32 @@ class LocationAutoComplete extends Component{
     setLocation(null);
   }
 
+  checkLocation(location){
+    let parameter = {
+      condition: [{
+        column: 'locality',
+        clause: '=',
+        value: location.locality
+      }]
+    }
+    this.setState({errorMessage: null, isLoading: true})
+    Api.request(Routes.investorLocationsRetrieve, parameter, response => {
+      this.setState({isLoading: false})
+      if(response.data.length > 0){
+        const { setLocation } = this.props;
+        setLocation(location)
+        this.props.navigation.navigate('createRequestStack')
+      }else{
+        this.setState({ errorMessage: 'Location is not allowed!'})
+      }
+    })
+  }
+
   manageLocation = (data) => {
     let address = data.address_components;
     if(address.length < 5){
       ToastAndroid.show('Please be specific with the address', ToastAndroid.LONG);
     }else{
-      const { setLocation } = this.props;
       let geometry = data.geometry;
       let location = {
         route: address[0].long_name,
@@ -30,14 +58,49 @@ class LocationAutoComplete extends Component{
         latitude: geometry.location.lat,
         longitude: geometry.location.lng
       }
-      setLocation(location)
-      this.props.navigation.navigate('createRequestStack')
+      this.checkLocation(location)
     }
   }
+
+  clearLocation = () => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.GooglePlacesRef.setAddressText('');
+          this.setState({errorMessage: null})
+      }}>
+        <FontAwesomeIcon 
+          icon={faTimes}
+          size={20}
+          style={{
+            color: Color.gray,
+            marginTop: 15,
+            marginRight: 10
+          }}
+        />
+      </TouchableOpacity>
+    );
+  }
   render() {
+    const { isLoading } = this.state;
     return (
       <View style={Style.MainContainer}>
+        {
+          this.state.errorMessage != null && (
+            <View style={{
+              paddingLeft: 20,
+              paddingRight: 20
+            }}>
+              <Text style={{
+                color: Color.danger,
+                lineHeight: 50
+              }}>Opps! {this.state.errorMessage}</Text>
+            </View> 
+          ) 
+        }
         <GooglePlacesAutocomplete
+          ref={(instance) => { this.GooglePlacesRef = instance }}
+          renderRightButton={() => this.clearLocation()}
           placeholder='Find location'
           minLength={2} // minimum length of text to search
           autoFocus={false}
@@ -106,6 +169,8 @@ class LocationAutoComplete extends Component{
 
           debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
         />
+
+        {isLoading ? <Spinner mode="overlay"/> : null }
       </View>
     );
   }
