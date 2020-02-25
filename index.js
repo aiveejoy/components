@@ -8,6 +8,7 @@ import Empty from './Empty';
 import UserImage from './User';
 import Tutorial from './Tutorial';
 import ImageUpload from './Image';
+import SystemNotification from './SystemNotification'
 export {
   Spinner,
   CustomModal,
@@ -17,5 +18,6 @@ export {
   Empty,
   UserImage,
   Tutorial,
-  ImageUpload
+  ImageUpload,
+  SystemNotification
 }
