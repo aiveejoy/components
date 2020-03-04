@@ -147,7 +147,8 @@ class Otp extends Component {
             fontSize: 16,
             textAlign: 'center',
             borderRadius: 5,
-            marginRight: 2
+            marginRight: 2,
+            height: 50
           }}
           onChangeText={(code) => this.setText(code, i)}
           value={this.state.otp[i].code}

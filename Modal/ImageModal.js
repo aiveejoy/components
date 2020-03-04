@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import styles from './Style.js';
-import { View, TouchableOpacity, Image} from 'react-native';
+import { View, TouchableOpacity, Image, Platform} from 'react-native';
 import Modal from "react-native-modal";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -14,6 +14,11 @@ import Config from 'src/config.js';
 class ImageModal extends Component {
   constructor(props){
     super(props);
+  }
+
+  action = () => {
+    console.log('hi')
+    this.props.action()
   }
 
   render(){
@@ -32,9 +37,12 @@ class ImageModal extends Component {
                 width: '100%',
                 alignItems: 'flex-end',
                 justifyContent: 'center',
-                height: 50
+                height: 50,
+                marginTop: Platform == 'android' ? 0 : 20,
+                marginRight: Platform == 'android' ? 0 : 20,
               }}>
-                <TouchableOpacity onPress={() => this.props.action()} style={styles.close}>
+                <TouchableOpacity onPress={() => this.action()} style={[styles.close, {
+                }]}>
                   <FontAwesomeIcon icon={ faTimes } style={{
                     color: Color.white
                   }} size={BasicStyles.iconSize} />
