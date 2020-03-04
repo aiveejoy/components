@@ -41,7 +41,7 @@ const LocationStack = createStackNavigator({
     screen: LocationAutoComplete, 
     navigationOptions: ({ navigation }) => ({
       title: 'Add Location',
-      // headerLeft: <HeaderOptions navigationProps={navigation} />,
+      headerLeft: <HeaderOptions navigationProps={navigation} />,
       drawerLabel: 'Add Location',
       headerStyle: {
         backgroundColor: Color.primary,
