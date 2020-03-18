@@ -79,6 +79,7 @@ class ImageUpload extends Component {
         });
         formData.append('file_url', response.fileName);
         formData.append('account_id', user.id);
+        console.log(formData)
         Api.upload(Routes.imageUpload, formData, imageResponse => {
           this.retrieve()
         })
