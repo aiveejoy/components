@@ -12,7 +12,13 @@ class HeaderOptions extends Component {
     super(props);
   }
   back = () => {
-    this.props.navigationProps.navigate('createRequestStack');
+    const { setPreviousRoute } = this.props;
+    const { previousRoute } = this.props.state;
+    if(previousRoute == null){
+      return
+    }
+    setPreviousRoute(null)
+    this.props.navigationProps.navigate(previousRoute);
   };
   render() {
     return (
@@ -25,23 +31,29 @@ class HeaderOptions extends Component {
     );
   }
 }
-
-
+ 
 const mapStateToProps = state => ({ state: state });
 
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    logout: () => dispatch(actions.logout())
+    logout: () => dispatch(actions.logout()),
+    setPreviousRoute: (previousRoute) => dispatch(actions.setPreviousRoute(previousRoute))
   };
 };
+
+
+let HeaderOptionsState = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HeaderOptions);
 
 const LocationStack = createStackNavigator({
   locationScreen: {
     screen: LocationAutoComplete, 
     navigationOptions: ({ navigation }) => ({
       title: 'Add Location',
-      headerLeft: <HeaderOptions navigationProps={navigation} />,
+      headerLeft: <HeaderOptionsState navigationProps={navigation} />,
       drawerLabel: 'Add Location',
       headerStyle: {
         backgroundColor: Color.primary,
