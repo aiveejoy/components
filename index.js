@@ -9,6 +9,7 @@ import UserImage from './User';
 import Tutorial from './Tutorial';
 import ImageUpload from './Image';
 import SystemNotification from './SystemNotification'
+import GooglePlacesAutoComplete from './Location/GooglePlacesAutoComplete.js'
 export {
   Spinner,
   CustomModal,
@@ -19,5 +20,6 @@ export {
   UserImage,
   Tutorial,
   ImageUpload,
-  SystemNotification
+  SystemNotification,
+  GooglePlacesAutoComplete
 }
