@@ -147,6 +147,7 @@ class LocationAutoComplete extends Component{
             onChangeText={(searchValue) => {
               this.setState({searchValue})
               this.getPlaces(searchValue)
+              this.props.onChange()
             }}
             value={this.state.searchValue}
             placeholder={placeholder ? placeholder : 'Type location'}
