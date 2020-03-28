@@ -138,7 +138,7 @@ class LocationAutoComplete extends Component{
     return (
       <View style={[Style.MainContainer, {
         position: 'relative',
-        zIndex: 2,
+        zIndex: this.props.zIndex ? this.props.zIndex : 2,
         backgroundColor: Color.white
       }]}>
         <View>
@@ -186,7 +186,7 @@ class LocationAutoComplete extends Component{
           results != null && (
             <View style={{
               position: 'absolute',
-              zIndex: 2,
+              zIndex: this.props.zIndex ? this.props.zIndex : 2,
               top: 50,
               left: 0
             }}>
