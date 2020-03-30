@@ -92,7 +92,8 @@ class LocationAutoComplete extends Component{
     return (
       <View style={{
         backgroundColor: Color.white,
-        width: '100%'
+        width: '100%',
+        marginBottom: 50
       }}>
         <FlatList
           style={{
