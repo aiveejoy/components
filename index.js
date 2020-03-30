@@ -10,6 +10,7 @@ import Tutorial from './Tutorial';
 import ImageUpload from './Image';
 import SystemNotification from './SystemNotification'
 import GooglePlacesAutoComplete from './Location/GooglePlacesAutoComplete.js'
+import DateTime from './DateTime'
 export {
   Spinner,
   CustomModal,
@@ -21,5 +22,6 @@ export {
   Tutorial,
   ImageUpload,
   SystemNotification,
-  GooglePlacesAutoComplete
+  GooglePlacesAutoComplete,
+  DateTime
 }
