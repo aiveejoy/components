@@ -109,7 +109,9 @@ class LocationAutoComplete extends Component{
               paddingTop: 5,
               paddingBottom: 5,
               backgroundColor: Color.white,
-              width: '100%'
+              width: '100%',
+              position: 'relative',
+              zIndex: 5
             }}>
               <TouchableHighlight
                 onPress={() => {this.setSelectedItem(item)}}
