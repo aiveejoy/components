@@ -93,11 +93,15 @@ class LocationAutoComplete extends Component{
       <View style={{
         backgroundColor: Color.white,
         width: '100%',
-        marginBottom: 50
+        marginBottom: 50,
+        position: 'relative',
+        zIndex: this.props.zIndex ? this.props.zIndex + 5 : 5
       }}>
         <FlatList
           style={{
-            backgroundColor: Color.white
+            backgroundColor: Color.white,
+            position: 'relative',
+            zIndex: this.props.zIndex ? this.props.zIndex + 5 : 5
           }}
           data={results}
           extraData={selected}
@@ -110,8 +114,7 @@ class LocationAutoComplete extends Component{
               paddingBottom: 5,
               backgroundColor: Color.white,
               width: '100%',
-              position: 'relative',
-              zIndex: 5
+              marginBottom: ((results.length - 1) == index) ? 100 : 0
             }}>
               <TouchableHighlight
                 onPress={() => {this.setSelectedItem(item)}}
