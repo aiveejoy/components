@@ -11,6 +11,7 @@ import ImageUpload from './Image';
 import SystemNotification from './SystemNotification'
 import GooglePlacesAutoComplete from './Location/GooglePlacesAutoComplete.js'
 import DateTime from './DateTime'
+import Confirmation from './Confirmation'
 export {
   Spinner,
   CustomModal,
@@ -23,5 +24,6 @@ export {
   ImageUpload,
   SystemNotification,
   GooglePlacesAutoComplete,
-  DateTime
+  DateTime,
+  Confirmation
 }
