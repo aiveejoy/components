@@ -89,7 +89,7 @@ class Confirmation extends Component {
                   color: Color.primaryDark,
                   textAlign: 'center'
                 }}>
-                Are you sure you want to continue?
+                 {this.props.message ? this.props.message : 'Are you sure you want to continue?'}
                 </Text>
               </View>
               {
