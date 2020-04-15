@@ -95,42 +95,43 @@ class LocationAutoComplete extends Component{
         width: '100%',
         marginBottom: 50,
         position: 'relative',
-        zIndex: this.props.zIndex ? this.props.zIndex + 5 : 5
+        zIndex: this.props.zIndex ? this.props.zIndex + 9 : 5
       }}>
         <FlatList
           style={{
             backgroundColor: Color.white,
             position: 'relative',
-            zIndex: this.props.zIndex ? this.props.zIndex + 5 : 5
+            zIndex: this.props.zIndex ? this.props.zIndex + 10 : 5
           }}
           data={results}
           extraData={selected}
           ItemSeparatorComponent={this.FlatListItemSeparator}
           renderItem={({ item, index }) => (
-            <View style={{
-              borderBottomWidth: 1,
-              borderBottomColor: Color.gray,
-              paddingTop: 5,
-              paddingBottom: 5,
-              backgroundColor: Color.white,
-              width: '100%',
-              marginBottom: ((results.length - 1) == index) ? 100 : 0
-            }}>
-              <TouchableHighlight
-                onPress={() => {this.setSelectedItem(item)}}
-                underlayColor={Color.gray}
-                >
-                <View style={Style.TextContainer}>
-                  <Text
-                    style={[BasicStyles.titleText, {
-                      paddingTop: 10,
-                      color: Color.darkGray
-                    }]}>
-                    {item.name + ',' + item.formatted_address}
-                  </Text>                  
-                </View>
-              </TouchableHighlight>
-            </View>
+            <TouchableHighlight
+              onPress={() => {this.setSelectedItem(item)}}
+              underlayColor={Color.gray}
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: Color.gray,
+                paddingTop: 5,
+                paddingBottom: 5,
+                backgroundColor: Color.white,
+                width: '100%',
+                marginBottom: ((results.length - 1) == index) ? 100 : 0,
+                position: 'relative',
+                zIndex: this.props.zIndex ? this.props.zIndex + 15 : 5
+              }}
+              >
+              <View style={Style.TextContainer}>
+                <Text
+                  style={[BasicStyles.titleText, {
+                    paddingTop: 10,
+                    color: Color.darkGray
+                  }]}>
+                  {item.name + ',' + item.formatted_address}
+                </Text>                  
+              </View>
+            </TouchableHighlight>
           )}
           keyExtractor={(item, index) => index.toString()}
         />
@@ -144,12 +145,17 @@ class LocationAutoComplete extends Component{
     return (
       <View style={[Style.MainContainer, {
         position: 'relative',
-        zIndex: this.props.zIndex ? this.props.zIndex : 2,
-        backgroundColor: Color.white
+        zIndex: this.props.zIndex ? this.props.zIndex + 3 : 2,
+        minHeight: 50
       }]}>
-        <View>
+        <View style={{
+          position: 'relative'
+        }}>
           <TextInput
-            style={BasicStyles.formControlCreate}
+            style={[BasicStyles.formControlCreate, {
+              backgroundColor: Color.white,
+              marginBottom: 0
+            }]}
             onChangeText={(searchValue) => {
               this.setState({searchValue})
               this.getPlaces(searchValue)
@@ -191,9 +197,8 @@ class LocationAutoComplete extends Component{
         {
           results != null && (
             <View style={{
-              position: 'absolute',
-              zIndex: this.props.zIndex ? this.props.zIndex : 2,
-              top: 50,
+              position: 'relative',
+              zIndex: this.props.zIndex ? this.props.zIndex + 6 : 2,
               left: 0
             }}>
               {this._showResults()}

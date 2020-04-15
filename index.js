@@ -10,6 +10,7 @@ import Tutorial from './Tutorial';
 import ImageUpload from './Image';
 import SystemNotification from './SystemNotification'
 import GooglePlacesAutoComplete from './Location/GooglePlacesAutoComplete.js'
+import GooglePlacesAutoCompleteWithMap from './Location/GooglePlacesAutoCompleteWithMap.js'
 import DateTime from './DateTime'
 import Confirmation from './Confirmation'
 export {
@@ -24,6 +25,7 @@ export {
   ImageUpload,
   SystemNotification,
   GooglePlacesAutoComplete,
+  GooglePlacesAutoCompleteWithMap,
   DateTime,
   Confirmation
 }
