@@ -10,7 +10,6 @@ import MapView, { PROVIDER_GOOGLE, Marker,Callout } from 'react-native-maps';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMapMarker } from '@fortawesome/free-solid-svg-icons';
 import Geolocation from '@react-native-community/geolocation';
-import Geocoder from 'react-native-geocoder';
 class GooglePlacesAutoCompleteWithMap extends Component {
   constructor(props) {
     super(props);
