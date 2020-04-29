@@ -15,6 +15,8 @@ class Slider extends Component {
     super(props);
   }
   navigateToScreen = (route) => {
+    const { setActiveRoute } = this.props;
+    setActiveRoute(null)
     this.props.navigation.toggleDrawer();
     const navigateAction = NavigationActions.navigate({
       routeName: route
@@ -24,8 +26,9 @@ class Slider extends Component {
 
   logoutAction(){
     //clear storage
-    const { logout } = this.props;
+    const { logout, setActiveRoute } = this.props;
     logout();
+    setActiveRoute(null)
     this.props.navigation.navigate('loginStack');
   }
 
@@ -108,7 +111,8 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    logout: () => dispatch(actions.logout())
+    logout: () => dispatch(actions.logout()),
+    setActiveRoute: (route) => dispatch(actions.setActiveRoute(route))
   };
 };
 
