@@ -15,20 +15,20 @@ class Slider extends Component {
     super(props);
   }
   navigateToScreen = (route) => {
-    const { setActiveRoute } = this.props;
-    setActiveRoute(null)
     this.props.navigation.toggleDrawer();
     const navigateAction = NavigationActions.navigate({
       routeName: route
     });
     this.props.navigation.dispatch(navigateAction);
+    // const { setActiveRoute } = this.props;
+    // setActiveRoute(null)
   }
 
   logoutAction(){
     //clear storage
     const { logout, setActiveRoute } = this.props;
     logout();
-    setActiveRoute(null)
+    // setActiveRoute(null)
     this.props.navigation.navigate('loginStack');
   }
 
