@@ -31,7 +31,7 @@ class Empty extends Component{
             paddingBottom: 50,
             paddingTop: 10,
             fontWeight: 'bold'
-          }}>No activity for a moment!</Text>
+          }}>No activity at the moment!</Text>
 
           {
             this.props.refresh == true && (
