@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View,StyleSheet,AppRegistry,Text, Modal, TouchableOpacity} from 'react-native';
 import { Routes, Color, BasicStyles} from 'common';
-import QRCode from 'react-native-qrcode-svg';
 import GooglePlacesAutoComplete from './GooglePlacesAutoComplete.js'
 import Api from 'services/api/index.js';
 import Style from './Style.js';
