@@ -8,8 +8,6 @@ import Empty from './Empty';
 import UserImage from './User';
 import Tutorial from './Tutorial';
 import ImageUpload from './Image';
-<<<<<<< HEAD
-import SystemNotification from './SystemNotification'
 import GooglePlacesAutoComplete from './Location/GooglePlacesAutoComplete.js'
 import GooglePlacesAutoCompleteWithMap from './Location/GooglePlacesAutoCompleteWithMap.js'
 import DateTime from './DateTime'
