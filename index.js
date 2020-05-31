@@ -15,6 +15,7 @@ import Confirmation from './Confirmation'
 import SystemNotification from './SystemNotification';
 import Marketplace from './Marketplace';
 import Product from './Marketplace/Product.js';
+import Checkout from './Marketplace/Checkout.js';
 export {
   Spinner,
   CustomModal,
@@ -31,5 +32,6 @@ export {
   DateTime,
   Confirmation,
   Marketplace,
-  Product
+  Product,
+  Checkout
 }

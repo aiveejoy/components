@@ -19,17 +19,7 @@ class Product extends Component{
     this.state = {
       selected: null,
       isLoading: false,
-      toggle: false,
-      options: [{
-        title: 'POST TO REQUEST',
-        description: 'LET OUR PARTNERS PAY FOR YOU, THEN PAY THEM LATER'
-      }, {
-        title: 'PROCEED WITH INSTALLMENT',
-        description: 'AGREE THE TERMS OF THE SELLER'
-      }, {
-        title: 'PROCEED TO CHECKOUT',
-        description: 'PURCHASE ITEM(S) DIRECTLY'
-      }]
+      toggle: false
     }
   }
 
@@ -39,15 +29,19 @@ class Product extends Component{
     );
   };
 
-  setAction = (index) => {
-    switch(index){
-      case 0: //post to request
-      break;
-      case 1: // proceed with installments
-      break;
-      case 2: // direct checkout
-      break;
-    }
+  setAction = (index, item) => {
+    const navigateAction = NavigationActions.navigate({
+      routeName: item.route
+    });
+    this.props.navigation.dispatch(navigateAction);
+    // switch(index){
+    //   case 0: // post to request
+    //   break;
+    //   case 1: // proceed with installments
+    //   break;
+    //   case 2: // direct checkout
+    //   break;
+    // }
   }
 
   _menu = () => {
@@ -68,7 +62,7 @@ class Product extends Component{
           marginBottom: 20
         }}>
         {
-          options.map((item, index) => {
+          Helper.checkoutOptions.map((item, index) => {
             return (
               <TouchableHighlight style={{
                 height: 60,
@@ -82,7 +76,7 @@ class Product extends Component{
                 borderBottomWidth: index < 2 ? 2 : 0,
                 borderBottomColor: Color.white
               }}
-                onPress={() => {this.setAction(index)}}
+                onPress={() => {this.setAction(index, item)}}
                 underlayColor={Color.gray}
                   >
                   <View style={{
