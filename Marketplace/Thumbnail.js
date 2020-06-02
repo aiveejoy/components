@@ -51,14 +51,20 @@ class Thumbnail extends Component{
         }}>
           <Text style={{
             fontWeight: 'bold',
-            width: '70%',
-            color: Color.primary
+            width: '100%'
           }}
             numberOfLines={1}
           >{item.title}</Text>
+        </View>
+
+        <View style={{
+          paddingLeft: 10,
+          paddingRight: 10,
+          paddingTop: 10,
+          paddingBottom: 10
+        }}>
           <Text style={{
-            width: '30%',
-            textAlign: 'right',
+            textAlign: 'left',
             fontWeight: 'bold',
             color: Color.primary
           }}
@@ -69,19 +75,6 @@ class Thumbnail extends Component{
               item.price[0].currency + ' ' + item.price[item.price.length - 1].price + '-' + item.price[0].price
             }
           </Text>
-        </View>
-
-        <View style={{
-          paddingLeft: 10,
-          paddingRight: 10,
-          paddingTop: 10,
-          paddingBottom: 10
-        }}>
-        <Text numberOfLines={1}>
-          {
-            item.description
-          }
-        </Text>
         </View>
       </View>
     );

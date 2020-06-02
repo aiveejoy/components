@@ -41,6 +41,14 @@ class Checkout extends Component{
     );
   };
 
+
+  navigate = (route) => {
+    const navigateAction = NavigationActions.navigate({
+      routeName: route
+    });
+    this.props.navigation.dispatch(navigateAction);
+  }
+
   _floatButton = () => {
     const { product } = this.props.state;
     return(
@@ -209,7 +217,7 @@ class Checkout extends Component{
                     </View>
                   </View>
 
-                  <Billing />
+                  <Billing onEdit={(route) => this.navigate(route)}/>
 
                   <PaymentMethod />
 

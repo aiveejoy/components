@@ -22,10 +22,6 @@ class Billing extends Component{
   componentDidMount(){
   }
 
-  editBilling(){
-
-  }
-
   render() {
     return(
       <View style={{
@@ -48,7 +44,7 @@ class Billing extends Component{
             }}
 
             onPress={() => {
-              this.editBilling()
+              this.props.onEdit('Billing')
             }}
 
             underlayColor={Color.white}
