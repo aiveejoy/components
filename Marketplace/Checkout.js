@@ -13,7 +13,7 @@ import Billing from './Billing.js';
 import PaymentMethod from './PaymentMethod.js';
 import { WebView } from 'react-native-webview';
 import Currency from 'services/Currency.js';
-
+import Installment from './Installment.js';
 const height = Math.round(Dimensions.get('window').height);
 class Checkout extends Component{
   constructor(props){
@@ -27,12 +27,6 @@ class Checkout extends Component{
       shippingFee: 150,
       currency: 'PHP'
     }
-  }
-
-  componentDidMount(){
-    this.setState({
-      total: this.state.price + this.state.shippingFee
-    })
   }
 
   FlatListItemSeparator = () => {
@@ -81,9 +75,9 @@ class Checkout extends Component{
               <Text style={{
                 fontWeight: 'bold',
                 color: Color.white
-              }}>
+              }}> 
               {
-                Currency.display(this.state.total, this.state.currency)
+                'TOTAL ' + Currency.display(product.price[0].price, this.state.currency)
               }
               </Text>
               <Text style={{
@@ -100,6 +94,7 @@ class Checkout extends Component{
   }
 
   _summary = () => {
+    const { product } = this.props.state;
     return (
       <View style={{
         borderTopWidth: 1,
@@ -133,7 +128,7 @@ class Checkout extends Component{
               textAlign: 'right'
             }}>
               {
-                Currency.display(this.state.price, this.state.currency)
+                Currency.display(product.price[0].price, this.state.currency)
               }
             </Text>
           </View>
@@ -205,15 +200,20 @@ class Checkout extends Component{
                       <Text style={{
                         fontWeight: 'bold',
                         paddingTop: 10,
-                        paddingBottom: 10
+                        paddingBottom: 5
                       }}
                       numberOfLines={1}
                       >{product.title}</Text>
                       <Text>
                         {
-                          Currency.display(this.state.price, this.state.currency)
+                          Currency.display(product.price[0].price, this.state.currency)
                         }
                       </Text>
+                      {
+                        product.installment != null && (
+                          <Installment data={product}/>
+                        )
+                      }
                     </View>
                   </View>
 

@@ -10,6 +10,7 @@ import { faImage } from '@fortawesome/free-solid-svg-icons';
 import { Dimensions } from 'react-native';
 import Config from 'src/config.js';
 import Currency from 'services/Currency.js';
+import Installment from './Installment.js';
 const height = Math.round(Dimensions.get('window').height);
 class Thumbnail extends Component{
   constructor(props){
@@ -44,24 +45,12 @@ class Thumbnail extends Component{
             </View>
           )
         }
-        <View style={{
-          flexDirection: 'row',
-          paddingRight: 10,
-          paddingLeft: 10
-        }}>
-          <Text style={{
-            fontWeight: 'bold',
-            width: '100%'
-          }}
-            numberOfLines={1}
-          >{item.title}</Text>
-        </View>
 
         <View style={{
           paddingLeft: 10,
           paddingRight: 10,
-          paddingTop: 10,
-          paddingBottom: 10
+          paddingTop: 5,
+          paddingBottom: 5
         }}>
           <Text style={{
             textAlign: 'left',
@@ -75,6 +64,19 @@ class Thumbnail extends Component{
               item.price[0].currency + ' ' + item.price[item.price.length - 1].price + '-' + item.price[0].price
             }
           </Text>
+
+          <Text style={{
+            fontWeight: 'bold',
+            width: '100%'
+          }}
+            numberOfLines={1}
+          >{item.title}</Text>
+          
+          {
+            item.installment != null && (
+              <Installment data={item}/>
+            )
+          }
         </View>
       </View>
     );

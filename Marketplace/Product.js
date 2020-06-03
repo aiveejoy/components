@@ -11,7 +11,7 @@ import { Dimensions } from 'react-native';
 import ProductImages from './ProductImages.js';
 import { WebView } from 'react-native-webview';
 import Currency from 'services/Currency.js';
-
+import Installment from './Installment.js';
 const height = Math.round(Dimensions.get('window').height);
 class Product extends Component{
   constructor(props){
@@ -30,6 +30,9 @@ class Product extends Component{
   };
 
   setAction = (index, item) => {
+    this.setState({
+      toggle: false
+    })
     const navigateAction = NavigationActions.navigate({
       routeName: item.route
     });
@@ -42,6 +45,31 @@ class Product extends Component{
     //   case 2: // direct checkout
     //   break;
     // }
+  }
+
+  _installmentRequiremens = (installment) => {
+    let array = installment.requirements.split(',')
+    let requirements = []
+    array.map((item, index) => {
+      Helper.requirementsOptions.map((itemI, indexI) => {
+        if(item == itemI.payload){
+          requirements.push(
+            <Text>{itemI.title}</Text>
+          ) 
+        }
+      })
+      
+    })
+    return (
+      <View>
+        <Text style={{
+          fontWeight: 'bold'
+        }}>Installment requirements</Text>
+        {
+          requirements
+        }
+      </View>
+    );
   }
 
   _menu = () => {
@@ -173,12 +201,11 @@ class Product extends Component{
                 product.price[0].currency + ' ' + product.price[product.price.length - 1].price + '-' + product.price[0].price
               }
               </Text>
-              <Text style={{
-                color: Color.white,
-                fontSize: 10
-              }}>
-               INSTALLMENT HERE
-              </Text>
+              {
+                product.installment != null && (
+                  <Installment data={product} color={Color.white}/>
+                )
+              }
             </View>
         </TouchableHighlight>
       </View>
@@ -191,6 +218,7 @@ class Product extends Component{
     const { product } = this.props.state;
     return (
       <View style={Style.MainContainer}>
+        {isLoading ? <Spinner mode="overlay"/> : null }
         <ScrollView
           style={Style.ScrollView}
           onScroll={(event) => {
@@ -200,8 +228,7 @@ class Product extends Component{
             }
           }}
           >
-          {product == null && (<Empty refresh={true} onRefresh={() => this.retrieve()}/>)}
-          {isLoading ? <Spinner mode="overlay"/> : null }
+          {(product == null && isLoading == false) && (<Empty refresh={true} onRefresh={() => this.retrieve()}/>)}
           <View style={[Style.MainContainer, {
             minHeight: height,
             position: 'relative'
@@ -213,7 +240,7 @@ class Product extends Component{
                   paddingRight: 10
                 }}>
                   <View>
-                    <ProductImages item={product} />
+                    <ProductImages item={product} key={product.id}/>
                   </View>
 
                   <View>
@@ -231,6 +258,11 @@ class Product extends Component{
                       source={{html: product.description}}
                       />
                   </View>
+                  {
+                    product.installment != null && (
+                      this._installmentRequiremens(product.installment)
+                    )
+                  }
                 </View>
               )
             }

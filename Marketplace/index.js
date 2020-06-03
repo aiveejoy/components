@@ -35,12 +35,37 @@ class Marketplace extends Component{
   };
 
   setProduct = (item) => {
-    const { setProduct } = this.props;
-    setProduct(item);
-    const navigateAction = NavigationActions.navigate({
-      routeName: 'Product'
-    });
-    this.props.navigation.dispatch(navigateAction);
+    this.retrieveProduct(item.id);
+  }
+
+  retrieveProduct = (productId) => {
+    const { user } = this.props.state;
+    if(user == null || productId == null){
+      return
+    }
+    let parameter = {
+      account_id: user.id,
+      inventory_type: Helper.ecommerce.inventoryType,
+      condition: [{
+        value: productId,
+        column: 'id',
+        clause: '='
+      }]
+    }
+    this.setState({isLoading: true})
+    Api.request(Routes.productsRetrieve, parameter, response => {
+      this.setState({isLoading: false})
+      const { setProduct } = this.props;
+      if(response.data.length > 0){
+        setProduct(response.data[0])
+      }else{
+        setProduct(null)
+      }
+      const navigateAction = NavigationActions.navigate({
+        routeName: 'Product'
+      });
+      this.props.navigation.dispatch(navigateAction);
+    })
   }
 
   retrieve = () => {
@@ -61,10 +86,8 @@ class Marketplace extends Component{
       }
     }
     this.setState({isLoading: true})
-      console.log('Marketplace parameter', parameter)
-    Api.request(Routes.productsRetrieve, parameter, response => {
+    Api.request(Routes.productsRetrieveBasic, parameter, response => {
       this.setState({isLoading: false})
-      console.log('Marketplace', response.data)
       this.setState({
         data: response.data
       })
@@ -74,55 +97,57 @@ class Marketplace extends Component{
   render() {
     const { selected, isLoading, data } = this.state;
     return (
-      <ScrollView
-        style={Style.ScrollView}
-        onScroll={(event) => {
-          if(event.nativeEvent.contentOffset.y <= 0) {
-            if(this.state.isLoading == false){
-              this.retrieve()
-            }
-          }
-        }}
-        >
-        {data == null && (<Empty refresh={true} onRefresh={() => this.retrieve()}/>)}
+      <View style={Style.MainContainer}>
         {isLoading ? <Spinner mode="overlay"/> : null }
-        <View style={[Style.MainContainer, {
-          minHeight: height
-        }]}>
-          {
-            data && (
-              <FlatList
-                data={data}
-                extraData={selected}
-                ItemSeparatorComponent={this.FlatListItemSeparator}
-                renderItem={({ item, index }) => (
-                  <View>
-                    <TouchableHighlight
-                      onPress={() => {
-                        this.setProduct(item)
-                      }}
-                      underlayColor={Color.gray}
-                      >
-                      <View style={[Style.TextContainer, {
-                        backgroundColor: Color.white
-                      }]}>
-                      {
-                        item != null && (
-                          <Thumbnail 
-                            item={item}
-                          />
-                        )
-                      }
-                      </View>
-                    </TouchableHighlight>
-                  </View>
-                )}
-                keyExtractor={(item, index) => index.toString()}
-              />
-            )
-          }
-        </View>
-      </ScrollView>
+        <ScrollView
+          style={Style.ScrollView}
+          onScroll={(event) => {
+            if(event.nativeEvent.contentOffset.y <= 0) {
+              if(this.state.isLoading == false){
+                this.retrieve()
+              }
+            }
+          }}
+          >
+          {(data == null && isLoading == false) && (<Empty refresh={true} onRefresh={() => this.retrieve()}/>)}
+          <View style={[Style.MainContainer, {
+            minHeight: height
+          }]}>
+            {
+              (data && isLoading == false) && (
+                <FlatList
+                  data={data}
+                  extraData={selected}
+                  ItemSeparatorComponent={this.FlatListItemSeparator}
+                  renderItem={({ item, index }) => (
+                    <View>
+                      <TouchableHighlight
+                        onPress={() => {
+                          this.setProduct(item)
+                        }}
+                        underlayColor={Color.gray}
+                        >
+                        <View style={[Style.TextContainer, {
+                          backgroundColor: Color.white
+                        }]}>
+                        {
+                          item != null && (
+                            <Thumbnail 
+                              item={item}
+                            />
+                          )
+                        }
+                        </View>
+                      </TouchableHighlight>
+                    </View>
+                  )}
+                  keyExtractor={(item, index) => index.toString()}
+                />
+              )
+            }
+          </View>
+        </ScrollView>
+      </View>
     );
   }
 }
@@ -132,6 +157,7 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
+    setSelectedProductId: (productId) => dispatch(actions.setSelectedProductId(productId)),
     setProduct: (product) => dispatch(actions.setProduct(product))
   };
 };
