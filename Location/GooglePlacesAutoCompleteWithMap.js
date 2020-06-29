@@ -28,6 +28,21 @@ class GooglePlacesAutoCompleteWithMap extends Component {
     });
   }
 
+  manageOnDragEnd(e){
+    console.log('onDragEnd', e.nativeEvent)
+    let coordinate = e.nativeEvent.coordinate
+    this.setState({
+      location: {
+        longitude: coordinate.longitude,
+        latitude: coordinate.latitude,
+        route: null,
+        locality: null,
+        country: 'Philippines',
+        region: null
+      }
+    })
+  }
+
   _mapView = () => {
     const { location } = this.state;
     return (
@@ -57,7 +72,7 @@ class GooglePlacesAutoCompleteWithMap extends Component {
             longitudeDelta: 0.0421,
           }}
           >
-          {(location != null && location.route != 'xx' && location.locality != 'xx') && 
+          {(location != null && location.route != null && location.locality != null) && 
             (
               <Marker
                 coordinate={{
@@ -66,21 +81,29 @@ class GooglePlacesAutoCompleteWithMap extends Component {
                   latitudeDelta: 0.0922,
                   longitudeDelta: 0.0421,
                 }}
-                title={location.route + ', ' + location.locality + ', ' + location.country}
+                draggable
+                onDragEnd={(e) => {
+                  this.manageOnDragEnd(e)
+                }}
+                title={location.route + ', ' + location.locality + ', ' + location.country + '.Long press to drag'}
               />
             )
         }
 
-        {(location != null && location.route == 'xx' && location.locality == 'xx') && 
+        {(location != null && location.route == null && location.locality == null) && 
             (
               <Marker
+                onDragEnd={(e) => {
+                  this.manageOnDragEnd(e)
+                }}
+                draggable
                 coordinate={{
                   longitude: parseFloat(location.longitude),
                   latitude: parseFloat(location.latitude),
                   latitudeDelta: 0.0922,
                   longitudeDelta: 0.0421,
                 }}
-                title={'Current Location'}
+                title={'You are here! Long press to drag'}
               />
             )
         }
@@ -95,10 +118,10 @@ class GooglePlacesAutoCompleteWithMap extends Component {
         location: {
           longitude: info.coords.longitude,
           latitude: info.coords.latitude,
-          route: 'xx',
-          locality: 'xx',
-          country: 'xx',
-          region: 'xx'
+          route: null,
+          locality: null,
+          country: 'Philippines',
+          region: null
         }
       })
     })
