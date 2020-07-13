@@ -12,6 +12,14 @@ export default {
     borderBottomColor: Color.gray,
     borderBottomWidth: 1
   },
+  navSectionStyleNoBorder: {
+    paddingTop: 5,
+    paddingBottom: 5
+  },
+  navSectionStyleBorderTop: {
+    borderTopColor: Color.primary,
+    borderTopWidth: 1
+  },
   sectionHeadingStyle: {
     paddingTop: 50,
     paddingBottom: 10,
