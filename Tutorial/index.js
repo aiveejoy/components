@@ -77,7 +77,7 @@ class Tutorial extends Component {
 
   render () {
     return <AppIntroSlider
-    slides={Helper.tutorials}
+    data={Helper.tutorials}
     renderItem={this._renderItem}
     bottomButton
     key={1}
