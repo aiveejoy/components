@@ -55,6 +55,9 @@ class Pagination extends Component {
             <View style={styles.MainContainer}>
               <Text>Shops</Text>
             </View>
+            <View style={styles.MainContainer}>
+              <Text>Others</Text>
+            </View>
           </Pager>
         </PagerProvider>
       </View>
