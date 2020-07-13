@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import styles from './Style';
 import {NavigationActions} from 'react-navigation';
-import {ScrollView, Text, View, Image} from 'react-native';
+import {ScrollView, Text, View, Image, TouchableOpacity} from 'react-native';
 import { connect } from 'react-redux';
 import { Helper, BasicStyles, Color } from 'common';
 import Config from 'src/config.js';
@@ -81,14 +81,20 @@ class Slider extends Component {
               Helper.DrawerMenu.map((item, index) => {
                 return(
                 <View style={[styles.navSectionStyleNoBorder, {
-                  flexDirection: 'row',
-                  alignItems: 'center',
                   paddingLeft: 15
                 }]} key={index}>
-                  <FontAwesomeIcon icon={item.icon} style={item.iconStyle}/>
-                  <Text style={styles.navItemStyle} onPress={() => this.navigateToScreen(item.route)}>
-                    {item.title}
-                  </Text>
+                  <TouchableOpacity
+                    onPress={() => this.navigateToScreen(item.route)}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      width: '100%'
+                    }}>
+                      <FontAwesomeIcon icon={item.icon} style={item.iconStyle}/>
+                      <Text style={styles.navItemStyle}>
+                        {item.title}
+                      </Text>
+                  </TouchableOpacity>
                 </View>)
               })
             }
