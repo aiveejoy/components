@@ -72,13 +72,45 @@ class Slider extends Component {
                     Hi {user.username}!
                   </Text>
                 </View>
-              ) : <Text style={[styles.sectionHeadingStyle, {
-              paddingTop: 150
-            }]}>
-              Welcome to {Helper.company}!
-            </Text>}
-            {Helper.DrawerMenu.length > 0 &&
+              ) : 
+              <View style={[styles.sectionHeadingStyle, {
+                alignItems: 'flex-start'
+              }]}>
+                <TouchableOpacity>
+                  <Text style={{
+                    color: Color.white,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    paddingLeft: 20
+                  }}>
+                    Login or register
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              }
+            {(user != null && Helper.DrawerMenu.length > 0) &&
               Helper.DrawerMenu.map((item, index) => {
+                return(
+                <View style={[styles.navSectionStyleNoBorder, {
+                  paddingLeft: 15
+                }]} key={index}>
+                  <TouchableOpacity
+                    onPress={() => this.navigateToScreen(item.route)}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      width: '100%'
+                    }}>
+                      <FontAwesomeIcon icon={item.icon} style={item.iconStyle}/>
+                      <Text style={styles.navItemStyle}>
+                        {item.title}
+                      </Text>
+                  </TouchableOpacity>
+                </View>)
+              })
+            }
+            {(user == null && Helper.DrawerMenuLogout.length > 0) &&
+              Helper.DrawerMenuLogout.map((item, index) => {
                 return(
                 <View style={[styles.navSectionStyleNoBorder, {
                   paddingLeft: 15
@@ -112,20 +144,29 @@ class Slider extends Component {
                   </View>)
                 })
               }
-              <View style={styles.navSectionStyleNoBorder}>
-                <Text style={[styles.navItemStyle, {
-                  color: Color.primary,
-                  fontWeight: 'bold'
-                }]} onPress={() => this.logoutAction()}>
-                  Logout
-                </Text>
-              </View>
+              {
+                user !== null && (
+                  <View style={styles.navSectionStyleNoBorder}>
+                    <Text style={[styles.navItemStyle, {
+                      color: Color.primary,
+                      fontWeight: 'bold'
+                    }]} onPress={() => this.logoutAction()}>
+                      Logout
+                    </Text>
+                  </View>
+                )
+              }
+              
             </View>
           </View>
         </ScrollView>
-        <View style={styles.footerContainer}>
-          <Text>A product of {Helper.company}</Text>
-        </View>
+        {
+          /*
+            <View style={styles.footerContainer}>
+              <Text>A product of {Helper.company}</Text>
+            </View> 
+          */
+        }
       </View>
     );
   }
