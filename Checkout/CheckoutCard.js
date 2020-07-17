@@ -8,23 +8,9 @@ import {faUserCircle,faMapMarker, faUniversity,faKaaba,faPlus,faMinus} from '@fo
 class CheckoutCard extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      quantity:1,
-    }
   }
 
-  onPressInc=()=>
-  {
-    this.setState({quantity:this.state.quantity+1})
-  }
-
-  onPressDec=()=>
-  {
-    if(this.state.quantity>0)
-    {
-    this.setState({quantity:this.state.quantity-1})
-    }
-  }
+ 
   render() {
     const { details } = this.props;
     return (
@@ -32,16 +18,16 @@ class CheckoutCard extends Component {
    
         <View style={Style.details}>
           <View style={Style.newLeft}>
-          <TouchableOpacity onPress={()=>this.onPressDec()}><FontAwesomeIcon style={{paddingRight:10}} icon={faMinus} color={'orange'}/></TouchableOpacity>
-    <Text style={{fontSize:20,marginTop:-5,marginRight:5,marginLeft:5}}>{this.state.quantity}</Text>
-    <TouchableOpacity onPress={()=>this.onPressInc()}><FontAwesomeIcon style={{paddingRight:10}} icon={faPlus} color={'orange'}/></TouchableOpacity>
+          <TouchableOpacity onPress={()=>this.props.onSubtract()}><FontAwesomeIcon style={{paddingRight:10}} icon={faMinus} color={'orange'}/></TouchableOpacity>
+    <Text style={{fontSize:20,marginTop:-5,marginRight:5,marginLeft:5}}>{details.quantity}</Text>
+    <TouchableOpacity onPress={()=>this.props.onAdd()}><FontAwesomeIcon style={{paddingRight:10}} icon={faPlus} color={'orange'}/></TouchableOpacity>
           </View>
           <View style={Style.leftSide}>
             <Text style={Style.title}>
               { details.title }
             </Text>
             <Text style={Style.tags,{fontiSize:15}}>
-             {`PHP `+(details.price*this.state.quantity)}
+             {`PHP `+(details.price*details.quantity)}
             </Text>
           </View>
           <View style={Style.rightSide}>
