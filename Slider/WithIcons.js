@@ -76,7 +76,8 @@ class Slider extends Component {
               <View style={[styles.sectionHeadingStyle, {
                 alignItems: 'flex-start'
               }]}>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => this.navigateToScreen('loginStack')}>
                   <Text style={{
                     color: Color.white,
                     paddingTop: 10,
