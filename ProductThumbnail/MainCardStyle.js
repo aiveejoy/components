@@ -46,16 +46,26 @@ export default {
     width: '100%',
     height: 150,
   },
-  distanceView: {
+  videoIndicator: {
     position: 'absolute',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
     bottom: 10,
     right: 10,
-    width: '17%',
     paddingVertical: 5,
-    backgroundColor: Color.white,
+    paddingHorizontal: 8,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 1,
     borderRadius: 5,
+    borderColor: 'rgba(255,255,255,0.8)',
   },
-  distanceText: {
+  playIcon: {
+    color: Color.white
+  },
+  videoIndicatorText: {
+    color: Color.white,
+    marginLeft: 5,
     textAlign: 'center',
     fontWeight: '600'
   },
@@ -90,7 +100,7 @@ export default {
     alignItems: 'center',
   },
   starRatings: {
-    color: '#FFD801',
+    color: Color.goldenYellow,
   },
   textRatings: {
     marginLeft: 3,
@@ -100,5 +110,23 @@ export default {
     color: Color.darkGray,
     marginTop: 3,
     fontSize: 10
+  },
+  deliveryTime: {
+    marginTop: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  timeText: {
+    marginLeft: 3,
+    fontWeight: '600',
+    fontSize: 13
+  },
+  circleDivider: {
+    marginHorizontal: 4
+  },
+  distanceText: {
+    textAlign: 'center',
+    fontWeight: '600',
+    fontSize: 13
   }
 }

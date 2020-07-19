@@ -17,6 +17,7 @@ class Pagination extends Component {
             {
               Helper.pagerMenu.map((item, index) => (
                 <TouchableOpacity
+                  key={index}
                   onPress={() => this.props.onChange(index)}
                   style={{
                     width: width / 3,

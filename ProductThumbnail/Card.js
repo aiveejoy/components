@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import { Text, View, Image } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faStopwatch } from '@fortawesome/free-solid-svg-icons';
 import Style from './CardStyle';
 
 class Card extends Component {
   render() {
     const { details } = this.props;
-    const numberFormatter = (num) => (
-      Math.abs(num) > 999 ? Math.sign(num)*((Math.abs(num)/1000).toFixed(1)) + 'k+' : Math.sign(num)*Math.abs(num)
-    )
     return (
       <View style={Style.container}>
         <View style={Style.promoContainer}>
@@ -37,7 +34,10 @@ class Card extends Component {
             <View style={Style.ratings}>
               <FontAwesomeIcon icon={faStar} size={15} style={Style.starRatings} />
               <Text style={Style.textRatings}>{ details.ratings.avg  }</Text>
-              <Text style={Style.totalRatings}>({ numberFormatter(details.ratings.total) || 0 })</Text>
+            </View>
+            <View style={Style.deliveryTime}>
+              <FontAwesomeIcon icon={faStopwatch} size={15} style={Style.expectedTime} />
+              <Text style={Style.timeText}>{ details.delivery_time ? `${details.delivery_time}min` : '' }</Text>
             </View>
             <View>
               <Text style={Style.distance}>{ details.distance }km</Text>

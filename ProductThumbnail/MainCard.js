@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { Text, View, Image } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faStopwatch, faCircle, faPlay } from '@fortawesome/free-solid-svg-icons';
 import Style from './MainCardStyle';
 
 class MainCard extends Component {
   render() {
     const { details } = this.props;
-    const numberFormatter = (num) => (
-      Math.abs(num) > 999 ? Math.sign(num)*((Math.abs(num)/1000).toFixed(1)) + 'k+' : Math.sign(num)*Math.abs(num)
-    )
+    // const numberFormatter = (num) => (
+    //   Math.abs(num) > 999 ? Math.sign(num)*((Math.abs(num)/1000).toFixed(1)) + 'k+' : Math.sign(num)*Math.abs(num)
+    // )
     return (
       <View style={Style.container}>
         <View style={Style.promoContainer}>
@@ -23,9 +23,12 @@ class MainCard extends Component {
         </View>
         <View style={Style.imageContainer}>
           <Image source={{ uri: 'https://' + details.img_url }} style={Style.image} />
-          <View style={Style.distanceView}>
-            <Text style={Style.distanceText}>{ details.distance }km</Text>
-          </View>
+            { details.video_url !== null && 
+              <View style={Style.videoIndicator}>
+                <FontAwesomeIcon icon={faPlay} size={15} style={Style.playIcon} />
+                <Text style={Style.videoIndicatorText}>Hold to preview</Text>
+              </View>
+            }
         </View>
         <View style={Style.details}>
           <View style={Style.leftSide}>
@@ -34,7 +37,7 @@ class MainCard extends Component {
             </Text>
             <Text style={Style.tags}>
               {
-                details.tags.map((tag, i) => `${tag}${i + 1 === details.tags.length ? '' : ','}`) 
+                details.tags.map((tag, i) => `${tag}${i + 1 === details.tags.length ? '' : ', '}`) 
               }
             </Text>
           </View>
@@ -43,7 +46,13 @@ class MainCard extends Component {
               <FontAwesomeIcon icon={faStar} size={20} style={Style.starRatings} />
               <Text style={Style.textRatings}>{ details.ratings.avg }</Text>
             </View>
-            <Text style={Style.totalRatings}>({ numberFormatter(details.ratings.total) || 0 })</Text>
+            <View style={Style.deliveryTime}>
+              <FontAwesomeIcon icon={faStopwatch} size={14} />
+              <Text style={Style.timeText}>{ details.delivery_time ? `${details.delivery_time}min` : '' }</Text>
+              <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} />
+              <Text style={Style.distanceText}>{ details.distance }km</Text>
+            </View>
+            {/* <Text style={Style.totalRatings}>({ numberFormatter(details.ratings.total) || 0 })</Text> */}
           </View>
         </View>
       </View>

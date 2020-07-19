@@ -17,6 +17,7 @@ import Marketplace from './Marketplace';
 import Product from './Marketplace/Product.js';
 import Checkout from './Marketplace/Checkout.js';
 import Switch from './Toggle/Switch.js';
+import ShopThumbnail from './ShopThumbnail'
 export {
   Spinner,
   CustomModal,
@@ -35,5 +36,6 @@ export {
   Marketplace,
   Product,
   Checkout,
-  Switch
+  Switch,
+  ShopThumbnail
 }

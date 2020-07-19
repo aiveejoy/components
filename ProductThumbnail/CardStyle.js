@@ -68,7 +68,7 @@ export default {
     alignItems: 'center',
   },
   starRatings: {
-    color: '#FFD801',
+    color: Color.goldenYellow,
   },
   textRatings: {
     marginLeft: 3,
@@ -78,6 +78,14 @@ export default {
     color: Color.darkGray,
     marginLeft: 3,
     fontSize: 10
+  },
+  deliveryTime: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  timeText: {
+    marginLeft: 3,
+    fontSize: 12
   },
   distance: {
     fontSize: 12
