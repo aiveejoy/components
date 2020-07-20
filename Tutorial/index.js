@@ -85,6 +85,7 @@ class Tutorial extends Component {
     onSkip={() => this.props.onSkip()}
     renderNextButton={this._renderNextButton}
     renderDoneButton={this._renderFinishButton}
+    slides={Helper.tutorials}
     />;
   }
 }
