@@ -33,13 +33,15 @@ class Slider extends Component {
   }
 
   render () {
-    const { user } = this.props.state;
+    const { user, theme } = this.props.state;
     return (
       <View style={styles.container}>
         <ScrollView>
           <View>
             {user != null ? (
-                <View style={styles.sectionHeadingStyle}>
+                <View style={[styles.sectionHeadingStyle, {
+                  backgroundColor: theme ? theme.primary : Color.primary,
+                }]}>
                   {
                     user.account_profile != null && user.account_profile.url != null && (
                       <Image
@@ -74,7 +76,8 @@ class Slider extends Component {
                 </View>
               ) : 
               <View style={[styles.sectionHeadingStyle, {
-                alignItems: 'flex-start'
+                alignItems: 'flex-start',
+                backgroundColor: theme ? theme.primary : Color.primary
               }]}>
                 <TouchableOpacity
                   onPress={() => this.navigateToScreen('loginStack')}>
@@ -102,7 +105,9 @@ class Slider extends Component {
                       alignItems: 'center',
                       width: '100%'
                     }}>
-                      <FontAwesomeIcon icon={item.icon} style={item.iconStyle}/>
+                      <FontAwesomeIcon icon={item.icon} style={[item.iconStyle, {
+                        color: theme ? theme.primary : Color.primary
+                      }]}/>
                       <Text style={styles.navItemStyle}>
                         {item.title}
                       </Text>
@@ -123,7 +128,9 @@ class Slider extends Component {
                       alignItems: 'center',
                       width: '100%'
                     }}>
-                      <FontAwesomeIcon icon={item.icon} style={item.iconStyle}/>
+                      <FontAwesomeIcon icon={item.icon}  style={[item.iconStyle, {
+                        color: theme ? theme.primary : Color.primary
+                      }]}/>
                       <Text style={styles.navItemStyle}>
                         {item.title}
                       </Text>
@@ -149,7 +156,7 @@ class Slider extends Component {
                 user !== null && (
                   <View style={styles.navSectionStyleNoBorder}>
                     <Text style={[styles.navItemStyle, {
-                      color: Color.primary,
+                      color: theme ? theme.primary : Color.primary,
                       fontWeight: 'bold'
                     }]} onPress={() => this.logoutAction()}>
                       Logout
