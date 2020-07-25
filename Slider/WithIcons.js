@@ -138,7 +138,9 @@ class Slider extends Component {
                 </View>)
               })
             }
-            <View style={styles.navSectionStyleBorderTop}>
+            <View style={[styles.navSectionStyleBorderTop, {
+              borderTopColor: theme ? theme.primary : Color.primary
+            }]}>
               {Helper.DrawerMenuBottom.length > 0 &&
                 Helper.DrawerMenuBottom.map((item, index) => {
                   return(
