@@ -69,7 +69,8 @@ class Slider extends Component {
                   <Text  style={{
                     color: Color.white,
                     fontWeight: 'bold',
-                    fontSize: 16
+                    fontSize: 16,
+                    marginTop: 10
                   }}>
                     Hi {user.username}!
                   </Text>
