@@ -21,7 +21,9 @@ class LocationAutoComplete extends Component{
   }
 
   componentDidMount(){
+  
   }
+
 
   getPlaces = (searchValue) => {
 
@@ -54,6 +56,7 @@ class LocationAutoComplete extends Component{
   }
 
   clear = () => {
+   
     this.setState({
       searchValue: null,
       results: null
@@ -61,9 +64,14 @@ class LocationAutoComplete extends Component{
   }
 
   onCancel = () => {
+    const {initialRegion}=this.props;
+    let location ={
+      latitude:initialRegion.latitude,
+      longitude:initialRegion.longitude,
+    }
     this.clear()
     this.setState({selectedFlag: false})
-    this.props.onFinish(null)
+    this.props.onFinish(location)
   }
 
   setSelectedItem = (item) => {
