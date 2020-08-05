@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, Image } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faStar, faCircle, faStopwatch } from '@fortawesome/free-solid-svg-icons';
-import { Color } from 'common';
+import { faStar, faCircle, faStopwatch, faImage } from '@fortawesome/free-solid-svg-icons';
+import Config from 'src/config.js'
 import Style from './Style'
 
 export default class ShopThumbnail extends Component {
@@ -12,49 +12,69 @@ export default class ShopThumbnail extends Component {
 
   render() {
     const { details } = this.props
-    let tags = ""
-    tags = (
-      details ? 
-      details.tags.length > 0 ?
-      details.tags.map((tag, i) => (
-        tags = `${tag}${i + 1 === details.tags.length ? '' : ', '}`
-      ))
-      : null
-      : null
+    const { logo, name, rating, delivery_time, distance, prefix } = details
+
+    const ImageDisplay = (
+      logo == null 
+      ? <FontAwesomeIcon icon={faImage} size={100} style={Style.image} />
+      : <Image source={{ uri: Config.BACKEND_URL + logo }} style={Style.image} />
     )
+
+    const TagsDisplay = (
+      prefix == null
+      ? ''
+      : prefix
+    )
+
+    const DeliveryTime = (
+      delivery_time == null
+      ? 25
+      : delivery_time
+    )
+
+    const DistanceDisplay = (
+      distance == null
+      ? null
+      : distance.toFixed(2)
+    )
+
     return (
       <View>
         <View style={Style.container}>
           <View style={Style.imageContainer}>
-            <Image source={{ uri: details.logo }} style={Style.image} />
+            { ImageDisplay }
           </View>
           <View style={Style.detailsContainer}>
             <View style={Style.upper}>
               <Text style={Style.title} numberOfLines={2}>
-                { details ? details.name : 'No title'}
+                { name }
               </Text>
               <Text style={Style.tags} numberOfLines={1}>
-                {tags}
+                { TagsDisplay }
               </Text>
             </View>
             <View style={Style.lower}>
               <View style={Style.ratings}>
                 <FontAwesomeIcon icon={faStar} size={15} style={Style.starRatings} />
                 <Text style={Style.avgRating}>
-                  { details ? details.ratings.avg : null }
+                  { rating == null ? null : rating.avg }
                 </Text>
                 <Text style={Style.totalReviews}>
-                  { details ? `(${this.numberFormatter(details.ratings.totalReviews)} reviews)` : null }
+                  { 
+                    rating == null
+                    ? null
+                    : `(${this.numberFormatter(rating.total)} reviews)`
+                  }
                 </Text>
               </View>
               <View style={Style.timeAndDistance}>
                 <FontAwesomeIcon icon={faStopwatch} size={15} />
                 <Text style={Style.deliveryTime}>
-                  { details ? `${details.delivery_time} min` : null }
+                  { `${DeliveryTime} min` }
                 </Text>
                 <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} />
                 <Text style={Style.distance}>
-                  { details ? `${details.distance}km` : null }
+                  { `${DistanceDisplay}km` }
                 </Text>
               </View>
             </View>

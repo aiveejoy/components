@@ -44,7 +44,7 @@ export default {
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
     width: '100%',
-    height: 150,
+    height: 150
   },
   videoIndicator: {
     position: 'absolute',

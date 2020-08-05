@@ -9,7 +9,8 @@ export default {
   image: {
     borderRadius: 10,
     height: 100,
-    width: 100
+    width: 100,
+    color: '#ccc'
   },
   detailsContainer: {
     flex: 1,
