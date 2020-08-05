@@ -16,7 +16,7 @@ export default class ShopThumbnail extends Component {
 
     const ImageDisplay = (
       logo == null 
-      ? <FontAwesomeIcon icon={faImage} size={100} style={Style.image} />
+      ? <FontAwesomeIcon icon={faImage} size={100} style={[Style.image, {color: '#ccc'}]} />
       : <Image source={{ uri: Config.BACKEND_URL + logo }} style={Style.image} />
     )
 
