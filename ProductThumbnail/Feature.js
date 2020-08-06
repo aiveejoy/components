@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Text, View, Image } from 'react-native';
+import Config from 'src/config.js'
 import Style from './FeatureStyle';
 
 class Feature extends Component {
@@ -9,7 +10,7 @@ class Feature extends Component {
       <View style={Style.container}>
         <View style={Style.imageContainer}>
           <Image
-            source={{ uri: 'https://' + details.img_url }}
+            source={{ uri: Config.BACKEND_URL + details.img_url }}
             style={Style.image}
           />
           <View style={Style.promoWrapper}>
