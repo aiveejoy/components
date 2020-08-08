@@ -63,7 +63,7 @@ export default class ShopThumbnail extends Component {
                   { 
                     rating == null
                     ? null
-                    : `(${this.numberFormatter(rating.total)} reviews)`
+                    : `(${this.numberFormatter(rating.total)} ${rating.total > 1 ? 'reviews' : 'review'})`
                   }
                 </Text>
               </View>
@@ -72,9 +72,12 @@ export default class ShopThumbnail extends Component {
                 <Text style={Style.deliveryTime}>
                   { `${DeliveryTime} min` }
                 </Text>
-                <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} />
+                {
+                  DistanceDisplay &&
+                  <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} />
+                }
                 <Text style={Style.distance}>
-                  { `${DistanceDisplay}km` }
+                  { DistanceDisplay && `${DistanceDisplay}km` }
                 </Text>
               </View>
             </View>

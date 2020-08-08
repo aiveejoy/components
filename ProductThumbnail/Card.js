@@ -35,7 +35,7 @@ class Card extends Component {
     const DistanceDisplay = (
       distance == null
       ? null
-      : `${distance.toFixed(2)}km`
+      : distance.toFixed(2)
     )
 
     return (
@@ -76,7 +76,7 @@ class Card extends Component {
             </View>
             <View>
               <Text style={Style.distance}>
-                { DistanceDisplay }
+                { DistanceDisplay && `${DistanceDisplay}km` }
               </Text>
             </View>
           </View>

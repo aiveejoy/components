@@ -30,7 +30,7 @@ class MainCard extends Component {
     const DistanceDisplay = (
       distance == null
       ? null
-      : `${distance.toFixed(2)}km`
+      : distance.toFixed(2)
     )
 
     const DeliveryTime = (
@@ -82,9 +82,12 @@ class MainCard extends Component {
               <Text style={Style.timeText}>
                 { DeliveryTime }
               </Text>
-              <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} />
+              {
+                DistanceDisplay &&
+                <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} />
+              }
               <Text style={Style.distanceText}>
-                { DistanceDisplay }
+                { DistanceDisplay && `${DistanceDisplay}km` }
               </Text>
             </View>
           </View>
