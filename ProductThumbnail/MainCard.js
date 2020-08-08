@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import { Text, View, Image } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar, faStopwatch, faCircle, faPlay, faImage } from '@fortawesome/free-solid-svg-icons';
+import { Color } from 'common'
 import Config from 'src/config.js'
 import Style from './MainCardStyle';
 
 class MainCard extends Component {
   render() {
-    const { details } = this.props;
+    const { details, theme } = this.props;
     const {
       title,
       description,
@@ -61,7 +62,7 @@ class MainCard extends Component {
         </View>
         <View style={Style.details}>
           <View style={Style.leftSide}>
-            <Text style={Style.title} numberOfLines={1}>
+            <Text style={[Style.title, { color: theme ? theme.primary : Color.primary }]} numberOfLines={1}>
               { title || 'Product' }
             </Text>
             <Text style={Style.tags}>

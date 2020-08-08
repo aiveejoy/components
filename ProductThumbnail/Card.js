@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import { Text, View, Image } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar, faStopwatch, faImage } from '@fortawesome/free-solid-svg-icons';
+import { Color } from 'common'
 import Config from 'src/config.js'
 import Style from './CardStyle';
 
 class Card extends Component {
   render() {
-    const { details } = this.props
+    const { details, theme } = this.props
     const {
       title,
       rating,
@@ -55,7 +56,7 @@ class Card extends Component {
         <View style={Style.details}>
           <View>
             <Text
-              style={Style.title}
+              style={[Style.title, { color: theme ? theme.primary : Color.primary }]}
               numberOfLines={1}
             >
               { title || 'Product' }
