@@ -4,15 +4,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import Style from './checkoutCardStyle';
 import {faUserCircle,faMapMarker, faUniversity,faKaaba,faPlus,faMinus} from '@fortawesome/free-solid-svg-icons';
+import Config from 'src/config.js'
 
 class CheckoutCard extends Component {
   constructor(props){
     super(props);
   }
 
- 
   render() {
-    const { details } = this.props;
+    const { details } = this.props
+    const {index}=this.props;
     return (
       <View style={Style.container}>
    
@@ -24,14 +25,14 @@ class CheckoutCard extends Component {
           </View>
           <View style={Style.leftSide}>
             <Text style={Style.title}>
-              { details.title }
+              { details.title}
             </Text>
             <Text style={Style.tags,{fontiSize:15}}>
-             {`PHP `+(details.price*details.quantity)}
+             {`PHP `+(details.price[0].price*details.quantity)}
             </Text>
           </View>
           <View style={Style.rightSide}>
-          <Image source={{ uri: 'https://' + details.img_url }} style={Style.image} />
+          <Image source={{ uri: Config.BACKEND_URL+ details.featured[0].url }} style={Style.image} />
           </View>
         </View>
       </View>

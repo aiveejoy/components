@@ -237,7 +237,8 @@ class ImageUpload extends Component {
                 <View style={{
                   width: '50%',
                   alignItems: 'center',
-                  height: '100%'
+                  height: '100%',
+                  backgroundColor: Color.white
                 }}>
                   <TouchableOpacity 
                     onPress={() => this.upload()}
@@ -254,12 +255,13 @@ class ImageUpload extends Component {
                   alignItems: 'center',
                   height: '100%',
                   borderLeftColor: Color.gray,
-                  borderLeftWidth: 1
+                  borderLeftWidth: 1,
+                  backgroundColor: Color.white
                 }}>
                   <TouchableOpacity 
                     onPress={() => this.select()}
                     underlayColor={Color.gray}
-                    >
+                  >
                     <Text style={[styles.text, {
                       color: Color.primary,
                       width: '100%'
