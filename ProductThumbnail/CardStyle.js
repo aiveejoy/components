@@ -54,7 +54,6 @@ export default {
     padding: 10,
   },
   title: {
-    color: Color.primary,
     fontSize: 12,
     fontWeight: '600',
     lineHeight: 20

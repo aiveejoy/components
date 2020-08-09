@@ -84,7 +84,6 @@ export default {
     alignItems: 'flex-end'
   },
   title: {
-    color: Color.primary,
     fontSize: 15,
     fontWeight: '600',
     lineHeight: 20
