@@ -44,7 +44,7 @@ class ErrorModal extends Component {
                 </View>
               </View>
               <View style={[styles.content, {
-                height: '100%',
+                height: '80%',
                 justifyContent: 'center'
               }]}>
                 <Text style={{
