@@ -26,8 +26,7 @@ class Slider extends Component {
 
   logoutAction(){
     //clear storage
-    const { logout, setActiveRoute, retrieveCart } = this.props;
-    retrieveCart([])
+    const { logout, setActiveRoute } = this.props;
     logout();
     // setActiveRoute(null)
     this.props.navigation.navigate('loginStack');
@@ -194,8 +193,7 @@ const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
     logout: () => dispatch(actions.logout()),
-    setActiveRoute: (route) => dispatch(actions.setActiveRoute(route)),
-    retrieveCart: (items) => dispatch(actions.retrieveCart(items))
+    setActiveRoute: (route) => dispatch(actions.setActiveRoute(route))
   };
 };
 
