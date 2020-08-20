@@ -30,9 +30,11 @@ class Slider extends Component {
     const { logout, setActiveRoute } = this.props;
 
     // unsubscribe pusher
-    Pusher.pusher.unsubscribe(Helper.pusher.channel);
-    Pusher.pusher = null
-    Pusher.channel = null
+    if (Pusher.pusher) {
+      Pusher.pusher.unsubscribe(Helper.pusher.channel);
+      Pusher.pusher = null
+      Pusher.channel = null
+    }
 
     logout();
     // setActiveRoute(null)
