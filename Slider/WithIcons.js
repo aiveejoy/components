@@ -9,6 +9,7 @@ import { Helper, BasicStyles, Color } from 'common';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import Pusher from 'services/Pusher.js';
 
 class Slider extends Component {
   constructor(props){
@@ -27,6 +28,12 @@ class Slider extends Component {
   logoutAction(){
     //clear storage
     const { logout, setActiveRoute } = this.props;
+
+    // unsubscribe pusher
+    Pusher.pusher.unsubscribe(Helper.pusher.channel);
+    Pusher.pusher = null
+    Pusher.channel = null
+
     logout();
     // setActiveRoute(null)
     this.props.navigation.navigate('loginStack');
