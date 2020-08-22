@@ -38,6 +38,13 @@ class Slider extends Component {
     this.props.navigation.dispatch(navigateAction);
   }
 
+  navigateToStack =(route) => {
+    const navigateAction = NavigationActions.navigate({
+      routeName: route
+    });
+    this.props.navigation.dispatch(navigateAction);
+  }
+
   logoutAction(){
     //clear storage
     const { logout, setActiveRoute } = this.props;
@@ -103,7 +110,7 @@ class Slider extends Component {
                 backgroundColor: theme ? theme.primary : Color.primary
               }]}>
                 <TouchableOpacity
-                  onPress={() => this.navigateToScreen('loginStack')}>
+                  onPress={() => this.navigateToStack('loginStack')}>
                   <Text style={{
                     color: Color.white,
                     paddingTop: 10,
