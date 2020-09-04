@@ -7,6 +7,7 @@ export default {
     backgroundColor: Color.primary,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 10,
     borderRadius
   },
   heading: {
