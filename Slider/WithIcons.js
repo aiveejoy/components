@@ -2,13 +2,14 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import styles from './Style';
-import {NavigationActions} from 'react-navigation';
+import {NavigationActions, StackActions} from 'react-navigation';
 import {ScrollView, Text, View, Image, TouchableOpacity} from 'react-native';
 import { connect } from 'react-redux';
 import { Helper, BasicStyles, Color } from 'common';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import Pusher from 'services/Pusher.js';
 
 class Slider extends Component {
   constructor(props){
@@ -16,18 +17,45 @@ class Slider extends Component {
   }
   navigateToScreen = (route) => {
     this.props.navigation.toggleDrawer();
+    // const navigateAction = NavigationActions.navigate({
+    //   routeName: route
+    // });
+    // this.props.navigation.dispatch(navigateAction);
+    // const { setActiveRoute } = this.props;
+    // setActiveRoute(null)
+
+    const navigateAction = NavigationActions.navigate({
+      routeName: 'drawerStack',
+      action: StackActions.reset({
+        index: 0,
+        key: null,
+        actions: [
+            NavigationActions.navigate({routeName: route}),
+        ]
+      })
+    });
+
+    this.props.navigation.dispatch(navigateAction);
+  }
+
+  navigateToStack =(route) => {
     const navigateAction = NavigationActions.navigate({
       routeName: route
     });
     this.props.navigation.dispatch(navigateAction);
-    // const { setActiveRoute } = this.props;
-    // setActiveRoute(null)
   }
 
   logoutAction(){
     //clear storage
-    const { logout, setActiveRoute, retrieveCart } = this.props;
-    retrieveCart([])
+    const { logout, setActiveRoute } = this.props;
+
+    // unsubscribe pusher
+    if (Pusher.pusher) {
+      Pusher.pusher.unsubscribe(Helper.pusher.channel);
+      Pusher.pusher = null
+      Pusher.channel = null
+    }
+
     logout();
     // setActiveRoute(null)
     this.props.navigation.navigate('loginStack');
@@ -82,7 +110,7 @@ class Slider extends Component {
                 backgroundColor: theme ? theme.primary : Color.primary
               }]}>
                 <TouchableOpacity
-                  onPress={() => this.navigateToScreen('loginStack')}>
+                  onPress={() => this.navigateToStack('loginStack')}>
                   <Text style={{
                     color: Color.white,
                     paddingTop: 10,
@@ -194,8 +222,7 @@ const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
     logout: () => dispatch(actions.logout()),
-    setActiveRoute: (route) => dispatch(actions.setActiveRoute(route)),
-    retrieveCart: (items) => dispatch(actions.retrieveCart(items))
+    setActiveRoute: (route) => dispatch(actions.setActiveRoute(route))
   };
 };
 
