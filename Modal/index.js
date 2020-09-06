@@ -103,7 +103,7 @@ class CustomModal extends Component {
                     });
     return (
       <View>
-        {
+       {
           errorMessage != null && (
             <View style={{
               alignItems: 'center',

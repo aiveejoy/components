@@ -22,8 +22,9 @@ class Ledger extends Component {
       <CollapseHeader>
     
       <Separator bordered style={{height:50,flexDirection:'row',justifyContent:'space-between',backgroundColor:'#EDEDED'}}>
-        <Text numberOfLines={1} ellipsizeMode='tail' style={{fontWeight:'bold', width:'50%'}}>{details.merchant}</Text>
-        <Text style={{color: details.offset==="+"? "green" : "red", position:"absolute",left:200,top:15,width:'30%'}}>{`${details.offset} ${details.currency} ${details.amount}`}</Text>
+        <Text numberOfLines={1} ellipsizeMode='tail' style={{fontWeight:'bold', width:'50%'}}>{details.created_at_human}</Text>
+        {details.amount>0 ? <Text style={{color: "green", position:"absolute",left:200,top:15,width:'30%'}}>{`+ ${details.currency} ${details.amount}`}</Text> : <Text style={{color: "red", position:"absolute",left:200,top:15,width:'30%'}}>{`- ${details.currency} ${details.amount}`}</Text>}
+        {/* <Text style={{color: "red", position:"absolute",left:200,top:15,width:'30%'}}>{`+ ${details.currency} ${details.amount}`}</Text> */}
         <FontAwesomeIcon style={{marginRight:20,width:'10%'}} icon={faChevronDown}/>
         </Separator>
       </CollapseHeader>
