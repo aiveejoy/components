@@ -68,7 +68,9 @@ class ImageUpload extends Component {
       noData: true,
     }
     ImagePicker.launchImageLibrary(options, response => {
+      console.log('response image', response)
       if (response.uri) {
+        console.log('test image upload uri')
         this.setState({ photo: response })
         let formData = new FormData();
         let uri = Platform.OS == "android" ? response.uri : response.uri.replace("file://", "");
@@ -79,9 +81,11 @@ class ImageUpload extends Component {
         });
         formData.append('file_url', response.fileName);
         formData.append('account_id', user.id);
-        console.log(formData)
+        console.log('formData', formData)
         Api.upload(Routes.imageUpload, formData, imageResponse => {
           this.retrieve()
+        }, error => {
+          console.log('error upload', error.response)
         })
       }else{
         this.setState({ photo: null })
@@ -196,8 +200,6 @@ class ImageUpload extends Component {
         <Modal isVisible={this.props.visible}>
           <View style={styles.mainContainer}>
             <View style={[styles.container, {
-              height: '90%',
-              marginTop: '10%'
             }]}>
               <View style={styles.header}>
                 <View style={{
