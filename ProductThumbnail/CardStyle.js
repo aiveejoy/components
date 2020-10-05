@@ -83,6 +83,7 @@ export default {
     alignItems: 'center',
   },
   timeText: {
+    color: Color.darkGray,
     marginLeft: 3,
     fontSize: 12
   },
