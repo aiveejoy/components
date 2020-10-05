@@ -15,8 +15,9 @@ class MainCard extends Component {
       rating,
       image,
       distance,
-      delivery_time
+      preparation_time
     } = details
+    console.log({ details })
 
     const ProductImage = (
       image == null 
@@ -35,9 +36,9 @@ class MainCard extends Component {
     )
 
     const DeliveryTime = (
-      delivery_time == null
-      ? '20min'
-      : `${details.delivery_time}min`
+      preparation_time == null
+      ? null
+      : `${details.preparation_time}min`
     )
 
     return (
@@ -79,13 +80,20 @@ class MainCard extends Component {
               </Text>
             </View>
             <View style={Style.deliveryTime}>
-              <FontAwesomeIcon icon={faStopwatch} size={14} />
-              <Text style={Style.timeText}>
-                { DeliveryTime }
-              </Text>
               {
-                DistanceDisplay &&
-                <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} />
+                DeliveryTime && (
+                  <>
+                    <FontAwesomeIcon icon={faStopwatch} size={14} color={Color.darkGray} />
+                    <Text style={Style.timeText}>
+                      { DeliveryTime }
+                    </Text>
+                  </>
+                )
+              }
+              {
+                DistanceDisplay && DeliveryTime && (
+                  <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} color={Color.darkGray} />
+                )
               }
               <Text style={Style.distanceText}>
                 { DistanceDisplay && `${DistanceDisplay}km` }

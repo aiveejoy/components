@@ -102,6 +102,7 @@ export default {
     color: Color.goldenYellow,
   },
   textRatings: {
+    color: Color.darkGray,
     marginLeft: 3,
     fontWeight: '600'
   },
@@ -116,6 +117,7 @@ export default {
     alignItems: 'center',
   },
   timeText: {
+    color: Color.darkGray,
     marginLeft: 3,
     fontWeight: '600',
     fontSize: 13
@@ -124,6 +126,7 @@ export default {
     marginHorizontal: 4
   },
   distanceText: {
+    color: Color.darkGray,
     textAlign: 'center',
     fontWeight: '600',
     fontSize: 13
