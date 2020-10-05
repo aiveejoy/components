@@ -46,7 +46,7 @@ class CheckoutCard extends Component {
             </Text>
           </View>
           <View style={Style.rightSide}>
-          <Image source={{ uri: Config.BACKEND_URL+ details.featured[0].url }} style={Style.image} />
+          {ImageDisplay}
           </View>
           </React.Fragment>
           ) 
