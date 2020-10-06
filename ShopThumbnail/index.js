@@ -12,7 +12,7 @@ export default class ShopThumbnail extends Component {
 
   render() {
     const { details } = this.props
-    const { logo, name, rating, delivery_time, distance, prefix } = details
+    const { logo, name, rating, preparation_time, distance, prefix } = details
 
     const ImageDisplay = (
       logo == null 
@@ -26,11 +26,7 @@ export default class ShopThumbnail extends Component {
       : prefix
     )
 
-    const DeliveryTime = (
-      delivery_time == null
-      ? 25
-      : delivery_time
-    )
+    const PreparationTime = preparation_time || null
 
     const DistanceDisplay = (
       distance == null
@@ -68,16 +64,19 @@ export default class ShopThumbnail extends Component {
                 </Text>
               </View>
               <View style={Style.timeAndDistance}>
-                <FontAwesomeIcon icon={faStopwatch} size={15} />
-                <Text style={Style.deliveryTime}>
-                  { `${DeliveryTime} min` }
-                </Text>
                 {
-                  DistanceDisplay &&
-                  <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} />
+                  PreparationTime && (
+                    <>
+                      <FontAwesomeIcon icon={faStopwatch} size={15} />
+                      <Text style={Style.deliveryTime}>
+                        { `${PreparationTime} min` }
+                      </Text>
+                      <FontAwesomeIcon icon={faCircle} size={5} style={Style.circleDivider} />
+                    </>
+                  )
                 }
                 <Text style={Style.distance}>
-                  { DistanceDisplay && `${DistanceDisplay}km` }
+                  { DistanceDisplay && `${DistanceDisplay} km` }
                 </Text>
               </View>
             </View>

@@ -17,7 +17,6 @@ class MainCard extends Component {
       distance,
       preparation_time
     } = details
-    console.log({ details })
 
     const ProductImage = (
       image == null 
