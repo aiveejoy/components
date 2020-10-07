@@ -17,8 +17,58 @@ class StandardRatings extends Component {
     this.state = {
       isLoading: false,
       index: -1,
-      comments: null
+      comments: null,
+      data: null
     }
+  }
+
+  componentDidMount(){
+    const { user } = this.props.state;
+    const { data } = this.props;
+    if(user == null || data == null){
+      return
+    }
+    let parameter = {
+      condition: [{
+        column: 'account_id',
+        value: user.id,
+        clause: '='
+      }, {
+        value: data.payload,
+        column: 'payload',
+        clause: '='
+      }, {
+        value: data.payload_value,
+        column: 'payload_value',
+        clause: '='
+      }, {
+        value: data.payload1,
+        column: 'payload_1',
+        clause: '='
+      }, {
+        value: data.payload_value1,
+        column: 'payload_value_1',
+        clause: '='
+      }],
+      account_id: user.id
+    }
+    console.log('rating', parameter);
+    this.setState({isLoading: true});
+    Api.request(Routes.ratingsRetrieve, parameter, response => {
+      this.setState({isLoading: false});
+      if(response.data.length > 0){
+        this.setState({
+          data: response.data
+        })
+      }else{
+        this.setState({
+          data: null
+        })
+      }
+    }, error => {
+      this.setState({isLoading: false});
+      console.log('error', error)
+    });
   }
 
   submit = () => {
@@ -38,6 +88,9 @@ class StandardRatings extends Component {
     Api.request(Routes.ratingsCreate, parameter, response => {
       this.setState({isLoading: false});
       this.props.action(true)
+    }, error => {
+      this.setState({isLoading: false});
+      console.log('error', error)
     });
   }
 
@@ -113,7 +166,7 @@ class StandardRatings extends Component {
 
 
   render(){
-    const { isLoading } = this.state;
+    const { isLoading, data } = this.state;
     return (
       <View>
         <Modal isVisible={this.props.visible}>
@@ -141,37 +194,42 @@ class StandardRatings extends Component {
               <View style={styles.content}>
                 {this._ratings()}
               </View>
-              <View style={[styles.action, {flexDirection: 'row'}]}>
-                <View style={{
-                  width: '50%',
-                  alignItems: 'center'
-                }}>
-                  <TouchableOpacity 
-                    onPress={() => this.close()}
-                    underlayColor={Color.gray}
-                    >
-                    <Text style={[styles.text, {
-                      color: Color.danger
-                    }]}>{this.props.actionLabel.no}</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={{
-                  width: '50%',
-                  alignItems: 'center',
-                  borderLeftColor: Color.gray,
-                  borderLeftWidth: 1
-                }}>
-                  <TouchableOpacity 
-                    onPress={() => this.submit()}
-                    underlayColor={Color.gray}
-                    >
-                    <Text style={[styles.text, {
-                      color: Color.primary
-                    }]}>{this.props.actionLabel.yes}</Text>
-                  </TouchableOpacity>
-                </View>
-                
-              </View>
+
+              {
+                data == null && (
+                  <View style={[styles.action, {flexDirection: 'row'}]}>
+                    <View style={{
+                      width: '50%',
+                      alignItems: 'center'
+                    }}>
+                      <TouchableOpacity 
+                        onPress={() => this.close()}
+                        underlayColor={Color.gray}
+                        >
+                        <Text style={[styles.text, {
+                          color: Color.danger
+                        }]}>{this.props.actionLabel.no}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{
+                      width: '50%',
+                      alignItems: 'center',
+                      borderLeftColor: Color.gray,
+                      borderLeftWidth: 1
+                    }}>
+                      <TouchableOpacity 
+                        onPress={() => this.submit()}
+                        underlayColor={Color.gray}
+                        >
+                        <Text style={[styles.text, {
+                          color: Color.primary
+                        }]}>{this.props.actionLabel.yes}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )
+              }
+              
             </View>
           </View>
           {isLoading ? <Spinner mode="overlay"/> : null }
