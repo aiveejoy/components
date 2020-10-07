@@ -153,6 +153,15 @@ class Item extends Component {
               'Transaction Code: ****' + item.code.substr(56, 63)
             }
             </Text>
+            <Text style={[BasicStyles.normalFontSize, {
+              width: '100%',
+              textAlign: 'right',
+              color: item.status == 'pending' ? Color.gray : Color.primary
+            }]}>
+            {
+              item.status.toUpperCase()
+            }
+            </Text>
           </View>
         </View>
       )
