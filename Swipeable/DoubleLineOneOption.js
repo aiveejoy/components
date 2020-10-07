@@ -41,7 +41,7 @@ class ItemOptions extends Component {
               justifyContent: 'center',
               alignItems: 'center'
             }}
-            onPress={() => this.props.onAdd(this.props.item)}
+            onPress={() => this.props.redirect(this.props.item)}
             underlayColor={Color.gray}
             >
               <View style={{
@@ -52,30 +52,6 @@ class ItemOptions extends Component {
                 <Text style={{
                   color: Color.white
                 }}>Message</Text>
-              </View>
-            </TouchableHighlight>
-            )
-          }
-
-          {
-          (existData.indexOf(item.id) > -1) && (
-            <TouchableHighlight style={{
-              width: (width / 5),
-              backgroundColor: Color.danger,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-            onPress={() => this.props.onDelete(this.props.item)}
-            underlayColor={Color.gray}
-            >
-              <View style={{
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <FontAwesomeIcon icon={ faTrash } style={{color: Color.white}} size={24}/>
-                <Text style={{
-                  color: Color.white
-                }}>Remove</Text>
               </View>
             </TouchableHighlight>
             )
@@ -195,8 +171,7 @@ class Basic extends Component {
           renderQuickActions={({item}) =>
             <ItemOptions
             item={item}
-            onAdd={(param) => this.props.onAdd(param)}
-            onDelete={(param) => this.props.onDelete(param)}
+            redirect={(param) => this.props.redirect(param)}
             existData={added}
             />
           }

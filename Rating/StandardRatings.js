@@ -23,52 +23,52 @@ class StandardRatings extends Component {
   }
 
   componentDidMount(){
-    const { user } = this.props.state;
-    const { data } = this.props;
-    if(user == null || data == null){
-      return
-    }
-    let parameter = {
-      condition: [{
-        column: 'account_id',
-        value: user.id,
-        clause: '='
-      }, {
-        value: data.payload,
-        column: 'payload',
-        clause: '='
-      }, {
-        value: data.payload_value,
-        column: 'payload_value',
-        clause: '='
-      }, {
-        value: data.payload1,
-        column: 'payload_1',
-        clause: '='
-      }, {
-        value: data.payload_value1,
-        column: 'payload_value_1',
-        clause: '='
-      }],
-      account_id: user.id
-    }
-    console.log('rating', parameter);
-    this.setState({isLoading: true});
-    Api.request(Routes.ratingsRetrieve, parameter, response => {
-      this.setState({isLoading: false});
-      if(response.data.length > 0){
-        this.setState({
-          data: response.data
-        })
-      }else{
-        this.setState({
-          data: null
-        })
-      }
-    }, error => {
-      this.setState({isLoading: false});
-      console.log('error', error)
-    });
+    // const { user } = this.props.state;
+    // const { data } = this.props;
+    // if(user == null || data == null){
+    //   return
+    // }
+    // let parameter = {
+    //   condition: [{
+    //     column: 'account_id',
+    //     value: user.id,
+    //     clause: '='
+    //   }, {
+    //     value: data.payload,
+    //     column: 'payload',
+    //     clause: '='
+    //   }, {
+    //     value: data.payload_value,
+    //     column: 'payload_value',
+    //     clause: '='
+    //   }, {
+    //     value: data.payload1,
+    //     column: 'payload_1',
+    //     clause: '='
+    //   }, {
+    //     value: data.payload_value1,
+    //     column: 'payload_value_1',
+    //     clause: '='
+    //   }],
+    //   account_id: user.id
+    // }
+    // console.log('rating', parameter);
+    // this.setState({isLoading: true});
+    // Api.request(Routes.ratingsRetrieve, parameter, response => {
+    //   this.setState({isLoading: false});
+    //   if(response.data.length > 0){
+    //     this.setState({
+    //       data: response.data
+    //     })
+    //   }else{
+    //     this.setState({
+    //       data: null
+    //     })
+    //   }
+    // }, error => {
+    //   this.setState({isLoading: false});
+    //   console.log('error', error)
+    // });
   }
 
   submit = () => {
