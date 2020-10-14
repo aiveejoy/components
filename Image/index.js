@@ -68,7 +68,7 @@ class ImageUpload extends Component {
       noData: true,
     }
     ImagePicker.launchImageLibrary(options, response => {
-      console.log('response image', response)
+      console.log('response image', response.uri)
       if (response.uri) {
         console.log('test image upload uri')
         this.setState({ photo: response })
