@@ -36,13 +36,13 @@ class Dropdown extends Component{
       };
     });
     this.setState({
-      iOSData: iOSData
+      iosData: iOSData
     })
   }
 
   render () {
     const { label, data, placeholder } = this.props;
-    const { iOSData } = this.state;
+    const { iosData } = this.state;
     return (
         <View style={{
         }}>
@@ -69,10 +69,10 @@ class Dropdown extends Component{
             )
           }
           {
-            (Platform.OS == 'ios' && iOSData.length > 0) && (
+            (Platform.OS == 'ios' && iosData.length > 0) && (
               <RNPickerSelect
                 onValueChange={(input) => this.onChange(input)}
-                items={iOSData}
+                items={iosData}
                 style={BasicStyles.pickerStyleIOSNoMargin}
                 placeholder={{
                   label: placeholder ? placeholder : 'Click to select',
