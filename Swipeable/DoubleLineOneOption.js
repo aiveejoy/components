@@ -41,7 +41,7 @@ class ItemOptions extends Component {
               justifyContent: 'center',
               alignItems: 'center'
             }}
-            onPress={() => this.props.redirect(this.props.item)}
+            onPress={() => this.props.redirect(item)}
             underlayColor={Color.gray}
             >
               <View style={{
