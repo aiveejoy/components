@@ -40,12 +40,13 @@ class MessagesV2 extends Component{
 
   componentDidMount(){
     const { user } = this.props.state
+    if (user == null) return
+
     const { setMessengerGroup } = this.props
     const { navigation: { state: { params } } } = this.props
-    
-    if (user == null) return
-    
-    if ((user.account_type + '').toLowerCase() === 'rider') {
+    const accountType = (user.account_type + '').toLowerCase()
+
+    if (accountType === 'rider') {
       const { id, code, merchantId, customerId } = params.checkoutData
       const parameter = {
         condition: [{
@@ -76,7 +77,7 @@ class MessagesV2 extends Component{
         console.log({ messengerGroupRetrieveError: error })
       })
     }
-    else if ((user.account_type + '').toLowerCase() === 'user') {
+    else if (accountType === 'user' || accountType === 'merchant') {
       const messengerTitle = params ? params.checkoutData.code : null
       const parameter = {
         condition: [{
@@ -92,14 +93,13 @@ class MessagesV2 extends Component{
           setMessengerGroup(response.data[0])
           this.retrieve();
         } else {
-          this.createGroup(params)
+          this.createGroup(params, accountType)
         }
       }, (error) => {
         this.setState({ isLoading: false })
         console.log({ messengerGroupRetrieveError: error })
       })
     }
-
   }
 
   componentWillUnmount() {
@@ -142,7 +142,7 @@ class MessagesV2 extends Component{
     });
   }
 
-  createGroup(params) {
+  createGroup(params, accountType) {
     const { setMessengerGroup } = this.props
     const checkoutId = params ? params.checkoutData.id : null
     const merchantId = params ? params.checkoutData.merchantId : null
@@ -155,11 +155,21 @@ class MessagesV2 extends Component{
       return
     }
 
-    const parameter = {
+    let parameter = {
       member: merchantId,
       creator: user.id,
       title: messengerTitle,
       payload: checkoutId
+    }
+    
+    if (accountType === 'merchant') {
+      const customerId = params ? params.checkoutData.customerId : null
+      parameter = {
+        member: customerId,
+        creator: merchantId,
+        title: messengerTitle,
+        payload: checkoutId
+      }
     }
 
     Api.request(Routes.customMessengerGroupCreate, parameter, response => {
