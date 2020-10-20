@@ -77,7 +77,7 @@ class MessagesV2 extends Component{
         console.log({ messengerGroupRetrieveError: error })
       })
     }
-    else if (accountType === 'user' || accountType === 'merchant') {
+    else if (accountType === 'user' || accountType === 'merchant' || accountType === 'admin') {
       const messengerTitle = params ? params.checkoutData.code : null
       const parameter = {
         condition: [{
