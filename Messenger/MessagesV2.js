@@ -47,40 +47,65 @@ class MessagesV2 extends Component{
     const { setMessengerGroup } = this.props
     const { navigation: { state: { params } } } = this.props
     const accountType = (user.account_type + '').toLowerCase()
-
-    if (accountType === 'rider') {
-      const { id, code, merchantId, customerId } = params.checkoutData
-      const parameter = {
-        condition: [{
-          column: 'title',
-          clause: '=',
-          value: code
-        }],
-        title: code,
-        payload: id,
-        creator: user.id,
-        member: customerId,
-        member2: merchantId,
-      }
-  
-      this.setState({ isLoading: true })
-      Api.request(Routes.messengerCreateForRider, parameter, response => {
-        if (Array.isArray(response.data)) {
-          setMessengerGroup(response.data[0])
-        } else {
-          setMessengerGroup({
-            id: response.data,
-            account_id: user.id
-          })
+    
+    if (params.checkoutData != null) {
+      if (accountType === 'rider') {
+        const { id, code, merchantId, customerId } = params.checkoutData
+        const parameter = {
+          condition: [{
+            column: 'title',
+            clause: '=',
+            value: code
+          }],
+          title: code,
+          payload: id,
+          creator: user.id,
+          member: customerId,
+          member2: merchantId,
         }
-        this.retrieve();
-      }, (error) => {
-        this.setState({ isLoading: false })
-        console.log({ messengerGroupRetrieveError: error })
-      })
+    
+        this.setState({ isLoading: true })
+        Api.request(Routes.messengerCreateForRider, parameter, response => {
+          if (Array.isArray(response.data)) {
+            setMessengerGroup(response.data[0])
+          } else {
+            setMessengerGroup({
+              id: response.data,
+              account_id: user.id
+            })
+          }
+          this.retrieve();
+        }, (error) => {
+          this.setState({ isLoading: false })
+          console.log({ messengerGroupRetrieveError: error })
+        })
+      }
+      else if (accountType === 'user' || accountType === 'merchant') {
+        const messengerTitle = params ? params.checkoutData.code : null
+        const parameter = {
+          condition: [{
+            column: 'title',
+            clause: '=',
+            value: messengerTitle
+          }]
+        }
+        
+        this.setState({ isLoading: true })
+        Api.request(Routes.messengerGroupRetrieve, parameter, response => {
+          if (response.data.length > 0) {
+            setMessengerGroup(response.data[0])
+            this.retrieve();
+          } else {
+            this.createGroup(params, accountType)
+          }
+        }, (error) => {
+          this.setState({ isLoading: false })
+          console.log({ messengerGroupRetrieveError: error })
+        })
+      }
     }
-    else if (accountType === 'user' || accountType === 'merchant' || accountType === 'admin') {
-      const messengerTitle = params ? params.checkoutData.code : null
+    else if (params.depositData != null) {
+      const messengerTitle = params ? params.depositData.code : null
       const parameter = {
         condition: [{
           column: 'title',
@@ -95,13 +120,15 @@ class MessagesV2 extends Component{
           setMessengerGroup(response.data[0])
           this.retrieve();
         } else {
-          this.createGroup(params, accountType)
+          Alert.alert('Conversation is not yet available')
+          this.setState({ isLoading: false })
         }
       }, (error) => {
         this.setState({ isLoading: false })
         console.log({ messengerGroupRetrieveError: error })
       })
     }
+
   }
 
   componentWillUnmount() {
