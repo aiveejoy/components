@@ -9,7 +9,8 @@ import {
   FlatList,
   TouchableOpacity,
   Platform,
-  Alert
+  KeyboardAvoidingView,
+  SafeAreaView
 } from 'react-native';
 import { Routes, Color, BasicStyles } from 'common';
 import { Spinner, UserImage } from 'components';
@@ -714,61 +715,72 @@ class MessagesV2 extends Component{
     const { isLoading, isImageModal, imageModalUrl, photo, keyRefresh, isPullingMessages } = this.state;
     const { messengerGroup, user } = this.props.state;
     return (
-      <View key={keyRefresh}>
-        {isLoading ? <Spinner mode="full"/> : null }
-        <ScrollView
-          ref={ref => this.scrollView = ref}
-          onContentSizeChange={(contentWidth, contentHeight)=>{        
-            if (!isPullingMessages) {
-              this.scrollView.scrollToEnd({animated: true});
-            }
-          }}
-          style={[Style.ScrollView, {
-            height: '100%'
-          }]}
-          onScroll={({ nativeEvent }) => {
-            const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
-            const isOnBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height
-            const isOnTop = contentOffset.y <= 0
-
-            if (isOnTop) {
-              if(this.state.isLoading == false){
+      <SafeAreaView>
+        <KeyboardAvoidingView
+          behavior={'padding'} 
+          keyboardVerticalOffset={
+            Platform.select({
+              ios: () => 65,
+              android: () => -200
+          })()}
+        >
+          <View key={keyRefresh}>
+            {isLoading ? <Spinner mode="full"/> : null }
+            <ScrollView
+              ref={ref => this.scrollView = ref}
+              onContentSizeChange={(contentWidth, contentHeight)=>{        
                 if (!isPullingMessages) {
-                  this.setState({ isPullingMessages: true })
+                  this.scrollView.scrollToEnd({animated: true});
                 }
-                this.retrieveMoreMessages()
-              }
-            }
-            if (isOnBottom) {
-              if (this.state.isLoading == false && isPullingMessages) {
-                this.setState({ isPullingMessages: false })
-              }
-            }
-          }}
-          >
-          <View style={{
-            flexDirection: 'row',
-            width: '100%'
-          }}>
-            {this._flatList()}
+              }}
+              style={[Style.ScrollView, {
+                height: '100%'
+              }]}
+              onScroll={({ nativeEvent }) => {
+                const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
+                const isOnBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height
+                const isOnTop = contentOffset.y <= 0
+
+                if (isOnTop) {
+                  if(this.state.isLoading == false){
+                    if (!isPullingMessages) {
+                      this.setState({ isPullingMessages: true })
+                    }
+                    this.retrieveMoreMessages()
+                  }
+                }
+                if (isOnBottom) {
+                  if (this.state.isLoading == false && isPullingMessages) {
+                    this.setState({ isPullingMessages: false })
+                  }
+                }
+              }}
+              >
+              <View style={{
+                flexDirection: 'row',
+                width: '100%'
+              }}>
+                {this._flatList()}
+              </View>
+            </ScrollView>
+            <View style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              borderTopColor: Color.lightGray,
+              borderTopWidth: 1,
+              backgroundColor: Color.white
+            }}>
+              {messengerGroup != null && (this._footer())}
+            </View>
+            <ImageModal
+              visible={isImageModal}
+              url={imageModalUrl}
+              action={() => this.setState({isImageModal: false})}
+            ></ImageModal>
           </View>
-        </ScrollView>
-        <View style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          borderTopColor: Color.lightGray,
-          borderTopWidth: 1,
-          backgroundColor: Color.white
-        }}>
-          {messengerGroup != null && (this._footer())}
-        </View>
-        <ImageModal
-          visible={isImageModal}
-          url={imageModalUrl}
-          action={() => this.setState({isImageModal: false})}
-        ></ImageModal>
-      </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     );
   }
 }
