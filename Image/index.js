@@ -69,6 +69,8 @@ class ImageUpload extends Component {
       noData: true,
       error: null
     }
+
+    this.setState({ error: null })
     ImagePicker.launchImageLibrary(options, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
@@ -81,13 +83,13 @@ class ImageUpload extends Component {
         this.setState({ photo: null })
       }else {
         console.log('test image upload uri')
-        this.setState({ photo: response })
         if(response.fileSize >= 1000000){
           this.setState({
             error: 'File size exceeded to 1MB'
           })
           return
         }
+        this.setState({ photo: response })
         console.log('response image', response)
         const formData = new FormData();
         let uri = Platform.OS === "android" ? response.uri : response.uri.replace("file://", "");
