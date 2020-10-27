@@ -55,7 +55,7 @@ class ImageUpload extends Component {
     if(photo != null){
       return
     }
-    this.props.onCLose()
+    this.props.onClose()
   }
 
   upload = () => {
@@ -68,27 +68,34 @@ class ImageUpload extends Component {
       noData: true,
     }
     ImagePicker.launchImageLibrary(options, response => {
-      console.log('response image', response.uri)
-      if (response.uri) {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+        this.setState({ photo: null })
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+        this.setState({ photo: null })
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        this.setState({ photo: null })
+      }else {
         console.log('test image upload uri')
         this.setState({ photo: response })
-        let formData = new FormData();
-        let uri = Platform.OS == "android" ? response.uri : response.uri.replace("file://", "");
-        formData.append("file", {
+        const formData = new FormData();
+        let uri = Platform.OS === "android" ? response.uri : response.uri.replace("file://", "");
+        formData.append('file', {
+          ...response,
           name: response.fileName,
           type: response.type,
           uri: uri
         });
-        formData.append('file_url', response.fileName);
+        formData.append('file_url', response.fileName ? response.fileName.replace(' ', '_') : null);
         formData.append('account_id', user.id);
         console.log('formData', formData)
-        Api.upload(Routes.imageUpload, formData, imageResponse => {
+        Api.uploadByFetch(Routes.imageUpload, formData, imageResponse => {
           this.retrieve()
         }, error => {
           console.log('error upload', error.response)
         })
-      }else{
-        this.setState({ photo: null })
       }
     })
   }
