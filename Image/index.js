@@ -16,7 +16,8 @@ class ImageUpload extends Component {
     this.state = {
       data: null,
       url: null,
-      photo: null
+      photo: null,
+      error: null
     }
   }
 
@@ -66,6 +67,7 @@ class ImageUpload extends Component {
     const { user } = this.props.state;
     const options = {
       noData: true,
+      error: null
     }
     ImagePicker.launchImageLibrary(options, response => {
       if (response.didCancel) {
@@ -80,6 +82,13 @@ class ImageUpload extends Component {
       }else {
         console.log('test image upload uri')
         this.setState({ photo: response })
+        if(response.fileSize >= 1000000){
+          this.setState({
+            error: 'File size exceeded to 1MB'
+          })
+          return
+        }
+        console.log('response image', response)
         const formData = new FormData();
         let uri = Platform.OS === "android" ? response.uri : response.uri.replace("file://", "");
         formData.append('file', {
@@ -112,10 +121,28 @@ class ImageUpload extends Component {
   }
 
   _images = (data) => {
+    const { error } = this.state;
     return (
       <ScrollView style={{
         width: '100%'
       }}>
+        {
+          error && (
+            <View style={{
+              width: '100%',
+              height: 50
+            }}>
+              <Text style={{
+                color: Color.danger,
+                paddingTop: 10,
+                paddingBottom: 10,
+                textAlign: 'center'
+              }}>
+                {error}
+              </Text>
+            </View>
+          )
+        }
         {
           this.state.photo != null && (
             <View style={{
