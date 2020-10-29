@@ -9,7 +9,7 @@ import { Color , BasicStyles, Helper, Routes} from 'common';
 import Api from 'services/api/index.js';
 import Config from 'src/config.js';
 import ImagePicker from 'react-native-image-picker';
-class ImageUpload extends Component {
+class IdUpload extends Component {
   constructor(props){
     super(props);
 
@@ -39,9 +39,8 @@ class ImageUpload extends Component {
         created_at: 'desc'
       }
     }
-if(this.props.id!=true)
-{
-    Api.request(Routes.imageRetrieve, parameter, response => {
+
+    Api.request(Routes.getValidID, parameter, response => {
       console.log('imageRetrieve', response)
       if(response.data.length > 0){
         this.setState({data: response.data, photo: null})
@@ -49,8 +48,7 @@ if(this.props.id!=true)
         this.setState({data: null, photo: null})
       }
     });
-}
-}
+  }
 
   onClose = () => {
     const { photo } = this.state;
@@ -71,7 +69,7 @@ if(this.props.id!=true)
     }
     ImagePicker.launchImageLibrary(options, response => {
       console.log('response image', response)
-      if (response.uri) {   
+      if (response.uri) {     
         console.log('test image upload uri')
         this.setState({ photo: response })
         let formData = new FormData();
@@ -85,25 +83,23 @@ if(this.props.id!=true)
         formData.append('account_id', user.id);
         console.log('formData', formData)
         Api.upload(Routes.imageUpload, formData, imageResponse => {
-          console.log('response here',imageResponse)
-          if(this.props.id==true)
-          {
-            const parameter={
-              account_id:this.props.state.user.id,
-              file_url:imageResponse.data.data
-            }
-            Api.request(Routes.uploadValidID, parameter, response => {
-            console.log(response)  
-            }, error => {
-              console.log( "this is uploadID error",error )
-             
-            })
-             
-          }
+            console.log('upload',imageResponse)
           this.retrieve()
         }, error => {
           console.log('error upload', error)
-        }) 
+        })
+        console.log(response)
+        this.setState({ photo: response })
+        let parameter={
+          url:response.fileName,
+          account_id:this.props.state.user.id
+        }
+        Api.upload(Routes.uploadValidID, parameter, imageResponse => {
+          console.log(parameter)
+          console.log("this is the response",imageResponse)
+        }, error => {
+          console.log('error upload', error)
+        })
     }else{
         this.setState({ photo: null })
       }
@@ -302,13 +298,12 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    setLedger: (ledger) => dispatch(actions.setLedger(ledger)),
-    setUserLedger: (userLedger) => dispatch(actions.setUserLedger(userLedger))
+    
   };
 };
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ImageUpload);
+)(IdUpload);
 
