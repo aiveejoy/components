@@ -41,7 +41,7 @@ class CheckoutCard extends Component {
             <Text style={Style.title}>
               {`${details.title} ${details.selectedVariation!=null ? details.selectedVariation.payload_value : ''}`}
             </Text>
-            <Text style={Style.tags,{fontiSize:15}}>
+            <Text style={Style.tags,{fontSize:15}}>
              {`PHP `+((details.selectedVariation!=null ? details.selectedVariation.price : details.price[0].price)*details.quantity)}
             </Text>
           </View>
