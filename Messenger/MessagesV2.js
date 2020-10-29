@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   Platform,
   KeyboardAvoidingView,
-  SafeAreaView
+  SafeAreaView,
+  Dimensions
 } from 'react-native';
 import { Routes, Color, BasicStyles } from 'common';
 import { Spinner, UserImage } from 'components';
@@ -18,10 +19,13 @@ import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import CommonRequest from 'services/CommonRequest.js';
+
+const DeviceHeight = Math.round(Dimensions.get('window').height);
+const DeviceWidth = Math.round(Dimensions.get('window').width);
 
 class MessagesV2 extends Component{
   constructor(props){
@@ -36,7 +40,8 @@ class MessagesV2 extends Component{
       keyRefresh: 0,
       isPullingMessages: false,
       offset: 0,
-      limit: 10
+      limit: 10,
+      isLock: false
     }
   }
 
@@ -114,14 +119,13 @@ class MessagesV2 extends Component{
         }]
       }
       
-      this.setState({ isLoading: true })
+      this.setState({ isLoading: true, isLock: false })
       Api.request(Routes.messengerGroupRetrieve, parameter, response => {
         if (response.data.length > 0) {
           setMessengerGroup(response.data[0])
           this.retrieve();
         } else {
-          Alert.alert('Conversation is not yet available')
-          this.setState({ isLoading: false })
+          this.setState({ isLoading: false, isLock: true })
         }
       }, (error) => {
         this.setState({ isLoading: false })
@@ -712,10 +716,37 @@ class MessagesV2 extends Component{
   }
 
   render() {
-    const { isLoading, isImageModal, imageModalUrl, photo, keyRefresh, isPullingMessages } = this.state;
+    const { 
+      isLoading,
+      isImageModal,
+      imageModalUrl,
+      photo,
+      keyRefresh,
+      isPullingMessages,
+      isLock
+    } = this.state;
     const { messengerGroup, user } = this.props.state;
     return (
       <SafeAreaView>
+        {
+          // ON DEPOSITS (IF CONVERSATION IS NOT YET AVAILABLE)
+          isLock && (
+            <View style={{
+              height: DeviceHeight - 150,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <FontAwesomeIcon
+                icon={faLock}
+                size={DeviceWidth * 0.20}
+                style={{ color: Color.black, marginBottom: 10 }}
+              />
+              <Text style={{ color: Color.darkGray, fontSize: 13 }}>
+                Conversation is not yet available, try again later
+              </Text>
+            </View>
+          )
+        }
         <KeyboardAvoidingView
           behavior={'padding'} 
           keyboardVerticalOffset={
