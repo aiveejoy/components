@@ -8,7 +8,9 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
-  Platform
+  Platform,
+  KeyboardAvoidingView,
+  SafeAreaView
 } from 'react-native';
 import { Routes, Color, BasicStyles } from 'common';
 import { Spinner, UserImage } from 'components';
@@ -40,44 +42,70 @@ class MessagesV2 extends Component{
 
   componentDidMount(){
     const { user } = this.props.state
+    if (user == null) return
+
     const { setMessengerGroup } = this.props
     const { navigation: { state: { params } } } = this.props
+    const accountType = (user.account_type + '').toLowerCase()
     
-    if (user == null) return
-    
-    if ((user.account_type + '').toLowerCase() === 'rider') {
-      const { id, code, merchantId, customerId } = params.checkoutData
-      const parameter = {
-        condition: [{
-          column: 'title',
-          clause: '=',
-          value: code
-        }],
-        title: code,
-        payload: id,
-        creator: user.id,
-        member: customerId,
-        member2: merchantId,
-      }
-  
-      this.setState({ isLoading: true })
-      Api.request(Routes.messengerCreateForRider, parameter, response => {
-        if (Array.isArray(response.data)) {
-          setMessengerGroup(response.data[0])
-        } else {
-          setMessengerGroup({
-            id: response.data,
-            account_id: user.id
-          })
+    if (params.checkoutData != null) {
+      if (accountType === 'rider') {
+        const { id, code, merchantId, customerId } = params.checkoutData
+        const parameter = {
+          condition: [{
+            column: 'title',
+            clause: '=',
+            value: code
+          }],
+          title: code,
+          payload: id,
+          creator: user.id,
+          member: customerId,
+          member2: merchantId,
         }
-        this.retrieve();
-      }, (error) => {
-        this.setState({ isLoading: false })
-        console.log({ messengerGroupRetrieveError: error })
-      })
+    
+        this.setState({ isLoading: true })
+        Api.request(Routes.messengerCreateForRider, parameter, response => {
+          if (Array.isArray(response.data)) {
+            setMessengerGroup(response.data[0])
+          } else {
+            setMessengerGroup({
+              id: response.data,
+              account_id: user.id
+            })
+          }
+          this.retrieve();
+        }, (error) => {
+          this.setState({ isLoading: false })
+          console.log({ messengerGroupRetrieveError: error })
+        })
+      }
+      else if (accountType === 'user' || accountType === 'merchant') {
+        const messengerTitle = params ? params.checkoutData.code : null
+        const parameter = {
+          condition: [{
+            column: 'title',
+            clause: '=',
+            value: messengerTitle
+          }]
+        }
+        
+        this.setState({ isLoading: true })
+        Api.request(Routes.messengerGroupRetrieve, parameter, response => {
+          if (response.data.length > 0) {
+            setMessengerGroup(response.data[0])
+            this.retrieve();
+          } else {
+            this.createGroup(params, accountType)
+          }
+        }, (error) => {
+          this.setState({ isLoading: false })
+          console.log({ messengerGroupRetrieveError: error })
+        })
+      }
     }
-    else if ((user.account_type + '').toLowerCase() === 'user') {
-      const messengerTitle = params ? params.checkoutData.code : null
+    else if (params.depositData != null) {
+      const messengerTitle = params ? params.depositData.code : null
       const parameter = {
         condition: [{
           column: 'title',
@@ -92,7 +120,8 @@ class MessagesV2 extends Component{
           setMessengerGroup(response.data[0])
           this.retrieve();
         } else {
-          this.createGroup(params)
+          Alert.alert('Conversation is not yet available')
+          this.setState({ isLoading: false })
         }
       }, (error) => {
         this.setState({ isLoading: false })
@@ -142,7 +171,7 @@ class MessagesV2 extends Component{
     });
   }
 
-  createGroup(params) {
+  createGroup(params, accountType) {
     const { setMessengerGroup } = this.props
     const checkoutId = params ? params.checkoutData.id : null
     const merchantId = params ? params.checkoutData.merchantId : null
@@ -155,11 +184,21 @@ class MessagesV2 extends Component{
       return
     }
 
-    const parameter = {
+    let parameter = {
       member: merchantId,
       creator: user.id,
       title: messengerTitle,
       payload: checkoutId
+    }
+    
+    if (accountType === 'merchant') {
+      const customerId = params ? params.checkoutData.customerId : null
+      parameter = {
+        member: customerId,
+        creator: merchantId,
+        title: messengerTitle,
+        payload: checkoutId
+      }
     }
 
     Api.request(Routes.customMessengerGroupCreate, parameter, response => {
@@ -676,61 +715,72 @@ class MessagesV2 extends Component{
     const { isLoading, isImageModal, imageModalUrl, photo, keyRefresh, isPullingMessages } = this.state;
     const { messengerGroup, user } = this.props.state;
     return (
-      <View key={keyRefresh}>
-        {isLoading ? <Spinner mode="full"/> : null }
-        <ScrollView
-          ref={ref => this.scrollView = ref}
-          onContentSizeChange={(contentWidth, contentHeight)=>{        
-            if (!isPullingMessages) {
-              this.scrollView.scrollToEnd({animated: true});
-            }
-          }}
-          style={[Style.ScrollView, {
-            height: '100%'
-          }]}
-          onScroll={({ nativeEvent }) => {
-            const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
-            const isOnBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height
-            const isOnTop = contentOffset.y <= 0
-
-            if (isOnTop) {
-              if(this.state.isLoading == false){
+      <SafeAreaView>
+        <KeyboardAvoidingView
+          behavior={'padding'} 
+          keyboardVerticalOffset={
+            Platform.select({
+              ios: () => 65,
+              android: () => -200
+          })()}
+        >
+          <View key={keyRefresh}>
+            {isLoading ? <Spinner mode="full"/> : null }
+            <ScrollView
+              ref={ref => this.scrollView = ref}
+              onContentSizeChange={(contentWidth, contentHeight)=>{        
                 if (!isPullingMessages) {
-                  this.setState({ isPullingMessages: true })
+                  this.scrollView.scrollToEnd({animated: true});
                 }
-                this.retrieveMoreMessages()
-              }
-            }
-            if (isOnBottom) {
-              if (this.state.isLoading == false && isPullingMessages) {
-                this.setState({ isPullingMessages: false })
-              }
-            }
-          }}
-          >
-          <View style={{
-            flexDirection: 'row',
-            width: '100%'
-          }}>
-            {this._flatList()}
+              }}
+              style={[Style.ScrollView, {
+                height: '100%'
+              }]}
+              onScroll={({ nativeEvent }) => {
+                const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
+                const isOnBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height
+                const isOnTop = contentOffset.y <= 0
+
+                if (isOnTop) {
+                  if(this.state.isLoading == false){
+                    if (!isPullingMessages) {
+                      this.setState({ isPullingMessages: true })
+                    }
+                    this.retrieveMoreMessages()
+                  }
+                }
+                if (isOnBottom) {
+                  if (this.state.isLoading == false && isPullingMessages) {
+                    this.setState({ isPullingMessages: false })
+                  }
+                }
+              }}
+              >
+              <View style={{
+                flexDirection: 'row',
+                width: '100%'
+              }}>
+                {this._flatList()}
+              </View>
+            </ScrollView>
+            <View style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              borderTopColor: Color.lightGray,
+              borderTopWidth: 1,
+              backgroundColor: Color.white
+            }}>
+              {messengerGroup != null && (this._footer())}
+            </View>
+            <ImageModal
+              visible={isImageModal}
+              url={imageModalUrl}
+              action={() => this.setState({isImageModal: false})}
+            ></ImageModal>
           </View>
-        </ScrollView>
-        <View style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          borderTopColor: Color.lightGray,
-          borderTopWidth: 1,
-          backgroundColor: Color.white
-        }}>
-          {messengerGroup != null && (this._footer())}
-        </View>
-        <ImageModal
-          visible={isImageModal}
-          url={imageModalUrl}
-          action={() => this.setState({isImageModal: false})}
-        ></ImageModal>
-      </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     );
   }
 }

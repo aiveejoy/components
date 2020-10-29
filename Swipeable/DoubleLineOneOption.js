@@ -41,7 +41,7 @@ class ItemOptions extends Component {
               justifyContent: 'center',
               alignItems: 'center'
             }}
-            onPress={() => this.props.redirect(this.props.item)}
+            onPress={() => this.props.redirect(item)}
             underlayColor={Color.gray}
             >
               <View style={{
@@ -166,7 +166,7 @@ class Basic extends Component {
     return (
         <SwipeableFlatList
           data={data}
-          renderItem={({item}) => <Item item={item} existData={added}/>}
+          renderItem={({item}) => <Item item={item} existData={added} />}
           maxSwipeDistance={width / 5}
           renderQuickActions={({item}) =>
             <ItemOptions

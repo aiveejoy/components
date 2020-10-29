@@ -16,7 +16,8 @@ class ImageUpload extends Component {
     this.state = {
       data: null,
       url: null,
-      photo: null
+      photo: null,
+      error: null
     }
   }
 
@@ -39,6 +40,7 @@ class ImageUpload extends Component {
         created_at: 'desc'
       }
     }
+ 
 if(this.props.id!=true)
 {
     Api.request(Routes.imageRetrieve, parameter, response => {
@@ -57,7 +59,7 @@ if(this.props.id!=true)
     if(photo != null){
       return
     }
-    this.props.onCLose()
+    this.props.onClose()
   }
 
   upload = () => {
@@ -68,44 +70,61 @@ if(this.props.id!=true)
     const { user } = this.props.state;
     const options = {
       noData: true,
+      error: null
     }
+
+    this.setState({ error: null })
     ImagePicker.launchImageLibrary(options, response => {
-      console.log('response image', response)
-      if (response.uri) {   
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+        this.setState({ photo: null })
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+        this.setState({ photo: null })
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        this.setState({ photo: null })
+      }else {
         console.log('test image upload uri')
+        if(response.fileSize >= 1000000){
+          this.setState({
+            error: 'File size exceeded to 1MB'
+          })
+          return
+        }
         this.setState({ photo: response })
-        let formData = new FormData();
-        let uri = Platform.OS == "android" ? response.uri : response.uri.replace("file://", "");
-        formData.append("file", {
+        console.log('response image', response)
+        const formData = new FormData();
+        let uri = Platform.OS === "android" ? response.uri : response.uri.replace("file://", "");
+        formData.append('file', {
+          ...response,
           name: response.fileName,
           type: response.type,
           uri: uri
         });
-        formData.append('file_url', response.fileName);
+        formData.append('file_url', response.fileName ? response.fileName.replace(' ', '_') : null);
         formData.append('account_id', user.id);
         console.log('formData', formData)
-        Api.upload(Routes.imageUpload, formData, imageResponse => {
-          console.log('response here',imageResponse)
+        Api.uploadByFetch(Routes.imageUpload, formData, imageResponse => {
           if(this.props.id==true)
           {
             const parameter={
               account_id:this.props.state.user.id,
-              file_url:imageResponse.data.data
+              file_url:imageResponse.data
             }
             Api.request(Routes.uploadValidID, parameter, response => {
             console.log(response)  
+            this.props.onClose()
+            alert("ID Successfully Uploaded")
             }, error => {
               console.log( "this is uploadID error",error )
              
             })
-             
           }
           this.retrieve()
         }, error => {
-          console.log('error upload', error)
-        }) 
-    }else{
-        this.setState({ photo: null })
+          console.log('error upload', error.response)
+        })
       }
     })
   }
@@ -123,10 +142,28 @@ if(this.props.id!=true)
   }
 
   _images = (data) => {
+    const { error } = this.state;
     return (
       <ScrollView style={{
         width: '100%'
       }}>
+        {
+          error && (
+            <View style={{
+              width: '100%',
+              height: 50
+            }}>
+              <Text style={{
+                color: Color.danger,
+                paddingTop: 10,
+                paddingBottom: 10,
+                textAlign: 'center'
+              }}>
+                {error}
+              </Text>
+            </View>
+          )
+        }
         {
           this.state.photo != null && (
             <View style={{
@@ -177,7 +214,7 @@ if(this.props.id!=true)
           )
         }
         {
-          data != null && data.map((imageItem, imageIndex) => {
+          data != null && this.props.onSelect && data.map((imageItem, imageIndex) => {
             return (
               <TouchableOpacity
                 onPress={() => this.setImage(imageItem.url)} 
@@ -255,7 +292,7 @@ if(this.props.id!=true)
                 height: '8%'
               }]}>
                 <View style={{
-                  width: '50%',
+                  width: this.props.onSelect ?  '50%' : '100%',
                   alignItems: 'center',
                   height: '100%',
                   backgroundColor: Color.white
@@ -270,24 +307,27 @@ if(this.props.id!=true)
                     }]}>Upload</Text>
                   </TouchableOpacity>
                 </View>
-                <View style={{
-                  width: '50%',
-                  alignItems: 'center',
-                  height: '100%',
-                  borderLeftColor: Color.gray,
-                  borderLeftWidth: 1,
-                  backgroundColor: Color.white
-                }}>
-                  <TouchableOpacity 
-                    onPress={() => this.select()}
-                    underlayColor={Color.gray}
-                  >
-                    <Text style={[styles.text, {
-                      color: Color.primary,
-                      width: '100%'
-                    }]}>Select</Text>
-                  </TouchableOpacity>
-                </View>
+                {this.props.onSelect && (
+                     <View style={{
+                      width: '50%',
+                      alignItems: 'center',
+                      height: '100%',
+                      borderLeftColor: Color.gray,
+                      borderLeftWidth: 1,
+                      backgroundColor: Color.white
+                    }}>
+                      <TouchableOpacity 
+                        onPress={() => this.select()}
+                        underlayColor={Color.gray}
+                      >
+                        <Text style={[styles.text, {
+                          color: Color.primary,
+                          width: '100%'
+                        }]}>Select</Text>
+                      </TouchableOpacity>
+                    </View>
+                )}
+             
               </View>
             </View>
           </View>
