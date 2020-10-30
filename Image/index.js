@@ -106,21 +106,6 @@ if(this.props.id!=true)
         formData.append('account_id', user.id);
         console.log('formData', formData)
         Api.uploadByFetch(Routes.imageUpload, formData, imageResponse => {
-          if(this.props.id==true)
-          {
-            const parameter={
-              account_id:this.props.state.user.id,
-              file_url:imageResponse.data
-            }
-            Api.request(Routes.uploadValidID, parameter, response => {
-            console.log(response)  
-            this.props.onClose()
-            alert("ID Successfully Uploaded")
-            }, error => {
-              console.log( "this is uploadID error",error )
-             
-            })
-          }
           this.retrieve()
         }, error => {
           console.log('error upload', error.response)
