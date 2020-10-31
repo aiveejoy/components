@@ -25,7 +25,7 @@ class Rating extends Component {
       )
     }
     return (
-      <View style={{flexDirection: 'row', marginBottom: 10}}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Text style={{
           color: Color.normalGray,
           lineHeight: 30,
