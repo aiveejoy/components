@@ -41,8 +41,7 @@ class ImageUpload extends Component {
       }
     }
  
-if(this.props.id!=true)
-{
+
     Api.request(Routes.imageRetrieve, parameter, response => {
       console.log('imageRetrieve', response)
       if(response.data.length > 0){
@@ -51,7 +50,7 @@ if(this.props.id!=true)
         this.setState({data: null, photo: null})
       }
     });
-}
+
 }
 
   onClose = () => {
