@@ -92,6 +92,7 @@ class CustomModal extends Component {
   }
 
   _charges = () => {
+    debugger
     const { data } = this.props;
     const { userLedger } = this.props.state;
     const { errorMessage } = this.state;
