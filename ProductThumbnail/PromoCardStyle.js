@@ -2,7 +2,7 @@ import { Color } from 'common';
 const borderRadius = 5
 export default {
   container: {
-    height: 70,
+    height: 200,
     width: '100%',
     backgroundColor: Color.primary,
     justifyContent: 'center',
@@ -20,4 +20,11 @@ export default {
     fontSize: 12,
     fontWeight: '500'
   },
+  image: {
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    width: '100%',
+    height: 100,
+    marginTop: 10
+  }
 }
