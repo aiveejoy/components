@@ -31,7 +31,7 @@ class CheckoutCard extends Component {
             <FontAwesomeIcon style={{paddingRight:10}} icon={faMinus} color={'orange'}/>
           </TouchableOpacity>
              <Text style={{fontSize:20,marginTop:-5,marginRight:5,marginLeft:5}}>
-                {details.quantity}
+                {this.props.variation?this.props.variation.quantity:details.quantity}
               </Text>
             <TouchableOpacity onPress={()=>this.props.onAdd()}>
                <FontAwesomeIcon style={{paddingRight:10}} icon={faPlus} color={'orange'}/>
@@ -39,10 +39,10 @@ class CheckoutCard extends Component {
           </View>
           <View style={Style.leftSide}>
             <Text style={Style.title}>
-              {`${details.title} ${details.selectedVariation!=null ? details.selectedVariation.payload_value : ''}`}
+              {`${details.title} ${this.props.variation ? this.props.variation.payload_value : ''}`}
             </Text>
-            <Text style={Style.tags,{fontiSize:15}}>
-             {`PHP `+((details.selectedVariation!=null ? details.selectedVariation.price : details.price[0].price)*details.quantity)}
+            <Text style={Style.tags,{fontSize:15}}>
+             {`PHP `+((this.props.variation ? this.props.variation.price : details.price[0].price)*details.quantity)}
             </Text>
           </View>
           <View style={Style.rightSide}>

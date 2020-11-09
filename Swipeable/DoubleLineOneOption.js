@@ -166,7 +166,7 @@ class Basic extends Component {
     return (
         <SwipeableFlatList
           data={data}
-          renderItem={({item}) => <Item item={item} existData={added}/>}
+          renderItem={({item}) => <Item item={item} existData={added} />}
           maxSwipeDistance={width / 5}
           renderQuickActions={({item}) =>
             <ItemOptions

@@ -9,15 +9,14 @@ import { Color , BasicStyles, Helper, Routes} from 'common';
 import Api from 'services/api/index.js';
 import Config from 'src/config.js';
 import ImagePicker from 'react-native-image-picker';
-class ImageUpload extends Component {
+class IdUpload extends Component {
   constructor(props){
     super(props);
 
     this.state = {
       data: null,
       url: null,
-      photo: null,
-      error: null
+      photo: null
     }
   }
 
@@ -40,9 +39,8 @@ class ImageUpload extends Component {
         created_at: 'desc'
       }
     }
- 
 
-    Api.request(Routes.imageRetrieve, parameter, response => {
+    Api.request(Routes.getValidID, parameter, response => {
       console.log('imageRetrieve', response)
       if(response.data.length > 0){
         this.setState({data: response.data, photo: null})
@@ -50,15 +48,14 @@ class ImageUpload extends Component {
         this.setState({data: null, photo: null})
       }
     });
-
-}
+  }
 
   onClose = () => {
     const { photo } = this.state;
     if(photo != null){
       return
     }
-    this.props.onClose()
+    this.props.onCLose()
   }
 
   upload = () => {
@@ -69,46 +66,42 @@ class ImageUpload extends Component {
     const { user } = this.props.state;
     const options = {
       noData: true,
-      error: null
     }
-
-    this.setState({ error: null })
     ImagePicker.launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-        this.setState({ photo: null })
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-        this.setState({ photo: null })
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-        this.setState({ photo: null })
-      }else {
+      console.log('response image', response)
+      if (response.uri) {     
         console.log('test image upload uri')
-        if(response.fileSize >= 1000000){
-          this.setState({
-            error: 'File size exceeded to 1MB'
-          })
-          return
-        }
         this.setState({ photo: response })
-        console.log('response image', response)
-        const formData = new FormData();
-        let uri = Platform.OS === "android" ? response.uri : response.uri.replace("file://", "");
-        formData.append('file', {
-          ...response,
+        let formData = new FormData();
+        let uri = Platform.OS == "android" ? response.uri : response.uri.replace("file://", "");
+        formData.append("file", {
           name: response.fileName,
           type: response.type,
           uri: uri
         });
-        formData.append('file_url', response.fileName ? response.fileName.replace(' ', '_') : null);
+        formData.append('file_url', response.fileName);
         formData.append('account_id', user.id);
         console.log('formData', formData)
-        Api.uploadByFetch(Routes.imageUpload, formData, imageResponse => {
+        Api.upload(Routes.imageUpload, formData, imageResponse => {
+            console.log('upload',imageResponse)
           this.retrieve()
         }, error => {
-          console.log('error upload', error.response)
+          console.log('error upload', error)
         })
+        console.log(response)
+        this.setState({ photo: response })
+        let parameter={
+          url:response.fileName,
+          account_id:this.props.state.user.id
+        }
+        Api.upload(Routes.uploadValidID, parameter, imageResponse => {
+          console.log(parameter)
+          console.log("this is the response",imageResponse)
+        }, error => {
+          console.log('error upload', error)
+        })
+    }else{
+        this.setState({ photo: null })
       }
     })
   }
@@ -126,28 +119,10 @@ class ImageUpload extends Component {
   }
 
   _images = (data) => {
-    const { error } = this.state;
     return (
       <ScrollView style={{
         width: '100%'
       }}>
-        {
-          error && (
-            <View style={{
-              width: '100%',
-              height: 50
-            }}>
-              <Text style={{
-                color: Color.danger,
-                paddingTop: 10,
-                paddingBottom: 10,
-                textAlign: 'center'
-              }}>
-                {error}
-              </Text>
-            </View>
-          )
-        }
         {
           this.state.photo != null && (
             <View style={{
@@ -198,7 +173,7 @@ class ImageUpload extends Component {
           )
         }
         {
-          data != null && this.props.onSelect && data.map((imageItem, imageIndex) => {
+          data != null && data.map((imageItem, imageIndex) => {
             return (
               <TouchableOpacity
                 onPress={() => this.setImage(imageItem.url)} 
@@ -276,7 +251,7 @@ class ImageUpload extends Component {
                 height: '8%'
               }]}>
                 <View style={{
-                  width: this.props.onSelect ?  '50%' : '100%',
+                  width: '50%',
                   alignItems: 'center',
                   height: '100%',
                   backgroundColor: Color.white
@@ -291,27 +266,24 @@ class ImageUpload extends Component {
                     }]}>Upload</Text>
                   </TouchableOpacity>
                 </View>
-                {this.props.onSelect && (
-                     <View style={{
-                      width: '50%',
-                      alignItems: 'center',
-                      height: '100%',
-                      borderLeftColor: Color.gray,
-                      borderLeftWidth: 1,
-                      backgroundColor: Color.white
-                    }}>
-                      <TouchableOpacity 
-                        onPress={() => this.select()}
-                        underlayColor={Color.gray}
-                      >
-                        <Text style={[styles.text, {
-                          color: Color.primary,
-                          width: '100%'
-                        }]}>Select</Text>
-                      </TouchableOpacity>
-                    </View>
-                )}
-             
+                <View style={{
+                  width: '50%',
+                  alignItems: 'center',
+                  height: '100%',
+                  borderLeftColor: Color.gray,
+                  borderLeftWidth: 1,
+                  backgroundColor: Color.white
+                }}>
+                  <TouchableOpacity 
+                    onPress={() => this.select()}
+                    underlayColor={Color.gray}
+                  >
+                    <Text style={[styles.text, {
+                      color: Color.primary,
+                      width: '100%'
+                    }]}>Select</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </View>
@@ -326,13 +298,12 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    setLedger: (ledger) => dispatch(actions.setLedger(ledger)),
-    setUserLedger: (userLedger) => dispatch(actions.setUserLedger(userLedger))
+    
   };
 };
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ImageUpload);
+)(IdUpload);
 
