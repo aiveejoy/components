@@ -11,7 +11,8 @@ import {
   Platform,
   KeyboardAvoidingView,
   SafeAreaView,
-  Dimensions
+  Dimensions,
+  Alert
 } from 'react-native';
 import { Routes, Color, BasicStyles } from 'common';
 import { Spinner, UserImage } from 'components';
@@ -281,6 +282,7 @@ class MessagesV2 extends Component{
     if(messengerGroup == null || user == null || this.state.newMessage == null){
       return
     }
+
     let parameter = {
       messenger_group_id: messengerGroup.id,
       message: this.state.newMessage,
@@ -314,6 +316,8 @@ class MessagesV2 extends Component{
       if(response.data != null){
         updateMessageByCode(response.data);
       }
+    }, error => {
+      console.log({ sendImageWithoutPayloadError: error })
     })
   }
 
@@ -321,12 +325,36 @@ class MessagesV2 extends Component{
     const { user, messengerGroup, messagesOnGroup } = this.props.state;
     const options = {
       noData: true,
+      error: null
     }
     ImagePicker.launchImageLibrary(options, response => {
-      if (response.uri) {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+        this.setState({ photo: null })
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+        this.setState({ photo: null })
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        this.setState({ photo: null })
+      }else {
+        if(response.fileSize >= 1000000){
+          Alert.alert('Notice', 'File size exceeded to 1MB')
+          return
+        }
+
         this.setState({ photo: response })
+        const { updateMessagesOnGroup } = this.props;
         let formData = new FormData();
         let uri = Platform.OS == "android" ? response.uri : response.uri.replace("file://", "");
+        formData.append("file", {
+          name: response.fileName,
+          type: response.type,
+          uri: uri
+        });
+        formData.append('file_url', response.fileName);
+        formData.append('account_id', user.id);
+
         let parameter = {
           messenger_group_id: messengerGroup.id,
           message: null,
@@ -347,27 +375,20 @@ class MessagesV2 extends Component{
           }],
           error: null
         }
-        const { updateMessagesOnGroup } = this.props;
         updateMessagesOnGroup(newMessageTemp);
-        formData.append("file", {
-          name: response.fileName,
-          type: response.type,
-          uri: uri
-        });
-        formData.append('file_url', response.fileName);
-        formData.append('account_id', user.id);
-        Api.upload(Routes.imageUploadUnLink, formData, imageResponse => {
+
+        Api.uploadByFetch(Routes.imageUploadUnLink, formData, imageResponse => {
           // add message
-          if(imageResponse.data.data != null){
+          if(imageResponse.data != null){
             parameter = {
               ...parameter,
-              url: imageResponse.data.data
+              url: imageResponse.data
             }
             this.sendImageWithoutPayload(parameter)
           }
+        }, error => {
+          console.log({ imageError: error })
         })
-      }else{
-        this.setState({ photo: null })
       }
     })
   }
