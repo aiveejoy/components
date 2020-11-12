@@ -28,13 +28,13 @@ class CheckoutCard extends Component {
             <React.Fragment>
           <View style={Style.newLeft}>
           <TouchableOpacity onPress={()=>this.props.onSubtract()}>
-            <FontAwesomeIcon style={{paddingRight:10}} icon={faMinus} color={'orange'}/>
+            <FontAwesomeIcon style={{paddingRight:12}} size={23} icon={faMinus} color={'orange'}/>
           </TouchableOpacity>
-             <Text style={{fontSize:20,marginTop:-5,marginRight:5,marginLeft:5}}>
+             <Text style={{fontSize:20,marginTop:-4,marginRight:5,marginLeft:7}}>
                 {this.props.variation?this.props.variation.quantity:details.quantity}
               </Text>
             <TouchableOpacity onPress={()=>this.props.onAdd()}>
-               <FontAwesomeIcon style={{paddingRight:10}} icon={faPlus} color={'orange'}/>
+               <FontAwesomeIcon style={{paddingRight:12}} size={23} icon={faPlus} color={'orange'}/>
             </TouchableOpacity>
           </View>
           <View style={Style.leftSide}>

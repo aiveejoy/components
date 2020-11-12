@@ -73,7 +73,7 @@ export default {
   leftSide: {
     paddingTop:50,
     width: '50%',
-    paddingLeft:25,
+    paddingLeft:35,
     marginTop:-9,
     flexDirection: 'column'
   },
