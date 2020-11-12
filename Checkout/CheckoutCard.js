@@ -23,7 +23,7 @@ class CheckoutCard extends Component {
       <View style={Style.container}>
    
         <View style={Style.details}>
-          {details.price!=null? 
+          {details.price!=null || this.props.variation.price!=null ? 
           (
             <React.Fragment>
           <View style={Style.newLeft}>
