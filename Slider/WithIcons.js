@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import styles from './Style';
 import {NavigationActions, StackActions} from 'react-navigation';
-import {ScrollView, Text, View, Image, TouchableOpacity} from 'react-native';
+import {ScrollView, Text, View, Image, TouchableOpacity, Alert} from 'react-native';
 import { connect } from 'react-redux';
 import { Helper, BasicStyles, Color } from 'common';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { faUserCircle, faBell } from '@fortawesome/free-solid-svg-icons';
 import Pusher from 'services/Pusher.js';
 
 class Slider extends Component {
@@ -103,6 +103,34 @@ class Slider extends Component {
                   }}>
                     Hi {user.username}!
                   </Text>
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.props.navigation.navigate('Notification')
+                    }}
+                    style={{ width: '100%' }}
+                  >
+                    <View
+                      style={{
+                        width: '100%',
+                        marginTop: 20,
+                        marginBottom: 10,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        paddingLeft: 15
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        icon={faBell}
+                        size={20}
+                        style={{ color: Color.white }}
+                      />
+                      <Text style={{ color: Color.white, marginHorizontal: 5 }}>
+                        Notifications
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 </View>
               ) : 
               <View style={[styles.sectionHeadingStyle, {
