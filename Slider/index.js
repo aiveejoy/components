@@ -25,6 +25,7 @@ class Slider extends Component {
   }
 
   logoutAction(){
+    
     //clear storage
     const { logout, setActiveRoute } = this.props;
     logout();

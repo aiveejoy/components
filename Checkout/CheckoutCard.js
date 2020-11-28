@@ -23,26 +23,26 @@ class CheckoutCard extends Component {
       <View style={Style.container}>
    
         <View style={Style.details}>
-          {details.price!=null? 
+          {details.price!=null || this.props.variation.price!=null ? 
           (
             <React.Fragment>
           <View style={Style.newLeft}>
           <TouchableOpacity onPress={()=>this.props.onSubtract()}>
-            <FontAwesomeIcon style={{paddingRight:10}} icon={faMinus} color={'orange'}/>
+            <FontAwesomeIcon style={{paddingRight:12}} size={23} icon={faMinus} color={'orange'}/>
           </TouchableOpacity>
-             <Text style={{fontSize:20,marginTop:-5,marginRight:5,marginLeft:5}}>
-                {details.quantity}
+             <Text style={{fontSize:20,marginTop:-4,marginRight:5,marginLeft:7}}>
+                {this.props.variation?this.props.variation.quantity:details.quantity}
               </Text>
             <TouchableOpacity onPress={()=>this.props.onAdd()}>
-               <FontAwesomeIcon style={{paddingRight:10}} icon={faPlus} color={'orange'}/>
+               <FontAwesomeIcon style={{paddingRight:12}} size={23} icon={faPlus} color={'orange'}/>
             </TouchableOpacity>
           </View>
           <View style={Style.leftSide}>
             <Text style={Style.title}>
-              {details.title}
+              {`${details.title} ${this.props.variation ? this.props.variation.payload_value : ''}`}
             </Text>
-            <Text style={Style.tags,{fontiSize:15}}>
-             {`PHP `+(details.price[0].price*details.quantity)}
+            <Text style={Style.tags,{fontSize:15}}>
+             {`PHP `+((this.props.variation ? this.props.variation.price : details.price[0].price)*details.quantity)}
             </Text>
           </View>
           <View style={Style.rightSide}>

@@ -10,7 +10,9 @@ import {
   TouchableOpacity,
   Platform,
   KeyboardAvoidingView,
-  SafeAreaView
+  SafeAreaView,
+  Dimensions,
+  Alert
 } from 'react-native';
 import { Routes, Color, BasicStyles } from 'common';
 import { Spinner, UserImage } from 'components';
@@ -18,10 +20,13 @@ import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import CommonRequest from 'services/CommonRequest.js';
+
+const DeviceHeight = Math.round(Dimensions.get('window').height);
+const DeviceWidth = Math.round(Dimensions.get('window').width);
 
 class MessagesV2 extends Component{
   constructor(props){
@@ -36,7 +41,8 @@ class MessagesV2 extends Component{
       keyRefresh: 0,
       isPullingMessages: false,
       offset: 0,
-      limit: 10
+      limit: 10,
+      isLock: false
     }
   }
 
@@ -114,14 +120,13 @@ class MessagesV2 extends Component{
         }]
       }
       
-      this.setState({ isLoading: true })
+      this.setState({ isLoading: true, isLock: false })
       Api.request(Routes.messengerGroupRetrieve, parameter, response => {
         if (response.data.length > 0) {
           setMessengerGroup(response.data[0])
           this.retrieve();
         } else {
-          Alert.alert('Conversation is not yet available')
-          this.setState({ isLoading: false })
+          this.setState({ isLoading: false, isLock: true })
         }
       }, (error) => {
         this.setState({ isLoading: false })
@@ -277,6 +282,7 @@ class MessagesV2 extends Component{
     if(messengerGroup == null || user == null || this.state.newMessage == null){
       return
     }
+
     let parameter = {
       messenger_group_id: messengerGroup.id,
       message: this.state.newMessage,
@@ -310,6 +316,8 @@ class MessagesV2 extends Component{
       if(response.data != null){
         updateMessageByCode(response.data);
       }
+    }, error => {
+      console.log({ sendImageWithoutPayloadError: error })
     })
   }
 
@@ -317,12 +325,36 @@ class MessagesV2 extends Component{
     const { user, messengerGroup, messagesOnGroup } = this.props.state;
     const options = {
       noData: true,
+      error: null
     }
     ImagePicker.launchImageLibrary(options, response => {
-      if (response.uri) {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+        this.setState({ photo: null })
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+        this.setState({ photo: null })
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        this.setState({ photo: null })
+      }else {
+        if(response.fileSize >= 1000000){
+          Alert.alert('Notice', 'File size exceeded to 1MB')
+          return
+        }
+
         this.setState({ photo: response })
+        const { updateMessagesOnGroup } = this.props;
         let formData = new FormData();
         let uri = Platform.OS == "android" ? response.uri : response.uri.replace("file://", "");
+        formData.append("file", {
+          name: response.fileName,
+          type: response.type,
+          uri: uri
+        });
+        formData.append('file_url', response.fileName);
+        formData.append('account_id', user.id);
+
         let parameter = {
           messenger_group_id: messengerGroup.id,
           message: null,
@@ -343,27 +375,20 @@ class MessagesV2 extends Component{
           }],
           error: null
         }
-        const { updateMessagesOnGroup } = this.props;
         updateMessagesOnGroup(newMessageTemp);
-        formData.append("file", {
-          name: response.fileName,
-          type: response.type,
-          uri: uri
-        });
-        formData.append('file_url', response.fileName);
-        formData.append('account_id', user.id);
-        Api.upload(Routes.imageUploadUnLink, formData, imageResponse => {
+
+        Api.uploadByFetch(Routes.imageUploadUnLink, formData, imageResponse => {
           // add message
-          if(imageResponse.data.data != null){
+          if(imageResponse.data != null){
             parameter = {
               ...parameter,
-              url: imageResponse.data.data
+              url: imageResponse.data
             }
             this.sendImageWithoutPayload(parameter)
           }
+        }, error => {
+          console.log({ imageError: error })
         })
-      }else{
-        this.setState({ photo: null })
       }
     })
   }
@@ -712,10 +737,37 @@ class MessagesV2 extends Component{
   }
 
   render() {
-    const { isLoading, isImageModal, imageModalUrl, photo, keyRefresh, isPullingMessages } = this.state;
+    const { 
+      isLoading,
+      isImageModal,
+      imageModalUrl,
+      photo,
+      keyRefresh,
+      isPullingMessages,
+      isLock
+    } = this.state;
     const { messengerGroup, user } = this.props.state;
     return (
       <SafeAreaView>
+        {
+          // ON DEPOSITS (IF CONVERSATION IS NOT YET AVAILABLE)
+          isLock && (
+            <View style={{
+              height: DeviceHeight - 150,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <FontAwesomeIcon
+                icon={faLock}
+                size={DeviceWidth * 0.20}
+                style={{ color: Color.black, marginBottom: 10 }}
+              />
+              <Text style={{ color: Color.darkGray, fontSize: 13 }}>
+                Conversation is not yet available, try again later
+              </Text>
+            </View>
+          )
+        }
         <KeyboardAvoidingView
           behavior={'padding'} 
           keyboardVerticalOffset={

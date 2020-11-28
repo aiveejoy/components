@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Animated, Easing } from 'react-native';
+import { Text, View, Animated, Easing, Image } from 'react-native';
 import { Color } from 'common';
 import Style from './PromoCardStyle';
 import Currency from 'services/Currency';
@@ -47,6 +47,10 @@ class PromoCard extends Component {
           <Text style={Style.heading}>{ details.description }</Text>
           <Text style={Style.heading}>{ details.code ? `Code: ${details.code}` : '' }</Text>
           <Text style={Style.caption}>{ details.type ? `Get up to ${discount}` : '' }</Text>
+          <Image
+            source={{ uri: 'https://image.shutterstock.com/image-vector/hot-sale-speech-bubble-banner-260nw-1409067080.jpg' }}
+            style={Style.image}
+          />
         </View>
       )
 
@@ -57,7 +61,7 @@ class PromoCard extends Component {
         outputRange: ['#ccc', '#eee']
       });
       content = (
-        <Animated.View style={[Style.container, { backgroundColor: colorAnimation, width: 100 }]}>
+        <Animated.View style={[Style.container, { backgroundColor: colorAnimation, width: 100, height: 70 }]}>
         </Animated.View>
       )
     }
