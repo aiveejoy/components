@@ -16,16 +16,40 @@ class ProductCard extends Component {
         
           <View style={Style.paddockInfo}>
             <View style={{flexDirection:'row'}}>
-            <View style={{marginTop:6,marginRight:10,width:10,height:10,borderRadius:100/2,backgroundColor:'#D3E584'}}/>
+              <View
+                style={{
+                  marginTop:6,
+                  marginRight:10,
+                  width:10,
+                  height:10,
+                  borderRadius:100/2,
+                  backgroundColor: details.stocks != null && details.stocks > 0 ? '#D3E584' : '#FF6262'
+                }}
+              />
               <Text style={{fontWeight:'bold',fontSize:17}}>{details.title}</Text>
             </View>
               <Text style={{marginLeft:19,color:'#C0C0C0'}}>{details.type}</Text>
           </View>
 
-          <View style={Style.paddockDate}>
-              <Text>{details.due_date}</Text>
-              <Text style={{fontWeight:'bold',color:'#5A84EE',fontSize:12}}>DUE DATE</Text>
-          </View>
+          {
+            details.due_date != null && (
+              <View style={Style.paddockDate}>
+                <Text>{details.due_date}</Text>
+                <Text style={{fontWeight:'bold',color:'#5A84EE',fontSize:12}}>DUE DATE</Text>
+              </View>
+            )
+          }
+          {
+            details.stocks != null && (
+              <View style={Style.stocks}>
+                <View style={[Style.stocksBox, { backgroundColor: details.stocks > 0 ? '#5A84EE' : '#FF6262' } ]}>
+                  <Text style={Style.stocksText}>
+                    {details.stocks}
+                  </Text>
+                </View>
+              </View>
+            )
+          }
      
       </View>
       </View>
