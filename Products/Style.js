@@ -47,7 +47,6 @@ export default {
     marginLeft:20,
     flexDirection:'column',
     width:'60%',
-    
   },
 
   paddockDate:{
@@ -60,6 +59,37 @@ export default {
     justifyContent:'flex-end',
     flexDirection:'column',
     alignItems:'center',
+  },
+
+  batchVolume:{
+    width:'20%',
+    minHeight:40,
+    borderRadius:12,
+    marginLeft:25,
+    backgroundColor:Color.white,
+    borderColor:'#C0C0C0',
+    borderWidth:1.5,
+    justifyContent:'center',
+    flexDirection:'column',
+    alignItems:'center',
+  },
+
+  stocks: {
+    height: 40,
+    width: '30%',
+    justifyContent: 'flex-end'
+  },
+  stocksBox: {
+    height: 30,
+    width: 30,
+    borderRadius: 12,
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stocksText: {
+    color: Color.white,
+    fontSize: 12,
   },
 
 //=======================PADDOCK CONTAINERS==================//
