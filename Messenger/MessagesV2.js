@@ -346,7 +346,7 @@ class MessagesV2 extends Component{
         this.setState({ photo: response })
         const { updateMessagesOnGroup } = this.props;
         let formData = new FormData();
-        let uri = Platform.OS == "android" ? response.uri : response.uri.replace("file://", "");
+        let uri = Platform.OS == "android" ? response.uri : response.uri.replace("file://", "/private");
         formData.append("file", {
           name: response.fileName,
           type: response.type,
