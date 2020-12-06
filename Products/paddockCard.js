@@ -11,7 +11,7 @@ class ProductCard extends Component {
   render() {
     const { details, theme } = this.props;
     return (
-      <View style={{alignItems:'center',width:'100%'}}>
+      <View style={{alignItems:'center',width:'100%',paddingHorizontal: 5}}>
       <View style={Style.paddockContainer}>
           <View style={Style.paddockInfo}>
           {details.type !=null && (
@@ -29,21 +29,27 @@ class ProductCard extends Component {
           />
      <Text style={{fontWeight:'bold',fontSize:17}}>{details.title}</Text>
      </View>
-     <Text style={{marginLeft:19,color:'#C0C0C0'}}>{details.type}</Text>
+     {
+        details.dataFrom && details.dataFrom === 'inventory' ? (
+          <Text style={{marginLeft:19,color:'#C0C0C0'}}>{details.volume}</Text>
+        ) : (  
+          <Text style={{marginLeft:19,color:'#C0C0C0'}}>{details.type}</Text>
+        )
+     }
+     
      </React.Fragment>
      )}
       {
-        details.volume !=null && (
+        details.dataFrom !== 'inventory' && details.volume != null && (
           <React.Fragment>
-          <View style={{flexDirection:'row'}}>
-
-     <Text style={{fontWeight:'bold',fontSize:17}}>{details.title}</Text>
-     </View>
-     <View style={{flexDirection:'row'}}>
-     <Text style={{color:'#C0C0C0'}}>Batch Number:</Text>
-     <Text style={{marginLeft:5,color:'#5A84EE'}}>{details.batchNum}</Text>
-     </View>
-     </React.Fragment>
+            <View style={{flexDirection:'row'}}>
+              <Text style={{fontWeight:'bold',fontSize:17}}>{details.title}</Text>
+            </View>
+            <View style={{flexDirection:'row'}}>
+              <Text style={{color:'#C0C0C0'}}>Batch Number:</Text>
+              <Text style={{marginLeft:5,color:'#5A84EE'}}>{details.batchNum}</Text>
+            </View>
+          </React.Fragment>
         )
       }
           </View>
@@ -55,15 +61,15 @@ class ProductCard extends Component {
               </View>
             )
           }
-        {
-            details.volume != null && (
+          {
+            details.dataFrom !== 'inventory' && details.volume != null && (
               <View style={Style.batchVolume}>
                 <Text style={{}}>{details.volume}</Text>
               </View>
             )
           }
           {
-            details.stocks != null && (
+            details.dataFrom === 'inventory' && details.stocks != null && (
               <View style={Style.stocks}>
                 <View style={[Style.stocksBox, { backgroundColor: details.stocks > 0 ? '#5A84EE' : '#FF6262' } ]}>
                   <Text style={Style.stocksText}>
