@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 import Style from './LocationWithMapStyles';
-import {View, Image, Text, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  Platform,
+  PermissionsAndroid,
+} from 'react-native';
 import {Color} from 'common';
 import {GooglePlacesAutoComplete} from 'components';
 import {connect} from 'react-redux';
@@ -37,29 +44,54 @@ class LocationWithMap extends Component {
     };
   }
 
-  componentDidMount() {
-    const {user} = this.props.state;
-    Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
-    Geolocation.getCurrentPosition(
-      (info) => {
-        this.setState({
-          region: {
-            ...this.state.region,
-            latitude: info.coords.latitude,
-            longitude: info.coords.longitude,
-          },
-        });
-      },
-      (error) => console.log(error),
-      {
-        enableHighAccuracy: true,
-        timeout: 2000,
-      },
-    ); //Transfer this to if(user!=null) when api available
-
-    if (user != null) {
-    }
+  async componentDidMount() {
+    await this.requestPermission();
   }
+
+  requestPermission = async () => {
+    if (Platform.OS === 'ios') {
+      Geolocation.requestAuthorization();
+      this.returnToOriginal();
+    } else {
+      let granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'App Geolocation Permission',
+          message: "App needs access to your phone's location.",
+        },
+      );
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        this.returnToOriginal();
+      } else {
+        console.log('Location permission not granted!!!!');
+      }
+    }
+  };
+
+  // getCurrentLocation = async () => {
+  //   const {user} = this.props.state;
+  //   Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
+  //   Geolocation.getCurrentPosition(
+  //     (info) => {
+  //       this.setState({
+  //         region: {
+  //           ...this.state.region,
+  //           latitude: info.coords.latitude,
+  //           longitude: info.coords.longitude,
+  //         },
+  //       });
+  //     },
+  //     (error) => console.log(error),
+  //     {
+  //       enableHighAccuracy: true,
+  //       timeout: 2000,
+  //     },
+  //   ); //Transfer this to if(user!=null) when api available
+
+  //   if (user != null) {
+  //   }
+  // };
 
   UNSAFE_componentWillMount() {}
 
@@ -327,7 +359,7 @@ class LocationWithMap extends Component {
             marginRight: 30,
             height: 35,
             width: 35,
-            backgroundColor: '#FF5B04',
+            backgroundColor: Color.primary,
             borderRadius: 35 / 2,
             bottom: 20,
             marginBottom: 5,
