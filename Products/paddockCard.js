@@ -27,7 +27,7 @@ class ProductCard extends Component {
               backgroundColor: details.stocks != null && details.stocks > 0 ? '#D3E584' : '#FF6262'
             }}
           />
-     <Text style={{fontWeight:'bold',fontSize:17}}>{details.title}</Text>
+     <Text style={{fontWeight:'bold',fontSize:17,marginBottom:3}}>{details.title}</Text>
      </View>
      {
         details.dataFrom && details.dataFrom === 'inventory' ? (
