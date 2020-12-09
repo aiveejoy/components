@@ -33,7 +33,7 @@ class ProductCard extends Component {
      </React.Fragment>
      )}
       {
-        details.volume !=null && (
+        details.weight !=null && (
           <React.Fragment>
           <View style={{flexDirection:'row'}}>
 
@@ -56,9 +56,9 @@ class ProductCard extends Component {
             )
           }
         {
-            details.volume != null && (
+            details.weight != null && (
               <View style={Style.batchVolume}>
-                <Text style={{}}>{details.volume}</Text>
+                <Text style={{}}>{details.weight}</Text>
               </View>
             )
           }
