@@ -64,7 +64,7 @@ class ProductCard extends Component {
           {
             details.dataFrom !== 'inventory' && details.volume != null && (
               <View style={Style.batchVolume}>
-                <Text style={{}}>{details.volume}</Text>
+                <Text style={{}}>{details.weight}</Text>
               </View>
             )
           }
