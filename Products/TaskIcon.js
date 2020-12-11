@@ -28,7 +28,7 @@ class TaskIcon extends Component {
     const bottom=this.props.bottom ? this.props.bottom : 150
     return (
        <View style={{position:'absolute',bottom:bottom,alignSelf:'flex-end'}}>
-       <TouchableOpacity onPress={()=>alert('redirect')}>
+       <TouchableOpacity onPress={()=>this.props.details.navigation.push('ApplyTask')}>
           <View style={{alignItems:'center'}}>
           <Image
           style={{padding:30,height:50,width:'100%'}}
