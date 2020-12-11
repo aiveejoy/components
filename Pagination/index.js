@@ -22,15 +22,18 @@ class Pagination extends Component {
                   key={index}
                   onPress={() => this.props.onChange(index)}
                   style={{
+                    borderRightWidth: 1,
+                    borderRightColor: Color.lightGray,
                     width: width / this.props.pages.length,
-                    borderBottomWidth: 2,
+                    borderBottomWidth: this.props.activeIndex == index ? 4 : 2,
                     borderBottomColor: this.props.activeIndex == index ? Color.primary : Color.lightGray,
                     justifyContent: 'center',
                     alignItems: 'center'
                   }}>
                   <Text style={{
                     fontSize: 11,
-                    color: this.props.activeIndex == index ? Color.primary : Color.black
+                    color: this.props.activeIndex == index ? Color.black : '',
+                    fontWeight: this.props.activeIndex == index ? 'bold' : 'normal'
                   }}>{item.name}</Text>
                 </TouchableOpacity>
               )): 
