@@ -35,10 +35,27 @@ class ProductCard extends Component {
         ) : (  
           <Text style={{marginLeft:19,color:'#C0C0C0'}}>{details.type}</Text>
         )
-     }
-     
+     }    
      </React.Fragment>
      )}
+     {
+       details.dataFrom=='paddockPage' && (
+        <React.Fragment>
+        <View style={{flexDirection:'row'}}>
+          <Text style={{fontWeight:'bold',fontSize:17,marginBottom:3}}>{details.item.title}</Text>
+        </View>
+        {
+          details.status!="due" && (
+            <View style={{flexDirection:'row'}}>
+            <Text style={{color:'#C0C0C0'}}>Batch Number:</Text>
+            <Text style={{marginLeft:5,color:'#5A84EE'}}>{details.item.batchNum}</Text>
+          </View>
+          )
+        }
+        </React.Fragment>
+
+       )
+     }
       {
         details.dataFrom !== 'inventory' && details.volume != null && (
           <React.Fragment>
@@ -61,10 +78,17 @@ class ProductCard extends Component {
               </View>
             )
           }
+           {
+       details.dataFrom=='paddockPage' && (
+        <View style={[Style.paddockDate,{justifyContent:'center',width:'20%',right:-30}]}>
+          <Text style={{fontSize:16}}>{details.item.volume}</Text>
+        </View>
+       )
+     }
           {
             details.dataFrom !== 'inventory' && details.volume != null && (
               <View style={Style.batchVolume}>
-                <Text style={{}}>{details.weight}</Text>
+                <Text>{details.weight}</Text>
               </View>
             )
           }
