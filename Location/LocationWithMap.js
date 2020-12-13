@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 import Style from './LocationWithMapStyles';
-import {View, Image, Text, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  Platform,
+  PermissionsAndroid,
+} from 'react-native';
 import {Color} from 'common';
 import {GooglePlacesAutoComplete} from 'components';
 import {connect} from 'react-redux';
@@ -33,33 +40,58 @@ class LocationWithMap extends Component {
       locationPicked: false,
       pinnedLocation: false,
       type: null,
+      address_region: null,
     };
   }
 
-  componentDidMount() {
-    const {user} = this.props.state;
-    Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
-    Geolocation.getCurrentPosition(
-      info => {
-        console.log('HELLOOO', info);
-        this.setState({
-          region: {
-            ...this.state.region,
-            latitude: info.coords.latitude,
-            longitude: info.coords.longitude,
-          },
-        });
-      },
-      error => console.log(error),
-      {
-        enableHighAccuracy: true,
-        timeout: 2000,
-      },
-    ); //Transfer this to if(user!=null) when api available
-
-    if (user != null) {
-    }
+  async componentDidMount() {
+    await this.requestPermission();
   }
+
+  requestPermission = async () => {
+    if (Platform.OS === 'ios') {
+      Geolocation.requestAuthorization();
+      this.returnToOriginal();
+    } else {
+      let granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'App Geolocation Permission',
+          message: "App needs access to your phone's location.",
+        },
+      );
+
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        this.returnToOriginal();
+      } else {
+        console.log('Location permission not granted!!!!');
+      }
+    }
+  };
+
+  // getCurrentLocation = async () => {
+  //   const {user} = this.props.state;
+  //   Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
+  //   Geolocation.getCurrentPosition(
+  //     (info) => {
+  //       this.setState({
+  //         region: {
+  //           ...this.state.region,
+  //           latitude: info.coords.latitude,
+  //           longitude: info.coords.longitude,
+  //         },
+  //       });
+  //     },
+  //     (error) => console.log(error),
+  //     {
+  //       enableHighAccuracy: true,
+  //       timeout: 2000,
+  //     },
+  //   ); //Transfer this to if(user!=null) when api available
+
+  //   if (user != null) {
+  //   }
+  // };
 
   UNSAFE_componentWillMount() {}
 
@@ -72,8 +104,7 @@ class LocationWithMap extends Component {
   };
 
   returnToOriginal = () => {
-    Geolocation.getCurrentPosition(info => {
-      console.log(info);
+    Geolocation.getCurrentPosition((info) => {
       this.setState({
         region: {
           ...this.state.region,
@@ -86,7 +117,7 @@ class LocationWithMap extends Component {
     });
   };
 
-  onRegionChange = regionUpdate => {
+  onRegionChange = (regionUpdate) => {
     if (this.state.isDraggingMap) {
       this.setState({
         isDraggingMap: false,
@@ -96,10 +127,9 @@ class LocationWithMap extends Component {
     if (!this.state.isDraggingMap) {
       return;
     }
-    console.log('test', regionUpdate);
     this.setState({region: regionUpdate, pinnedLocation: true});
     Geocoder.from(regionUpdate.latitude, regionUpdate.longitude)
-      .then(json => {
+      .then((json) => {
         var addressComponent = json.results[0].formatted_address.split(', ');
         this.setState({
           address:
@@ -111,11 +141,10 @@ class LocationWithMap extends Component {
           country: addressComponent[3],
         });
       })
-      .catch(error => console.warn(error));
+      .catch((error) => console.warn(error));
   };
 
-  manageLocation = location => {
-    console.log('ADDRESS', location);
+  manageLocation = (location) => {
     this.setState(
       {
         region: {
@@ -126,8 +155,9 @@ class LocationWithMap extends Component {
         },
         address: location.formatted_address,
         area: location.region,
-        locality: location.locality,
-        country: location.country,
+        locality: location.address_components[1].long_name,
+        address_region: location.address_components[3].long_name,
+        country: location.address_components[4].long_name,
       },
       () => {
         console.log('ADDRESS', this.state.region.formatted_address);
@@ -141,7 +171,16 @@ class LocationWithMap extends Component {
       alert('Please Input an Address or Use the Pin');
     } else
       this.setState({locationPicked: true}, () => {
-        setLocation(this.state.region);
+        const location = {
+          address: this.state.address,
+          locality: this.state.locality,
+          region: this.state.address_region,
+          country: this.state.country,
+          latitude: this.state.region.latitude,
+          longtitude: this.state.region.longitude,
+        };
+        console.log('LOCATION IN COMPONENT', location);
+        setLocation(location);
         this.props.navigation.pop();
       });
   };
@@ -193,7 +232,7 @@ class LocationWithMap extends Component {
           <FontAwesomeIcon icon={faChevronLeft} size={30} color="#000000" />
         </TouchableOpacity>
         <GooglePlacesAutocomplete
-          ref={instance => {
+          ref={(instance) => {
             this.GooglePlacesRef = instance;
           }}
           renderRightButton={() => this.clearLocation()}
@@ -204,7 +243,7 @@ class LocationWithMap extends Component {
           keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
           listViewDisplayed={false} // true/false/undefined
           fetchDetails={true}
-          renderDescription={row => row.description} // custom description render
+          renderDescription={(row) => row.description} // custom description render
           onPress={(data, details = null) => {
             // 'details' is provided when fetchDetails = true
             this.manageLocation(details);
@@ -297,11 +336,11 @@ class LocationWithMap extends Component {
 
         <MapView
           style={Style.map}
-          ref={ref => (this.mapView = ref)}
+          ref={(ref) => (this.mapView = ref)}
           provider={PROVIDER_GOOGLE}
           region={this.state.region}
           onPanDrag={this.setMapDragging}
-          onRegionChangeComplete={e => this.onRegionChange(e)}
+          onRegionChangeComplete={(e) => this.onRegionChange(e)}
           //onPress={()=>this.animate()}
         />
 
@@ -320,7 +359,7 @@ class LocationWithMap extends Component {
             marginRight: 30,
             height: 35,
             width: 35,
-            backgroundColor: '#FF5B04',
+            backgroundColor: Color.primary,
             borderRadius: 35 / 2,
             bottom: 20,
             marginBottom: 5,
@@ -366,17 +405,14 @@ class LocationWithMap extends Component {
     );
   }
 }
-const mapStateToProps = state => ({state: state});
+const mapStateToProps = (state) => ({state: state});
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   const {actions} = require('@redux');
   return {
     // updateUser: (user) => dispatch(actions.updateUser(user)),
-    setLocation: location => dispatch(actions.setLocation(location)),
+    setLocation: (location) => dispatch(actions.setLocation(location)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(LocationWithMap);
+export default connect(mapStateToProps, mapDispatchToProps)(LocationWithMap);

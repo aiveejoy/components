@@ -24,8 +24,8 @@ export default {
 //=======================PADDOCK CONTAINERS==================//
   paddockContainer: {
     minHeight:60,
-    width: '100%',
-    marginVertical: 10,
+    width: '95%',
+    marginTop: 10,
     // box-shadow
     backgroundColor: Color.white,
     borderRadius: 12,
