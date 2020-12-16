@@ -10,6 +10,7 @@ import Style from './Style';
 class ProductCard extends Component {
   render() {
     const { details, theme } = this.props;
+    console.log({ details })
     return (
       <View style={{alignItems:'center',width:'100%',paddingHorizontal: 5}}>
       <View style={Style.paddockContainer}>
@@ -24,7 +25,7 @@ class ProductCard extends Component {
               width:10,
               height:10,
               borderRadius:100/2,
-              backgroundColor: details.stocks != null && details.stocks > 0 ? '#D3E584' : '#FF6262'
+              backgroundColor: details.qty != null && details.qty > 0 ? '#D3E584' : '#FF6262'
             }}
           />
      <Text style={{fontWeight:'bold',fontSize:17,marginBottom:3}}>{details.title}</Text>
@@ -93,11 +94,11 @@ class ProductCard extends Component {
             )
           }
           {
-            details.dataFrom === 'inventory' && details.stocks != null && (
+            details.dataFrom === 'inventory' && details.qty != null && (
               <View style={Style.stocks}>
-                <View style={[Style.stocksBox, { backgroundColor: details.stocks > 0 ? '#5A84EE' : '#FF6262' } ]}>
+                <View style={[Style.stocksBox, { backgroundColor: details.qty > 0 ? '#5A84EE' : '#FF6262' } ]}>
                   <Text style={Style.stocksText}>
-                    {details.stocks}
+                    {details.qty}
                   </Text>
                 </View>
               </View>
