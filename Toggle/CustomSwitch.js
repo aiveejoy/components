@@ -4,7 +4,6 @@ import {BasicStyles} from 'common';
 class CustomSwitch extends Component {
   constructor(props) {
     super(props);
-    console.log('PROPS', this.props);
   }
 
   render() {
