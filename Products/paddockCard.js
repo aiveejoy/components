@@ -10,7 +10,6 @@ import Style from './Style';
 class ProductCard extends Component {
   render() {
     const { details, theme } = this.props;
-    console.log({ details })
     return (
       <View style={{alignItems:'center',width:'100%',paddingHorizontal: 5}}>
       <View style={Style.paddockContainer}>
