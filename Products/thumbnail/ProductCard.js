@@ -3,7 +3,7 @@ import { Text, View, Image, TouchableOpacity, TouchableHighlight } from 'react-n
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar, faStopwatch, faCircle, faPlay, faImage } from '@fortawesome/free-solid-svg-icons';
 import { Divider } from 'react-native-elements';
-import { Color } from 'common'
+import { Color, BasicStyles } from 'common'
 import Config from 'src/config.js'
 import Style from './Style';
 import {connect} from 'react-redux';
@@ -41,9 +41,13 @@ class ProductCard extends Component {
             (theme == 'v2' && item) && (
               <View style={{
                 width: '100%',
-                flexDirection: 'row'
+                flexDirection: 'row',
+                paddingLeft: 10,
+                paddingRight: 10
               }}>
-                <View style={Style.paddockInfo}>
+                <View style={[Style.paddockInfo, {
+                  width: '80%'
+                }]}>
                   <View>
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
@@ -60,14 +64,20 @@ class ProductCard extends Component {
                     </View>
                   </View>
                 </View>
-                <View style={[
-                  Style.paddockDate,
-                  {
-                    justifyContent:'center',
-                    width:'20%',
-                    right:-30
-                  }]}>
-                  <Text style={{fontSize:16}}>{item.rate!=null ? parseFloat(item.rate).toFixed(1) + "L" : "N/A"}</Text>
+
+                <View style={{
+                  width: '20%',
+                  alignItems: 'flex-end',
+                  justifyContent: 'center'
+                }}>
+                  <View style={[
+                    Style.paddockDate,
+                    {
+                      justifyContent: 'center',
+                      width:'100%'
+                    }]}>
+                    <Text style={{fontSize:16}}>{item.rate!=null ? parseFloat(item.rate).toFixed(1) + "L" : "N/A"}</Text>
+                  </View>
                 </View>
               </View>
             )
@@ -77,16 +87,18 @@ class ProductCard extends Component {
             (theme == 'v1' && item) && (
               <View style={{
                 width: '100%',
-                flexDirection: 'row'
+                flexDirection: 'row',
+                paddingLeft: 10,
+                paddingRight: 10
               }}>
                 <View style={[Style.paddockInfo, {
-                  width: '60%'
+                  width: '70%'
                 }]}>
                   <View style={{
                     width: '100%'
                   }}>
                     <View style={{flexDirection:'row'}}>
-                      <FontAwesomeIcon icon={faCircle} color={Color.primary} size={10} style={{
+                      <FontAwesomeIcon icon={faCircle} color={item.qty > 0 ? Color.primary : Color.danger } size={10} style={{
                         marginTop: 6,
                         marginRight: 5
                       }}/>
@@ -104,19 +116,24 @@ class ProductCard extends Component {
                     </View>
                   </View>
                 </View>
-                <View style={[
-                  Style.paddockDate,
-                  {
-                    justifyContent: 'center',
-                    width: 40,
-                    height: 40,
-                    backgroundColor: Color.blue,
-                    marginLeft: '15%'
-                  }]}>
-                  <Text style={{
-                    fontSize: 16,
-                    color: Color.white
-                  }}>{item.qty}</Text>
+                <View style={{
+                  width: '30%',
+                  alignItems: 'flex-end',
+                  justifyContent: 'center'
+                }}>
+                  <View style={[
+                    Style.paddockDate,
+                    {
+                      justifyContent: 'center',
+                      width: 40,
+                      height: 40,
+                      backgroundColor: item.qty > 0 ? Color.blue : Color.danger
+                    }]}>
+                    <Text style={{
+                      fontSize: 16,
+                      color: Color.white
+                    }}>{item.qty}</Text>
+                  </View>
                 </View>
               </View>
             )
@@ -126,10 +143,12 @@ class ProductCard extends Component {
             (theme == 'v3' && item) && (
               <View style={{
                 width: '100%',
-                flexDirection: 'row'
+                flexDirection: 'row',
+                paddingLeft: 10,
+                paddingRight: 10
               }}>
                 <View style={[Style.paddockInfo, {
-                  width: '60%'
+                  width: '70%'
                 }]}>
                   <View style={{
                     width: '100%'
@@ -156,19 +175,24 @@ class ProductCard extends Component {
                     </View>
                   </View>
                 </View>
-                <View style={[
-                  Style.paddockDate,
-                  {
-                    justifyContent: 'center',
-                    width: 40,
-                    height: 40,
-                    backgroundColor: Color.blue,
-                    marginLeft: '15%'
-                  }]}>
-                  <Text style={{
-                    fontSize: 16,
-                    color: Color.white
-                  }}>{item.qty}</Text>
+                <View style={{
+                  width: '30%',
+                  alignItems: 'flex-end',
+                  justifyContent: 'center'
+                }}>
+                  <View style={[
+                    Style.paddockDate,
+                    {
+                      justifyContent: 'center',
+                      width: 40,
+                      height: 40,
+                      backgroundColor: Color.blue
+                    }]}>
+                    <Text style={{
+                      fontSize: BasicStyles.standardFontSize,
+                      color: Color.white
+                    }}>{item.qty}</Text>
+                  </View>
                 </View>
               </View>
             )

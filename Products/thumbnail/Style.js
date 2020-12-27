@@ -1,4 +1,4 @@
-import { Color } from 'common';
+import { Color, BasicStyles } from 'common';
 
 export default {
   container: {
@@ -28,7 +28,7 @@ export default {
     marginTop: 15,
     // box-shadow
     backgroundColor: Color.white,
-    borderRadius: 12,
+    borderRadius: BasicStyles.standardBorderRadius,
     borderColor: '#FFFFFF',
     borderWidth:1,
     shadowColor: "#000",
@@ -46,7 +46,6 @@ export default {
   },
 
   paddockInfo:{
-    marginLeft:20,
     flexDirection:'column',
     width:'60%',
   },
@@ -66,7 +65,7 @@ export default {
   batchVolume:{
     width:'20%',
     minHeight:40,
-    borderRadius:12,
+    borderRadius: BasicStyles.standardBorderRadius,
     marginLeft:25,
     backgroundColor:Color.white,
     borderColor:'#C0C0C0',
@@ -84,7 +83,7 @@ export default {
   stocksBox: {
     height: 30,
     width: 30,
-    borderRadius: 12,
+    borderRadius: BasicStyles.standardBorderRadius,
     alignSelf: 'flex-end',
     justifyContent: 'center',
     alignItems: 'center',
@@ -100,7 +99,7 @@ export default {
 imageContainer:{
      marginTop:10,
      width:'50%',
-     borderRadius:10,
+     borderRadius: BasicStyles.standardBorderRadius,
      marginBottom:15,
      alignItems:'center',
  },
@@ -136,7 +135,7 @@ imageContainer:{
   marginVertical: 10,
   // box-shadow
   backgroundColor: Color.white,
-  borderRadius: 12,
+  borderRadius: BasicStyles.standardBorderRadius,
   borderColor: '#FFFFFF',
   borderWidth:1,
   shadowColor: "#000",

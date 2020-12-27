@@ -3,7 +3,7 @@ import { Text, View, Image, TouchableOpacity, TouchableHighlight } from 'react-n
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faStar, faStopwatch, faCircle, faPlay, faImage } from '@fortawesome/free-solid-svg-icons';
 import { Divider } from 'react-native-elements';
-import { Color } from 'common'
+import { Color, BasicStyles } from 'common'
 import Config from 'src/config.js'
 import Style from './Style';
 import {connect} from 'react-redux';
@@ -20,11 +20,13 @@ class PaddockCard extends Component {
       return
     }
     setPaddock({
-      ...item,
-      from: this.props.from
+      ...item
     })
+
     this.props.navigation.navigate('paddockStack', {
-      data: item
+      data: {
+        ...item
+      }
     })
   }
 
@@ -43,7 +45,9 @@ class PaddockCard extends Component {
             item && (
               <View style={{
                 width: '100%',
-                flexDirection: 'row'
+                flexDirection: 'row',
+                paddingLeft: 10,
+                paddingRight: 10
               }}>
                 <View style={[Style.paddockInfo, {
                   width: '60%'
@@ -68,14 +72,26 @@ class PaddockCard extends Component {
                     </View>
                   </View>
                 </View>
-                <View style={[
-                  Style.paddockDate,
-                  {
-                    justifyContent:'center',
-                    width:'30%',
-                  }]}>
-                  <Text>12/09/2020</Text>
-                  <Text style={{fontSize:11}}>{item.status}</Text>
+                <View style={{
+                  width: '40%',
+                  alignItems: 'flex-end',
+                  justifyContent: 'center'
+                }}>
+                  <View style={[
+                    Style.paddockDate,
+                    {
+                      justifyContent:'center',
+                      width:'100%'
+                    }]}>
+                    <Text style={{
+                      fontSize: BasicStyles.standardFontSize
+                    }}>12/09/2020</Text>
+                    <Text style={{
+                      fontSize: 11,
+                      color: Color.blue,
+                      fontWeight: 'bold'
+                    }}>{item.status}</Text>
+                  </View>
                 </View>
               </View>
             )
