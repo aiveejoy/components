@@ -22,10 +22,10 @@ export default {
   },
 
 //=======================PADDOCK CONTAINERS==================//
-  paddockContainer: {
+  cardContainer: {
     minHeight: 60,
-    width: '95%',
-    marginTop: 10,
+    width: '100%',
+    marginTop: 15,
     // box-shadow
     backgroundColor: Color.white,
     borderRadius: 12,

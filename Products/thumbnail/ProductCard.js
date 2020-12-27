@@ -27,9 +27,10 @@ class ProductCard extends Component {
 
   render() {
     const { item, theme } = this.props;
+    console.log('item', item)
     return (
       <TouchableHighlight
-        style={Style.paddockContainer}
+        style={Style.cardContainer}
         onPress={() => this.redirect()}
         underlayColor={Color.blue}
         >
@@ -99,6 +100,58 @@ class ProductCard extends Component {
                       <Text style={{
                         marginLeft:5,
                         color:Color.gray
+                      }}>({item.volume ? item.volume : '100L'})</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={[
+                  Style.paddockDate,
+                  {
+                    justifyContent: 'center',
+                    width: 40,
+                    height: 40,
+                    backgroundColor: Color.blue,
+                    marginLeft: '15%'
+                  }]}>
+                  <Text style={{
+                    fontSize: 16,
+                    color: Color.white
+                  }}>{item.qty}</Text>
+                </View>
+              </View>
+            )
+          }
+
+          {
+            (theme == 'v3' && item) && (
+              <View style={{
+                width: '100%',
+                flexDirection: 'row'
+              }}>
+                <View style={[Style.paddockInfo, {
+                  width: '60%'
+                }]}>
+                  <View style={{
+                    width: '100%'
+                  }}>
+                    <View style={{flexDirection:'row'}}>
+                      <Text style={{
+                        fontWeight:'bold',
+                        fontSize:17,
+                        marginBottom:3
+                      }}>{item.title}</Text>
+                    </View>
+                    <View style={{flexDirection:'row'}}>
+                      <Text style={{
+                        color: Color.gray
+                      }}>
+                        {
+                          item.merchant ? item.merchant : ''
+                        }
+                      </Text>
+                      <Text style={{
+                        marginLeft:5,
+                        color: Color.blue
                       }}>({item.volume ? item.volume : '100L'})</Text>
                     </View>
                   </View>
