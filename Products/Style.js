@@ -1,4 +1,4 @@
-import { Color } from 'common';
+import { Color, BasicStyles } from 'common';
 
 export default {
   container: {
@@ -91,7 +91,7 @@ export default {
   },
   stocksText: {
     color: Color.white,
-    fontSize: 12,
+    fontSize: BasicStyles.standardFontSize,
   },
 
 //=======================PADDOCK CONTAINERS==================//

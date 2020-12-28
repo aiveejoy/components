@@ -33,10 +33,9 @@ class PaddockCard extends Component {
   render() {
     const { item } = this.props;
     return (
-      <TouchableHighlight
+      <TouchableOpacity
         style={Style.cardContainer}
         onPress={() => this.redirect()}
-        underlayColor={Color.blue}
         >
         <View style={{
           width: '100%'
@@ -97,7 +96,7 @@ class PaddockCard extends Component {
             )
           }
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   }
 }

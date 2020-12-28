@@ -29,10 +29,9 @@ class ProductCard extends Component {
     const { item, theme } = this.props;
     console.log('item', item)
     return (
-      <TouchableHighlight
+      <TouchableOpacity
         style={Style.cardContainer}
         onPress={() => this.redirect()}
-        underlayColor={Color.blue}
         >
         <View style={{
           width: '100%'
@@ -198,7 +197,7 @@ class ProductCard extends Component {
             )
           }
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   }
 }
