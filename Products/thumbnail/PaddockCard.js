@@ -59,14 +59,15 @@ class PaddockCard extends Component {
                       }}/>
                       <Text style={{
                         fontWeight:'bold',
-                        fontSize: 17,
-                        marginBottom:3
+                        fontSize: BasicStyles.standardTitleFontSize,
+                        marginBottom: 3
                       }}>{item.name}</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
-                        marginLeft:5,
-                        color: Color.gray
+                        marginLeft: 5,
+                        color: Color.gray,
+                        fontSize: BasicStyles.standardFontSize
                       }}>Spray Mix</Text>
                     </View>
                   </View>
@@ -86,7 +87,7 @@ class PaddockCard extends Component {
                       fontSize: BasicStyles.standardFontSize
                     }}>12/09/2020</Text>
                     <Text style={{
-                      fontSize: 11,
+                      fontSize: BasicStyles.standardFontSize - 1,
                       color: Color.blue,
                       fontWeight: 'bold'
                     }}>{item.status}</Text>

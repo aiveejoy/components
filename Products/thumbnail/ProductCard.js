@@ -51,15 +51,20 @@ class ProductCard extends Component {
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
                         fontWeight:'bold',
-                        fontSize:17,
+                        fontSize: BasicStyles.standardTitleFontSize,
                         marginBottom:3
                       }}>{item.product_title}</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
-                        color:'#C0C0C0'
+                        color:'#C0C0C0',
+                        fontSize: BasicStyles.standardFontSize
                       }}>Batch Number:</Text>
-                      <Text style={{marginLeft:5,color:'#5A84EE'}}>{item.batchNum}</Text>
+                      <Text style={{
+                        marginLeft: 5,
+                        color: Color.blue,
+                        fontSize: BasicStyles.standardFontSize
+                      }}>{item.batch_number}</Text>
                     </View>
                   </View>
                 </View>
@@ -75,7 +80,7 @@ class ProductCard extends Component {
                       justifyContent: 'center',
                       width:'100%'
                     }]}>
-                    <Text style={{fontSize:16}}>{item.rate!=null ? parseFloat(item.rate).toFixed(1) + "L" : "N/A"}</Text>
+                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate!=null ? parseFloat(item.rate).toFixed(1) + "L" : "N/A"}</Text>
                   </View>
                 </View>
               </View>
@@ -103,14 +108,15 @@ class ProductCard extends Component {
                       }}/>
                       <Text style={{
                         fontWeight:'bold',
-                        fontSize:17,
+                        fontSize: BasicStyles.standardTitleFontSize,
                         marginBottom:3
                       }}>{item.title}</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
-                        marginLeft:5,
-                        color:Color.gray
+                        marginLeft: 5,
+                        color: Color.gray,
+                        fontSize: BasicStyles.standardFontSize
                       }}>({item.volume ? item.volume : '100L'})</Text>
                     </View>
                   </View>
@@ -129,7 +135,7 @@ class ProductCard extends Component {
                       backgroundColor: item.qty > 0 ? Color.blue : Color.danger
                     }]}>
                     <Text style={{
-                      fontSize: 16,
+                      fontSize: BasicStyles.standardTitle2FontSize,
                       color: Color.white
                     }}>{item.qty}</Text>
                   </View>
@@ -155,13 +161,14 @@ class ProductCard extends Component {
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
                         fontWeight:'bold',
-                        fontSize:17,
+                        fontSize: BasicStyles.standardTitleFontSize,
                         marginBottom:3
                       }}>{item.title}</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
-                        color: Color.gray
+                        color: Color.gray,
+                        fontSize: BasicStyles.standardFontSize
                       }}>
                         {
                           item.merchant ? item.merchant : ''
@@ -169,7 +176,8 @@ class ProductCard extends Component {
                       </Text>
                       <Text style={{
                         marginLeft:5,
-                        color: Color.blue
+                        color: Color.blue,
+                        fontSize: BasicStyles.standardFontSize
                       }}>({item.volume ? item.volume : '100L'})</Text>
                     </View>
                   </View>
@@ -188,7 +196,7 @@ class ProductCard extends Component {
                       backgroundColor: Color.blue
                     }]}>
                     <Text style={{
-                      fontSize: BasicStyles.standardFontSize,
+                      fontSize: BasicStyles.standardTitle2FontSize,
                       color: Color.white
                     }}>{item.qty}</Text>
                   </View>

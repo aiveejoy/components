@@ -10,15 +10,8 @@ export default {
     borderRadius: 12,
     borderColor: '#FFFFFF',
     borderWidth:1,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 2,
     alignItems:'center',
+    ...BasicStyles.standardShadow
   },
 
 //=======================PADDOCK CONTAINERS==================//

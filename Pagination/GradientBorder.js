@@ -45,7 +45,7 @@ class GradientBorder extends Component {
                     }}>
                     <Text
                       style={{
-                        fontSize: BasicStyles.standardFontSize,
+                        fontSize: BasicStyles.standardSubTitleFontSize,
                         color: this.props.activeIndex == index ? Color.black : Color.gray,
                         fontWeight:
                           this.props.activeIndex == index ? 'bold' : 'normal',
@@ -70,7 +70,7 @@ class GradientBorder extends Component {
                     }}>
                     <Text
                       style={{
-                        fontSize: BasicStyles.standardFontSize,
+                        fontSize: BasicStyles.standardSubTitleFontSize,
                         color:
                           this.props.activeIndex == index
                             ? Color.primary
