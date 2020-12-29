@@ -61,14 +61,14 @@ class PaddockCard extends Component {
                         fontWeight:'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
                         marginBottom: 3
-                      }}>{item.name}</Text>
+                      }}>{item.paddock ? item.paddock.name : null}</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
                         marginLeft: 5,
                         color: Color.gray,
                         fontSize: BasicStyles.standardFontSize
-                      }}>Spray Mix</Text>
+                      }}>{item.spray_mix ? item.spray_mix.name : null}</Text>
                     </View>
                   </View>
                 </View>
@@ -85,7 +85,7 @@ class PaddockCard extends Component {
                     }]}>
                     <Text style={{
                       fontSize: BasicStyles.standardFontSize
-                    }}>12/09/2020</Text>
+                    }}>{item.due_date}</Text>
                     <Text style={{
                       fontSize: BasicStyles.standardFontSize - 1,
                       color: Color.blue,
