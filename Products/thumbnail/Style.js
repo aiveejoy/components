@@ -107,7 +107,6 @@ imageContainer:{
     marginBottom:15,
  },
  text:{
-   fontFamily:'Roboto',
    textAlign:'center',
    fontWeight:"bold"
  },
