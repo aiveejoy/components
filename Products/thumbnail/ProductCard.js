@@ -78,7 +78,9 @@ class ProductCard extends Component {
                     Style.paddockDate,
                     {
                       justifyContent: 'center',
-                      width:'100%'
+                      width:'100%',
+                      borderColor: Color.blue,
+                      borderWidth: 0.5
                     }]}>
                     <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.qty !=null ? parseFloat(item.qty).toFixed(1) + "L" : "N/A"}</Text>
                   </View>
