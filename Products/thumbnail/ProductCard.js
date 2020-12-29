@@ -53,7 +53,7 @@ class ProductCard extends Component {
                         fontWeight:'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
                         marginBottom:3
-                      }}>{item.product_title}</Text>
+                      }}>{item.title}</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
@@ -80,7 +80,7 @@ class ProductCard extends Component {
                       justifyContent: 'center',
                       width:'100%'
                     }]}>
-                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate!=null ? parseFloat(item.rate).toFixed(1) + "L" : "N/A"}</Text>
+                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.qty !=null ? parseFloat(item.qty).toFixed(1) + "L" : "N/A"}</Text>
                   </View>
                 </View>
               </View>
