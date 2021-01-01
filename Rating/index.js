@@ -27,7 +27,6 @@ class Rating extends Component {
       <View style={{
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
         paddingTop: 10,
         paddingBottom: 10
       }}>
