@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import styles from './Style';
-import {NavigationActions} from 'react-navigation';
+import {NavigationActions, StackActions} from 'react-navigation';
 import {ScrollView, Text, View, Image} from 'react-native';
 import { connect } from 'react-redux';
 import { Helper, BasicStyles, Color } from 'common';
@@ -17,11 +17,16 @@ class Slider extends Component {
   navigateToScreen = (route) => {
     this.props.navigation.toggleDrawer();
     const navigateAction = NavigationActions.navigate({
-      routeName: route
+      routeName: 'drawerStack',
+      action: StackActions.reset({
+        index: 0,
+        key: null,
+        actions: [
+            NavigationActions.navigate({routeName: route}),
+        ]
+      })
     });
     this.props.navigation.dispatch(navigateAction);
-    // const { setActiveRoute } = this.props;
-    // setActiveRoute(null)
   }
 
   logoutAction(){

@@ -48,6 +48,9 @@ class TextInputWithLabel extends Component {
         <View style={BasicStyles.standardTextInput}>
           <TextInput
             value={this.props.variable}
+            multiline={this.props.multiline}
+            maxLength={this.props.maxLength}
+            keyboardType={this.props.keyboardType}
             onChangeText={(input) => {
               this.props.onChange(input);
             }}
