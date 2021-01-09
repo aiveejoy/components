@@ -39,13 +39,15 @@ class Slider extends Component {
   }
 
   render () {
-    const { user } = this.props.state;
+    const { user, theme } = this.props.state;
     return (
       <View style={styles.container}>
         <ScrollView>
           <View>
             {user != null ? (
-                <View style={styles.sectionHeadingStyle}>
+                <View style={[styles.sectionHeadingStyle, {
+                  backgroundColor: theme ? theme.primary : Color.primary
+                }]}>
                   {
                     user.account_profile != null && user.account_profile.url != null && (
                       <Image
@@ -79,7 +81,8 @@ class Slider extends Component {
                   </Text>
                 </View>
               ) : <Text style={[styles.sectionHeadingStyle, {
-              paddingTop: 150
+              paddingTop: 150,
+              backgroundColor: theme ? theme.primary : Color.primary
             }]}>
               Welcome to {Helper.company}!
             </Text>}

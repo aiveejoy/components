@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSmile } from '@fortawesome/free-solid-svg-icons';
 import { Color } from 'common';
 import { Dimensions } from 'react-native';
+import {connect} from 'react-redux';
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
 class Empty extends Component{
@@ -13,6 +14,7 @@ class Empty extends Component{
   }
 
   render () {
+    const { theme } = this.props.state;
     return (
       <View style={{
         alignItems: 'center',
@@ -22,7 +24,7 @@ class Empty extends Component{
             icon={faSmile}
             size={100}
             style={{
-              color: Color.primary,
+              color: theme ? theme.primary : Color.primary,
               marginTop: 50,
             }}
           />
@@ -44,13 +46,13 @@ class Empty extends Component{
                   borderRadius: 5,
                   color: Color.primary,
                   backgroundColor: Color.white,
-                  borderColor: Color.primary,
+                  borderColor: theme ? theme.primary : Color.primary,
                   borderWidth: 1,
                   width: '50%'
                 }}
                 >
                 <Text style={{
-                  color: Color.primary,
+                  color:theme ? theme.primary : Color.primary,
                   fontSize: 11,
                   textAlign: 'center'
                 }}>Reload</Text>
@@ -62,4 +64,12 @@ class Empty extends Component{
   }
 }
 
-export default Empty;
+const mapStateToProps = (state) => ({state: state});
+
+const mapDispatchToProps = (dispatch) => {
+  const {actions} = require('@redux');
+  return {
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Empty);

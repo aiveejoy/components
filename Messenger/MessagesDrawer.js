@@ -34,7 +34,7 @@ class HeaderOptions extends Component {
   }
 
   _card = () => {
-    const { messengerGroup } = this.props.state;
+    const { messengerGroup, theme } = this.props.state;
     const width = Math.round(Dimensions.get('window').width);
     // {Helper.showRequestType(messengerGroup.request.type)} - 
     return (
@@ -46,9 +46,9 @@ class HeaderOptions extends Component {
             width: width - 50,
             alignItems: 'center',
           }}>
-            <UserImage  user={messengerGroup.title} color={Color.primary}/>
+            <UserImage  user={messengerGroup.title} color={theme ? theme.primary :  Color.primary}/>
             <Text style={{
-              color: Color.primary,
+              color: theme ? theme.primary :  Color.primary,
               lineHeight: 30,
               paddingLeft: 1,
               // width: '30%'
@@ -58,7 +58,7 @@ class HeaderOptions extends Component {
                 onPress={this.viewMenu.bind(this)} style={{position: 'absolute', right: 0}}>
                 <FontAwesomeIcon 
                   icon={ faEllipsisV } 
-                  style={{color: Color.primary}}
+                  style={{color: theme ? theme.primary :  Color.primary}}
                 />
               </TouchableOpacity>
             }
@@ -70,14 +70,16 @@ class HeaderOptions extends Component {
   
   
   render() {
+    const { theme } = this.props.state;
     return (
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity onPress={this.back.bind(this)} 
           >
           <FontAwesomeIcon
             icon={ faChevronLeft }
-            size={BasicStyles.iconSize}
-            style={BasicStyles.iconStyle}/>
+            size={BasicStyles.headerBackIconSize}
+            style={{color: theme ? theme.primary : Color.primary }}
+            />
         </TouchableOpacity>
         {
           this._card()

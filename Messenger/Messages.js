@@ -362,7 +362,7 @@ class Messages extends Component{
   }
 
   _image = (item) => {
-    const { messengerGroup, user } = this.props.state;
+    const { messengerGroup, user, theme } = this.props.state;
     return (
       <View>
       {
@@ -452,11 +452,11 @@ class Messages extends Component{
                   style={[Style.templateBtn, {
                     width: '100%',
                     height: 40,
-                    borderColor: Color.primary
+                    borderColor: theme ? theme.primary : Color.primary
                   }]}
                   >
                   <Text style={[Style.templateText, {
-                    color: Color.primary
+                    color: theme ? theme.primary : Color.primary
                   }]}>Approve</Text>
                 </TouchableOpacity>
               </View>
@@ -599,6 +599,7 @@ class Messages extends Component{
   }
 
   _footer = () => {
+    const { theme } = this.props.state;
     return (
       <View style={{
         flexDirection: 'row' 
@@ -616,7 +617,7 @@ class Messages extends Component{
             icon={ faImage }
             size={BasicStyles.iconSize}
             style={{
-              color: Color.primary
+              color: theme ? theme.primary : Color.primary
             }}
             />
         </TouchableOpacity>
@@ -639,7 +640,7 @@ class Messages extends Component{
             icon={ faPaperPlane }
             size={BasicStyles.iconSize}
             style={{
-              color: Color.primary
+              color: theme ? theme.primary : Color.primary
             }}
             />
         </TouchableOpacity>
