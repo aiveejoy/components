@@ -31,6 +31,22 @@ export default {
     paddingBottom: 15
   },
 
+  selectedContainer: {
+    minHeight: 60,
+    width: '100%',
+    marginTop: 15,
+    // box-shadow
+    backgroundColor: Color.gray,
+    borderRadius: BasicStyles.standardBorderRadius,
+    borderColor: Color.gray,
+    borderWidth:1,
+    ...BasicStyles.standardShadow,
+    alignItems:'center',
+    flexDirection:'row',
+    paddingTop: 15,
+    paddingBottom: 15
+  },
+
   paddockInfo:{
     flexDirection:'column',
     width:'60%',

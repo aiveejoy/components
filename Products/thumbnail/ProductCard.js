@@ -26,15 +26,15 @@ class ProductCard extends Component {
   }
 
   render() {
-    const { item, theme } = this.props;
-    console.log('item', item)
+    const { item, theme, addedProduct, isAdded } = this.props;
     return (
       <TouchableOpacity
-        style={Style.cardContainer}
+        style={addedProduct && isAdded && addedProduct.product.id === item.id ? Style.selectedContainer : Style.cardContainer}
         onPress={() => this.redirect()}
+        
         >
         <View style={{
-          width: '100%'
+          width: '100%',
         }}>
           {
             (theme == 'v2' && item) && (
@@ -42,7 +42,7 @@ class ProductCard extends Component {
                 width: '100%',
                 flexDirection: 'row',
                 paddingLeft: 10,
-                paddingRight: 10
+                paddingRight: 10,
               }}>
                 <View style={[Style.paddockInfo, {
                   width: '80%'
@@ -52,12 +52,13 @@ class ProductCard extends Component {
                       <Text style={{
                         fontWeight:'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
-                        marginBottom:3
+                        marginBottom:3,
+                        color: addedProduct && isAdded && addedProduct.product.id === item.id ? 'white' : '',
                       }}>{item.title}</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
-                        color:'#C0C0C0',
+                        color: addedProduct && isAdded && addedProduct.product.id === item.id ? 'white' : '#C0C0C0',
                         fontSize: BasicStyles.standardFontSize
                       }}>Batch Number:</Text>
                       <Text style={{
