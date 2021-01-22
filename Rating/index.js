@@ -30,11 +30,13 @@ class Rating extends Component {
         paddingTop: 10,
         paddingBottom: 10
       }}>
+        
         <Text style={{
           color: Color.normalGray,
           fontSize: 12,
           paddingRight: 5
         }}>Ratings</Text>
+        
         {
           stars
         }
