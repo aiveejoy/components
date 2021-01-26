@@ -10,7 +10,7 @@ import {
 import {BasicStyles, Color, Helper} from 'common';
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
-class Pagination extends Component {
+class GradientBorder extends Component {
   constructor(props) {
     super(props);
   }
@@ -20,7 +20,11 @@ class Pagination extends Component {
     return (
       <View>
         <View
-          style={{height: 50, marginBottom: 10, backgroundColor: Color.primay}}>
+          style={{
+            height: 60,
+            marginBottom: 10,
+            backgroundColor: Color.white
+        }}>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
             {this.props.pages != null
               ? pages.map((item, index) => (
@@ -31,19 +35,18 @@ class Pagination extends Component {
                       borderRightWidth: 1,
                       borderRightColor: Color.lightGray,
                       width: width / this.props.pages.length,
-                      borderBottomWidth:
-                        this.props.activeIndex == index ? 4 : 2,
+                      borderBottomWidth: 6,
                       borderBottomColor:
                         this.props.activeIndex == index
                           ? Color.primary
-                          : Color.lightGray,
+                          : Color.white,
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
                     <Text
                       style={{
-                        fontSize: 11,
-                        color: Color.black,
+                        fontSize: BasicStyles.standardSubTitleFontSize,
+                        color: this.props.activeIndex == index ? Color.black : Color.gray,
                         fontWeight:
                           this.props.activeIndex == index ? 'bold' : 'normal',
                       }}>
@@ -67,7 +70,7 @@ class Pagination extends Component {
                     }}>
                     <Text
                       style={{
-                        fontSize: 11,
+                        fontSize: BasicStyles.standardSubTitleFontSize,
                         color:
                           this.props.activeIndex == index
                             ? Color.primary
@@ -84,4 +87,4 @@ class Pagination extends Component {
   }
 }
 
-export default Pagination;
+export default GradientBorder;

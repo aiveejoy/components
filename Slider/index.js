@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import styles from './Style';
-import {NavigationActions} from 'react-navigation';
+import {NavigationActions, StackActions} from 'react-navigation';
 import {ScrollView, Text, View, Image} from 'react-native';
 import { connect } from 'react-redux';
 import { Helper, BasicStyles, Color } from 'common';
@@ -17,11 +17,16 @@ class Slider extends Component {
   navigateToScreen = (route) => {
     this.props.navigation.toggleDrawer();
     const navigateAction = NavigationActions.navigate({
-      routeName: route
+      routeName: 'drawerStack',
+      action: StackActions.reset({
+        index: 0,
+        key: null,
+        actions: [
+            NavigationActions.navigate({routeName: route}),
+        ]
+      })
     });
     this.props.navigation.dispatch(navigateAction);
-    // const { setActiveRoute } = this.props;
-    // setActiveRoute(null)
   }
 
   logoutAction(){
@@ -34,13 +39,15 @@ class Slider extends Component {
   }
 
   render () {
-    const { user } = this.props.state;
+    const { user, theme } = this.props.state;
     return (
       <View style={styles.container}>
         <ScrollView>
           <View>
             {user != null ? (
-                <View style={styles.sectionHeadingStyle}>
+                <View style={[styles.sectionHeadingStyle, {
+                  backgroundColor: theme ? theme.primary : Color.primary
+                }]}>
                   {
                     user.account_profile != null && user.account_profile.url != null && (
                       <Image
@@ -74,7 +81,8 @@ class Slider extends Component {
                   </Text>
                 </View>
               ) : <Text style={[styles.sectionHeadingStyle, {
-              paddingTop: 150
+              paddingTop: 150,
+              backgroundColor: theme ? theme.primary : Color.primary
             }]}>
               Welcome to {Helper.company}!
             </Text>}

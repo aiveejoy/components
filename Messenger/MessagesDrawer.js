@@ -2,17 +2,23 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Text, Image } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import Messages from 'modules/messenger/Messages.js';
 import { Color, BasicStyles, Helper } from 'common';
 import { UserImage } from 'components';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import Currency from 'services/Currency.js';
+import Style from './Style';
+import { Dimensions } from 'react-native';
+// import { actions } from '../../redux';
 
 class HeaderOptions extends Component {
   constructor(props){
     super(props);
+    this.state = {
+      isViewing: false
+    }
   }
 
   back = () => {
@@ -22,8 +28,14 @@ class HeaderOptions extends Component {
     this.props.navigationProps.navigate('drawerStack');
   };
 
+  viewMenu = () => {
+    const { viewMenu } = this.props // new
+    viewMenu(!this.props.state.isViewing) // new
+  }
+
   _card = () => {
-    const { messengerGroup } = this.props.state;
+    const { messengerGroup, theme } = this.props.state;
+    const width = Math.round(Dimensions.get('window').width);
     // {Helper.showRequestType(messengerGroup.request.type)} - 
     return (
       <View>
@@ -31,24 +43,25 @@ class HeaderOptions extends Component {
           messengerGroup != null && (
           <View style={{
             flexDirection: 'row',
-            width: '100%'
+            width: width - 50,
+            alignItems: 'center',
           }}>
-            <UserImage  user={messengerGroup.title} color={Color.white}/>
+            <UserImage  user={messengerGroup.title} color={theme ? theme.primary :  Color.primary}/>
             <Text style={{
-              color: Color.white,
+              color: theme ? theme.primary :  Color.primary,
               lineHeight: 30,
               paddingLeft: 1,
-              width: '30%'
+              // width: '30%'
             }}>{messengerGroup.title.username.length > 10 ? messengerGroup.title.username.substr(0, 10) + '...' : messengerGroup.title.username}</Text>
-            <Text style={{
-              color: Color.white,
-              lineHeight: 30,
-              textAlign: 'right',
-              width: '67%',
-              marginLeft: -1
-            }}>
-              {Currency.display((messengerGroup.request.amount + messengerGroup.peer.charge).toFixed(2), messengerGroup.request.currency)}
-            </Text>
+            {Helper.MessengerMenu != null &&
+              <TouchableOpacity 
+                onPress={this.viewMenu.bind(this)} style={{position: 'absolute', right: 0}}>
+                <FontAwesomeIcon 
+                  icon={ faEllipsisV } 
+                  style={{color: theme ? theme.primary :  Color.primary}}
+                />
+              </TouchableOpacity>
+            }
           </View>
         )}
       </View>
@@ -57,14 +70,16 @@ class HeaderOptions extends Component {
   
   
   render() {
+    const { theme } = this.props.state;
     return (
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity onPress={this.back.bind(this)} 
           >
           <FontAwesomeIcon
             icon={ faChevronLeft }
-            size={BasicStyles.iconSize}
-            style={BasicStyles.iconStyle}/>
+            size={BasicStyles.headerBackIconSize}
+            style={{color: theme ? theme.primary : Color.primary }}
+            />
         </TouchableOpacity>
         {
           this._card()
@@ -82,6 +97,7 @@ const mapDispatchToProps = dispatch => {
   return {
     setMessagesOnGroup: (messagesOnGroup) => dispatch(actions.setMessagesOnGroup(messagesOnGroup)),
     setMessengerGroup: (messengerGroup) => dispatch(actions.setMessengerGroup(messengerGroup)),
+    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
   };
 };
 
@@ -98,7 +114,7 @@ const MessagesStack = createStackNavigator({
       headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
       drawerLabel: null,
       headerStyle: {
-        backgroundColor: Color.primary,
+        backgroundColor: Color.white,
       },
       headerTintColor: '#fff',
     })

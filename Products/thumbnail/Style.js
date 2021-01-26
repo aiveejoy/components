@@ -10,35 +10,37 @@ export default {
     borderRadius: 12,
     borderColor: '#FFFFFF',
     borderWidth:1,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 2,
     alignItems:'center',
+    ...BasicStyles.standardShadow
   },
 
 //=======================PADDOCK CONTAINERS==================//
-  paddockContainer: {
+  cardContainer: {
     minHeight: 60,
-    width: '95%',
-    marginTop: 10,
+    width: '100%',
+    marginTop: 15,
     // box-shadow
     backgroundColor: Color.white,
-    borderRadius: 12,
+    borderRadius: BasicStyles.standardBorderRadius,
     borderColor: '#FFFFFF',
     borderWidth:1,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 2,
+    ...BasicStyles.standardShadow,
+    alignItems:'center',
+    flexDirection:'row',
+    paddingTop: 15,
+    paddingBottom: 15
+  },
+
+  selectedContainer: {
+    minHeight: 60,
+    width: '100%',
+    marginTop: 15,
+    // box-shadow
+    backgroundColor: Color.gray,
+    borderRadius: BasicStyles.standardBorderRadius,
+    borderColor: Color.gray,
+    borderWidth:1,
+    ...BasicStyles.standardShadow,
     alignItems:'center',
     flexDirection:'row',
     paddingTop: 15,
@@ -46,7 +48,6 @@ export default {
   },
 
   paddockInfo:{
-    marginLeft:20,
     flexDirection:'column',
     width:'60%',
   },
@@ -66,7 +67,7 @@ export default {
   batchVolume:{
     width:'20%',
     minHeight:40,
-    borderRadius:12,
+    borderRadius: BasicStyles.standardBorderRadius,
     marginLeft:25,
     backgroundColor:Color.white,
     borderColor:'#C0C0C0',
@@ -84,14 +85,14 @@ export default {
   stocksBox: {
     height: 30,
     width: 30,
-    borderRadius: 12,
+    borderRadius: BasicStyles.standardBorderRadius,
     alignSelf: 'flex-end',
     justifyContent: 'center',
     alignItems: 'center',
   },
   stocksText: {
     color: Color.white,
-    fontSize: BasicStyles.standardFontSize,
+    fontSize: 12,
   },
 
 //=======================PADDOCK CONTAINERS==================//
@@ -100,7 +101,7 @@ export default {
 imageContainer:{
      marginTop:10,
      width:'50%',
-     borderRadius:10,
+     borderRadius: BasicStyles.standardBorderRadius,
      marginBottom:15,
      alignItems:'center',
  },
@@ -122,7 +123,6 @@ imageContainer:{
     marginBottom:15,
  },
  text:{
-   fontFamily:'Roboto',
    textAlign:'center',
    fontWeight:"bold"
  },
@@ -136,17 +136,10 @@ imageContainer:{
   marginVertical: 10,
   // box-shadow
   backgroundColor: Color.white,
-  borderRadius: 12,
+  borderRadius: BasicStyles.standardBorderRadius,
   borderColor: '#FFFFFF',
   borderWidth:1,
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 2,
-  },
-  shadowOpacity: 0.23,
-  shadowRadius: 2.62,
-  elevation: 2,
+  ...BasicStyles.standardShadow,
   flexDirection:'column',
   paddingTop: 15,
   paddingBottom: 15
@@ -160,14 +153,7 @@ imageContainer:{
   borderRadius: 12,
   borderColor: '#FFFFFF',
   borderWidth:1,
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 2,
-  },
-  shadowOpacity: 0.23,
-  shadowRadius: 2.62,
-  elevation: 2,
+  ...BasicStyles.standardShadow,
   alignItems:'center',
   
  },

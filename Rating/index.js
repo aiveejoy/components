@@ -18,18 +18,22 @@ class Rating extends Component {
         size={20}
         style={{
           color: Color.warning,
-          marginTop: 5
         }}
         key={i}
         />
       )
     }
     return (
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingTop: 10,
+        paddingBottom: 10
+      }}>
         <Text style={{
           color: Color.normalGray,
-          lineHeight: 30,
-          fontSize: 12
+          fontSize: 12,
+          paddingRight: 5
         }}>Ratings</Text>
         {
           stars

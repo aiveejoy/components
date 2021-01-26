@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import {View, Text, TouchableHighlight, StyleSheet} from 'react-native';
-
+import {BasicStyles} from 'common';
 class CustomSwitch extends Component {
   constructor(props) {
     super(props);
-    console.log('PROPS', this.props);
   }
 
   render() {
@@ -21,19 +20,14 @@ class CustomSwitch extends Component {
               <Text style={[styles.TextStyle, {color: '#FFFFFF'}]}>ON</Text>
             </View>
             <View
-              style={[
-                styles.ToggleContainer,
-                ,
-                {backgroundColor: '#FFFFFF'},
-              ]}></View>
+              style={[styles.ToggleContainer, , {backgroundColor: '#FFFFFF'}]}
+            />
           </View>
         ) : (
           <View style={styles.TouchContainer}>
             <View
-              style={[
-                styles.ToggleContainer,
-                {backgroundColor: '#F2F2F2'},
-              ]}></View>
+              style={[styles.ToggleContainer, {backgroundColor: '#F2F2F2'}]}
+            />
 
             <View style={styles.TextContainer}>
               <Text style={[styles.TextStyle, {color: '#676767'}]}>OFF</Text>
@@ -73,7 +67,7 @@ const styles = StyleSheet.create({
     height: '80%',
   },
   TextStyle: {
-    fontSize: 12,
+    fontSize: 10,
   },
 });
 
