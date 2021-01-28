@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View, Picker, Text, ScrollView, TextInput, TouchableOpacity, Image} from 'react-native';
+import {View, Text, ScrollView, TextInput, TouchableOpacity, Image} from 'react-native';
 import styles from 'modules/createTicket/Styles.js';
 import Api from 'services/api/index.js';
 import { Routes, BasicStyles } from 'common';
@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImages } from '@fortawesome/free-solid-svg-icons';
 import Color from 'common/Color';
 import { Spinner } from 'components';
+import Picker from '@react-native-community/picker';
 class CreateTicket extends Component {
 
   constructor(props) {

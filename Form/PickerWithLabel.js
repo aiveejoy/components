@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Picker} from 'react-native';
+import { View, Text, TouchableOpacity} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSmile } from '@fortawesome/free-solid-svg-icons';
 import { Color, BasicStyles } from 'common';
 import { Dimensions } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
+import Picker from '@react-native-community/picker';
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
 class PickerWithLabel extends Component{

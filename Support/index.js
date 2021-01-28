@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Button, TouchableOpacity, ScrollView, Picker } from 'react-native';
+import { View, Text, Button, TouchableOpacity, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { Routes } from 'common';
@@ -9,6 +9,7 @@ import Style from 'components/Support/Style';
 import Api from 'services/api/index.js';
 import Color from 'common/Color';
 import Pagination from 'components/Pagination/Dynamic.js';
+import Picker from '@react-native-community/picker';
 
 class Support extends Component {
 
