@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Text, Image } from 'react-native';
+import { View, TouchableOpacity, Text, Image, TouchableHighlight } from 'react-native';
 import { createStackNavigator } from 'react-navigation-stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
@@ -43,8 +43,8 @@ class HeaderOptions extends Component {
           messengerGroup != null && (
           <View style={{
             flexDirection: 'row',
-            width: width - 50,
-            alignItems: 'center',
+            width: width - 20,
+            alignItems: 'center'
           }}>
             <UserImage  user={messengerGroup.title} color={theme ? theme.primary :  Color.primary}/>
             <Text style={{
@@ -54,13 +54,28 @@ class HeaderOptions extends Component {
               // width: '30%'
             }}>{messengerGroup.title.username.length > 10 ? messengerGroup.title.username.substr(0, 10) + '...' : messengerGroup.title.username}</Text>
             {Helper.MessengerMenu != null &&
-              <TouchableOpacity 
-                onPress={this.viewMenu.bind(this)} style={{position: 'absolute', right: 0}}>
+              <TouchableHighlight 
+                activeOpacity={0.6}
+                underlayColor={Color.lightGray}
+                onPress={this.viewMenu.bind(this)} 
+                style={
+                  {
+                    position: 'absolute',
+                    right: 0,
+                    paddingRight: 15,
+                    paddingLeft: 15,
+                    paddingTop: 15,
+                    paddingBottom: 15,
+                    marginRight: 15,
+                    borderRadius: 50
+                  }
+                }
+              >
                 <FontAwesomeIcon 
                   icon={ faEllipsisV } 
                   style={{color: theme ? theme.primary :  Color.primary}}
                 />
-              </TouchableOpacity>
+              </TouchableHighlight>
             }
           </View>
         )}
