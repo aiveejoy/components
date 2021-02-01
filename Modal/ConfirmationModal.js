@@ -21,8 +21,8 @@ class Confirm extends Component {
         <Modal isVisible={this.props.visible}>
           <View style={styles.mainContainer}>
             <View style={[styles.container, {
-              height: '30%',
-              marginTop: '10%'
+              height: '24%',
+              marginTop: '20%'
             }]}>
               <View style={styles.header}>
                 <View style={{
@@ -30,7 +30,7 @@ class Confirm extends Component {
                 }}
                 >
                   <Text style={[styles.text, {
-                    color: Color.primaryDark,
+                    color: Color.black,
                     fontWeight: 'bold' 
                   }]}>{this.props.title}</Text>
                 </View>
@@ -48,11 +48,11 @@ class Confirm extends Component {
                 </View>
               </View>
               <View style={[styles.content, {
-                height: '50%',
+                height: '30%',
                 justifyContent: 'center'
               }]}>
                 <Text style={{
-                  color: Color.primaryDark,
+                  color: Color.black,
                   textAlign: 'center'
                 }}>
                 {
@@ -62,14 +62,16 @@ class Confirm extends Component {
               </View>
               <View style={[styles.action, {
                 flexDirection: 'row',
-                height: '100%'
+                height: '100%',
+                marginBottom: 50
               }]}>
                 <View style={{
                   width: '50%',
                   alignItems: 'center',
                   flexDirection: 'column',
-                  marginTop: '5%',
-                  height: '100%'
+                  marginTop: '10%',
+                  height: '100%',
+                  marginBottom: 10
                 }}>
                   <TouchableOpacity
                     underlayColor={Color.gray} 
@@ -83,9 +85,10 @@ class Confirm extends Component {
                 <View style={{
                   width: '50%',
                   alignItems: 'center',
-                  marginTop: '5%',
+                  marginTop: '10%',
                   flexDirection: 'column',
-                  height: '100%'
+                  height: '100%',
+                  marginBottom: 10
                 }}>
                   <TouchableOpacity
                     underlayColor={Color.gray} 
