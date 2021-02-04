@@ -27,6 +27,7 @@ class ProductCard extends Component {
 
   render() {
     const { item, theme, addedProduct, isAdded } = this.props;
+    console.log(item);
     return (
       <TouchableOpacity
         style={addedProduct && isAdded && addedProduct.product.id === item.id ? Style.selectedContainer : Style.cardContainer}
@@ -181,7 +182,7 @@ class ProductCard extends Component {
                         marginLeft:5,
                         color: Color.blue,
                         fontSize: BasicStyles.standardFontSize
-                      }}>({item.volume ? item.volume : '100L'})</Text>
+                      }}>({item.variation && item.variation.length > 0 ? item.variation[0].payload_value + item.variation[0].payload : '100L'})</Text>
                     </View>
                   </View>
                 </View>
