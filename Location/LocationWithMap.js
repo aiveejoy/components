@@ -42,17 +42,20 @@ class LocationWithMap extends Component {
       pinnedLocation: false,
       type: null,
       address_region: null,
+      watchID: null,
     };
   }
 
   async componentDidMount() {
     await this.requestPermission();
+    Geolocation.clearWatch(this.state.watchID);
   }
 
   requestPermission = async () => {
     if (Platform.OS === 'ios') {
       Geolocation.requestAuthorization();
       this.returnToOriginal();
+      this.getCurrentLocation();
     } else {
       let granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -63,7 +66,8 @@ class LocationWithMap extends Component {
       );
 
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        this.returnToOriginal();
+        this.returnToOriginal()
+        this.getCurrentLocation();
       } else {
         console.log('Location permission not granted!!!!');
       }
@@ -94,6 +98,30 @@ class LocationWithMap extends Component {
   //   }
   // };
 
+  getCurrentLocation = () => {
+    Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
+    let watchID = Geolocation.watchPosition(position => {
+      this.setState({
+        region: {
+          ...this.state.region,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        },
+        pinnedLocation: false,
+        address: null,
+      });
+    },
+    (error) => {
+      console.log(error.message);
+    },
+    { enableHighAccuracy: false, timeout: 30000, maximumAge: 1000 }
+    )
+
+    this.setState({
+      watchID: watchID
+    })
+  }
+
   UNSAFE_componentWillMount() {}
 
   setMapDragging = () => {
@@ -115,7 +143,12 @@ class LocationWithMap extends Component {
         pinnedLocation: false,
         address: null,
       });
-    });
+    },
+    (error) => {
+      console.log(error.message);
+    },
+    { enableHighAccuracy: false, timeout: 30000, maximumAge: 1000 }
+    );
   };
 
   onRegionChange = (regionUpdate) => {
