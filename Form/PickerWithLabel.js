@@ -5,7 +5,7 @@ import { faSmile } from '@fortawesome/free-solid-svg-icons';
 import { Color, BasicStyles } from 'common';
 import { Dimensions } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import Picker from '@react-native-community/picker';
+import { Picker } from '@react-native-community/picker';
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
 class PickerWithLabel extends Component{
