@@ -155,9 +155,9 @@ class LocationWithMap extends Component {
         },
         address: location.formatted_address,
         area: location.region,
-        locality: location.address_components[1].long_name,
-        address_region: location.address_components[3].long_name,
-        country: location.address_components[4].long_name,
+        locality: (location.address_components.length < 5) ? location.address_components[0].long_name : location.address_components[1].long_name,
+        address_region: (location.address_components.length < 5) ? location.address_components[2].long_name : location.address_components[3].long_name,
+        country: (location.address_components.length < 5) ? location.address_components[3].long_name : location.address_components[4].long_name,
       },
       () => {
         console.log('ADDRESS', this.state.region.formatted_address);
