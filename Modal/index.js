@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import styles from './Style';
-import {Text, View, TouchableOpacity, TextInput, Picker} from 'react-native';
+import {Text, View, TouchableOpacity, TextInput} from 'react-native';
 import Modal from "react-native-modal";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -10,6 +10,7 @@ import { Spinner } from 'components';
 import Currency from 'services/Currency.js';
 import Api from 'services/api/index.js';
 import RNPickerSelect from 'react-native-picker-select';
+import Picker from '@react-native-community/picker';
 class CustomModal extends Component {
   constructor(props){
     super(props);

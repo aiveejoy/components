@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import styles from './Style.js';
-import {Text, View, TouchableOpacity, TextInput, Picker, Image} from 'react-native';
+import {Text, View, TouchableOpacity, TextInput, Image} from 'react-native';
 import Modal from "react-native-modal";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTimes, faStar } from '@fortawesome/free-solid-svg-icons';
