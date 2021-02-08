@@ -27,7 +27,7 @@ class ProductCard extends Component {
 
   render() {
     const { item, theme, addedProduct, isAdded } = this.props;
-    console.log(item);
+    console.log(item.batch_number, "==================");
     return (
       <TouchableOpacity
         style={addedProduct && isAdded && addedProduct.product.id === item.id ? Style.selectedContainer : Style.cardContainer}
@@ -62,11 +62,14 @@ class ProductCard extends Component {
                         color: addedProduct && isAdded && addedProduct.product.id === item.id ? 'white' : '#C0C0C0',
                         fontSize: BasicStyles.standardFontSize
                       }}>Batch Number:</Text>
-                      <Text style={{
+                      {item.batch_number && item.batch_number.length > 0 && item.batch_number.map(i => {
+                        return (
+                      <Text
+                        style={{
                         marginLeft: 5,
                         color: Color.blue,
                         fontSize: BasicStyles.standardFontSize
-                      }}>{item.batch_number}</Text>
+                      }}>{i.batch_number}</Text>)})}
                     </View>
                   </View>
                 </View>
@@ -141,7 +144,7 @@ class ProductCard extends Component {
                     <Text style={{
                       fontSize: BasicStyles.standardTitle2FontSize,
                       color: Color.white
-                    }}>{item.qty}</Text>
+                    }}>{item.inventory.qty[0].total_remaining_product}</Text>
                   </View>
                 </View>
               </View>
