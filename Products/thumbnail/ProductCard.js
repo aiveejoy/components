@@ -144,7 +144,7 @@ class ProductCard extends Component {
                     <Text style={{
                       fontSize: BasicStyles.standardTitle2FontSize,
                       color: Color.white
-                    }}>{item.inventory.qty[0].total_remaining_product}</Text>
+                    }}>{this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty) : (item.inventory ? item.inventory.qty[0].total_remaining_product : null)}</Text>
                   </View>
                 </View>
               </View>
