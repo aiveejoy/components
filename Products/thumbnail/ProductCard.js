@@ -27,7 +27,7 @@ class ProductCard extends Component {
 
   render() {
     const { item, theme, addedProduct, isAdded } = this.props;
-    console.log(item.batch_number, "==================");
+    console.log(item, "==================item");
     return (
       <TouchableOpacity
         style={addedProduct && isAdded && addedProduct.product.id === item.id ? Style.selectedContainer : Style.cardContainer}
@@ -109,7 +109,7 @@ class ProductCard extends Component {
                     width: '100%'
                   }}>
                     <View style={{flexDirection:'row'}}>
-                      <FontAwesomeIcon icon={faCircle} color={item.qty > 0 ? Color.primary : Color.danger } size={10} style={{
+                      <FontAwesomeIcon icon={faCircle} color={this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty > 0 ? Color.primary : Color.danger) : (item.inventory && item.inventory.qty[0].total_remaining_product > 0 ? Color.primary : Color.danger)} size={10} style={{
                         marginTop: 6,
                         marginRight: 5
                       }}/>
@@ -139,12 +139,12 @@ class ProductCard extends Component {
                       justifyContent: 'center',
                       width: 40,
                       height: 40,
-                      backgroundColor: item.qty > 0 ? Color.blue : Color.danger
+                      backgroundColor: this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty > 0 ? Color.primary : Color.danger) : (item.inventory && item.inventory.qty[0].total_remaining_product > 0 ? Color.primary : Color.danger)
                     }]}>
                     <Text style={{
                       fontSize: BasicStyles.standardTitle2FontSize,
                       color: Color.white
-                    }}>{this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty) : (item.inventory ? item.inventory.qty[0].total_remaining_product : null)}</Text>
+                    }}>{ this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty) : (item.inventory ? item.inventory.qty[0].total_remaining_product : null)}</Text>
                   </View>
                 </View>
               </View>
