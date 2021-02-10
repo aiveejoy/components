@@ -27,7 +27,6 @@ class ProductCard extends Component {
 
   render() {
     const { item, theme, addedProduct, isAdded } = this.props;
-    console.log(item, "==================item");
     return (
       <TouchableOpacity
         style={addedProduct && isAdded && addedProduct.product.id === item.id ? Style.selectedContainer : Style.cardContainer}
@@ -69,7 +68,7 @@ class ProductCard extends Component {
                         marginLeft: 5,
                         color: Color.blue,
                         fontSize: BasicStyles.standardFontSize
-                      }}>{i.batch_number}</Text>)})}
+                      }}>{i}</Text>)})}
                     </View>
                   </View>
                 </View>
