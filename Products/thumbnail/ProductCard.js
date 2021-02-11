@@ -61,11 +61,14 @@ class ProductCard extends Component {
                         color: addedProduct && isAdded && addedProduct.product.id === item.id ? 'white' : '#C0C0C0',
                         fontSize: BasicStyles.standardFontSize
                       }}>Batch Number:</Text>
-                      <Text style={{
+                      {item.batch_number && item.batch_number.length > 0 && item.batch_number.map(i => {
+                        return (
+                      <Text
+                        style={{
                         marginLeft: 5,
                         color: Color.blue,
                         fontSize: BasicStyles.standardFontSize
-                      }}>{item.batch_number}</Text>
+                      }}>{i}</Text>)})}
                     </View>
                   </View>
                 </View>
@@ -105,7 +108,7 @@ class ProductCard extends Component {
                     width: '100%'
                   }}>
                     <View style={{flexDirection:'row'}}>
-                      <FontAwesomeIcon icon={faCircle} color={item.qty > 0 ? Color.primary : Color.danger } size={10} style={{
+                      <FontAwesomeIcon icon={faCircle} color={this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty > 0 ? Color.primary : Color.danger) : (item.inventory && item.inventory.qty[0].total_remaining_product > 0 ? Color.primary : Color.danger)} size={10} style={{
                         marginTop: 6,
                         marginRight: 5
                       }}/>
@@ -135,12 +138,12 @@ class ProductCard extends Component {
                       justifyContent: 'center',
                       width: 40,
                       height: 40,
-                      backgroundColor: item.qty > 0 ? Color.blue : Color.danger
+                      backgroundColor: this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty > 0 ? Color.primary : Color.danger) : (item.inventory && item.inventory.qty[0].total_remaining_product > 0 ? Color.primary : Color.danger)
                     }]}>
                     <Text style={{
                       fontSize: BasicStyles.standardTitle2FontSize,
                       color: Color.white
-                    }}>{item.qty}</Text>
+                    }}>{ this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty) : (item.inventory ? item.inventory.qty[0].total_remaining_product : null)}</Text>
                   </View>
                 </View>
               </View>
@@ -181,7 +184,7 @@ class ProductCard extends Component {
                         marginLeft:5,
                         color: Color.blue,
                         fontSize: BasicStyles.standardFontSize
-                      }}>({item.volume ? item.volume : '100L'})</Text>
+                      }}>({item.variation && item.variation.length > 0 ? item.variation[0].payload_value + item.variation[0].payload : '100L'})</Text>
                     </View>
                   </View>
                 </View>
