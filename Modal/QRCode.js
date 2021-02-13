@@ -70,7 +70,7 @@ class QRCodeModal extends Component {
   render() {
     return (
       <View>
-        <Modal isVisible={this.props.qrcodeModal}>
+        <Modal isVisible={false}>
           <View style={styles.mainContainer}>
             <View style={[styles.container, {
               height: '60%',
