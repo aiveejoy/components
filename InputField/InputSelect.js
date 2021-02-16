@@ -23,7 +23,7 @@ class InputSelect extends Component{
     return (
       <View style={{
         marginLeft: 20}}>
-        <Text style={{color: 'black', marginLeft: 20, marginBottom: 10 }}>{this.props.title}</Text>
+        <Text style={{color: 'black', marginLeft: 20, marginBottom: -10 }}>{this.props.title}</Text>
         <TextInput
           style={[BasicStyles.formControls, {marginLeft: 20 }]}
           onChangeText={(input) => this.setInput(input)}
@@ -34,7 +34,7 @@ class InputSelect extends Component{
         style={{
           position: 'absolute',
           right: 10,
-          top: 45,
+          top: 30,
           marginLeft: 30,
         }}
         underlayColor={Color.white}

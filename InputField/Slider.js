@@ -9,7 +9,7 @@ class Sliders extends Component{
   constructor(props){
     super(props);
     this.state = {
-      value: 5
+      value: 1
     }
   }
 
@@ -18,13 +18,14 @@ class Sliders extends Component{
       <View style={{
         marginLeft: 20,
         justifyContent: 'center' }}>
-        <Text style={{color: 'black', marginBottom: 10 }}>{this.props.title}</Text>
+        <Text style={{color: 'black', marginBottom: 0 }}>{this.props.title}</Text>
         <SliderPicker 
           callback={position => {
             this.setState({ value: position })
           }}
           defaultValue={this.state.value}
           labelFontColor={"#6c7682"}
+          labelFontWeight={'600'}
           showFill={false}
           labelFontSize={13}
           showNumberScale={true}
@@ -32,7 +33,7 @@ class Sliders extends Component{
           buttonBackgroundColor={'#fff'}
           buttonBorderColor={"#6c7682"}
           buttonBorderWidth={2}
-          scaleNumberFontWeight={'150'}
+          scaleNumberFontWeight={'300'}
           buttonDimensionsPercentage={6}
           buttonBorderColor={'#5842D7'}
           heightPercentage={1}
