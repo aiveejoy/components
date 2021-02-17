@@ -56,7 +56,7 @@ class ProductCard extends Component {
                         color: item.batch_number && item.batch_number.length > 0 ? 'white' : '',
                       }}>{item.title}</Text>
                     </View>
-                    <View style={{flexDirection:'row'}}>
+                    {this.props.batch === true && (<View style={{flexDirection:'row'}}>
                       <Text style={{
                         color: item.batch_number && item.batch_number.length > 0 ? 'white' : '#C0C0C0',
                         fontSize: BasicStyles.standardFontSize
@@ -70,6 +70,7 @@ class ProductCard extends Component {
                         fontSize: BasicStyles.standardFontSize
                       }}>{i}</Text>)})}
                     </View>
+                    )}
                   </View>
                 </View>
 
