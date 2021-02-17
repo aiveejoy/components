@@ -144,9 +144,9 @@ class Support extends Component {
         activeIndex={this.state.active}
         onChange={index => this.change(this.state.menu[index])}
       />
-      {this.state.isLoading ? <Spinner mode="overlay"/> : null }
       </View>
       <ScrollView>{div}</ScrollView>
+      {this.state.isLoading ? <Spinner mode="overlay"/> : null }
       <TouchableOpacity 
           style={Style.floatingButton}
           onPress={() => {
