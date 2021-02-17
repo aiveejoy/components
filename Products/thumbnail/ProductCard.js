@@ -87,7 +87,7 @@ class ProductCard extends Component {
                       borderColor: Color.blue,
                       borderWidth: 0.5
                     }]}>
-                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.qty !=null ? parseFloat(item.qty).toFixed(1) + "L" : "N/A"}</Text>
+                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate !=null ? parseInt(item.rate).toFixed(1) + "L" : "N/A"}</Text>
                   </View>
                 </View>
               </View>
