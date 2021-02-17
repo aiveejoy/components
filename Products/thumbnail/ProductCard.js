@@ -27,6 +27,7 @@ class ProductCard extends Component {
 
   render() {
     const { item, theme } = this.props;
+    console.log(item, "========");
     return (
       <TouchableOpacity
         style={item.batch_number && item.batch_number.length > 0 ? Style.selectedContainer : Style.cardContainer}
@@ -87,7 +88,7 @@ class ProductCard extends Component {
                       borderColor: Color.blue,
                       borderWidth: 0.5
                     }]}>
-                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.qty !=null ? parseFloat(item.qty).toFixed(1) + "L" : "N/A"}</Text>
+                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate !=null ? parseInt(item.rate).toFixed(1) + "L" : "N/A"}</Text>
                   </View>
                 </View>
               </View>
