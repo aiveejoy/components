@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Style from './Style.js';
+// import Style from './Style.js';
 import {
   TextInput,
   View,
@@ -14,16 +14,21 @@ import {
   Dimensions,
   Alert
 } from 'react-native';
-import { Routes, Color, BasicStyles } from 'common';
+import { Routes, Color, BasicStyles, Helper } from 'common';
 import { Spinner, UserImage } from 'components';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock, faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+// import Review from './templates/Review.js';
+// import AddRequirements from './templates/AddRequirements.js';
+// import Transfer from './templates/Transfer.js';
+// import SendRequirements from './templates/SendRequirements.js';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import CommonRequest from 'services/CommonRequest.js';
+import Style from 'modules/messenger/Style.js'
 
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -42,7 +47,9 @@ class MessagesV3 extends Component{
       isPullingMessages: false,
       offset: 0,
       limit: 10,
-      isLock: false
+      isLock: false,
+      settingsMenu: [],
+      settingsBreadCrumbs: ['Settings']
     }
   }
 
@@ -63,7 +70,6 @@ class MessagesV3 extends Component{
 
   retrieve = () => {
     const { offset, limit } = this.state
-
     this.setState({ isLoading: true });
 
     const parameter = {
@@ -653,6 +659,126 @@ class MessagesV3 extends Component{
     );
   }
 
+  cloneMenu() {
+    const { viewMenu } = this.props // new
+    viewMenu(false) // new
+  }
+
+  menu(data) {
+    /**
+    * returns Settings Menu
+    */
+    this.setState({settingsMenu: data.map((el, ndx) => {
+      return (
+        <View key={'msgmenu'+ndx}>
+          {el.title == 'Close' && <TouchableOpacity onPress={()=>{this.cloneMenu()}}>
+            <View style={Style.settingsTitles}>
+              <Text style={{color: Color.danger}}> Cancel </Text>
+            </View>
+          </TouchableOpacity>}
+          <TouchableOpacity onPress={()=>{this.settingsAction(el)}}>
+            <View style={Style.settingsTitles}>
+              {el.title != 'Close' && <Text style={{color: Color.black}}> {el.title} </Text>}
+              {el.button != undefined && 
+                  <View style={[Style.settingsButton, {backgroundColor: el.button.color}]}> 
+                    <Text style={{fontSize: BasicStyles.standardFontSize, color: 'white'}}> {el.button.title} </Text>
+                  </View>
+              }
+              {(el.button == undefined && el.title != 'Close') &&
+                <FontAwesomeIcon
+                  icon={ faChevronRight }
+                  size={BasicStyles.iconSize}
+                  style={{color: Color.primary}}/>
+              }
+            </View>
+          </TouchableOpacity>
+        </View>
+      )
+    })})
+  }
+
+  settingsRemove() {
+    /**
+    * when x button is click
+    */
+    if(this.state.settingsBreadCrumbs.length > 1){
+      this.state.settingsBreadCrumbs.pop();
+    }else{
+      this.cloneMenu()
+    }
+    switch(this.state.settingsBreadCrumbs.length){
+      case 1:
+        this.menu(Helper.MessengerMenu)
+        break;
+      case 2:
+        this.menu(Helper.requirementsMenu)
+        break;
+    }
+  }
+
+  settingsAction(data) {
+    /**
+    * When one of the settings menu is clicked
+    */
+    if(data.payload == 'same_page'){
+      switch(data.payload_value){
+        case 'requirements':
+          let temp = this.state.settingsBreadCrumbs
+          temp.push('Requirements')
+          this.setState({settingsBreadCrumbs: temp})
+          this.menu(Helper.requirementsMenu)
+          break;
+        case 'signature':
+          let sign = this.state.settingsBreadCrumbs
+          sign.push('On App Signature')
+          this.setState({settingsBreadCrumbs: sign})
+
+          let dummyData = [1, 2, 3, 4, 5]
+
+          let frame = [
+            <View>
+              <ScrollView>
+                <View style={Style.signatureFrameContainer}>
+                  {
+                    dummyData.map((ndx, el)=>{
+                      return (
+                        <View style={Style.signatureFrame}>
+                        </View>
+                      )
+                    })
+                  }
+                </View>
+              </ScrollView>
+              <View style={{paddingTop: 50}}>
+                <View style={Style.signatureFrameContainer}>
+                  <TouchableOpacity style={[Style.signatureAction, Style.signatureActionDanger]}>
+                    <Text style={{color: Color.white}}> Decline </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[Style.signatureAction, Style.signatureActionSuccess]}>
+                    <Text style={{color: Color.white}}> Accept </Text>
+                  </TouchableOpacity>
+                </View>
+                {false && <View style={Style.signatureFrameContainer}>
+                  <TouchableOpacity style={[Style.signatureFullSuccess, Style.signatureActionSuccess]}>
+                    <Text style={{color: Color.white}}> Upload </Text>
+                  </TouchableOpacity>
+                </View>}
+              </View>
+            </View>
+          ]
+          this.setState({settingsMenu: frame})
+      }
+    }else if(data.payload === 'redirect') {
+      if(data.title.toLowerCase() == 'details'){
+        const { request } = this.props.state.messengerGroup
+        this.props.navigation.navigate(data.payload_value, {data: {id: request.id}})
+      }else if(data.title.toLowerCase() == 'rate'){
+        this.props.navigation.navigate(data.payload_value, {data: {data: this.props.state.messengerGroup}})
+      }
+    }
+  }
+
+
   render() {
     const { 
       isLoading,
@@ -663,7 +789,7 @@ class MessagesV3 extends Component{
       isPullingMessages,
       isLock
     } = this.state;
-    const { messengerGroup, user } = this.props.state;
+    const { messengerGroup, user, isViewing } = this.props.state;
     return (
       <SafeAreaView>
         {
@@ -703,7 +829,7 @@ class MessagesV3 extends Component{
                 }
               }}
               style={[Style.ScrollView, {
-                height: '100%'
+                height: isViewing ? '40%' : '100%'
               }]}
               onScroll={({ nativeEvent }) => {
                 const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
@@ -732,6 +858,32 @@ class MessagesV3 extends Component{
                 {this._flatList()}
               </View>
             </ScrollView>
+            {isViewing &&
+          <View
+            style={
+              {
+                height: '60%', 
+                paddingBottom: 51, 
+                paddingTop: 0, 
+                borderTopWidth: 1, 
+                borderTopColor: Color.gray
+              }
+            }
+          >
+            <View style={Style.settingsTitles}>
+              <Text> {this.state.settingsBreadCrumbs.join(' > ')} </Text>
+              <TouchableOpacity onPress={() => {this.settingsRemove()}}>
+                <FontAwesomeIcon
+                  icon={ faTimes }
+                  size={20}
+                  style={{color: 'red'}}/>
+              </TouchableOpacity>
+            </View>
+              <ScrollView>
+                {this.state.settingsMenu}
+              </ScrollView>
+          </View>
+        }
             <View style={{
               position: 'absolute',
               bottom: 0,
@@ -740,7 +892,7 @@ class MessagesV3 extends Component{
               borderTopWidth: 1,
               backgroundColor: Color.white
             }}>
-              {messengerGroup != null && (this._footer())}
+              {messengerGroup != null && messengerGroup.status < 2 && !isViewing && (this._footer())}
             </View>
             <ImageModal
               visible={isImageModal}
@@ -762,6 +914,7 @@ const mapDispatchToProps = dispatch => {
     setMessengerGroup: (messengerGroup) => dispatch(actions.setMessengerGroup(messengerGroup)),
     updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
     updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message)),
+    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
   };
 };
 
