@@ -40,7 +40,6 @@ class Slider extends Component {
 
   render () {
     const { user, theme } = this.props.state;
-    console.log('+++++++++++++++++++++++', user)  
     return (
       <View style={styles.container}>
         <ScrollView>
