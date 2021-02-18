@@ -774,6 +774,8 @@ class MessagesV3 extends Component{
         this.props.navigation.navigate(data.payload_value, {data: {id: request.id}})
       }else if(data.title.toLowerCase() == 'rate'){
         this.props.navigation.navigate(data.payload_value, {data: {data: this.props.state.messengerGroup}})
+      }else if(data.title.toLowerCase() == 'transfer fund'){
+        this.props.navigation.navigate(data.payload_value)
       }
     }
   }
