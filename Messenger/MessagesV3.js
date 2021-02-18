@@ -39,8 +39,6 @@ class MessagesV3 extends Component{
       isImageModal: false,
       photo: null,
       keyRefresh: 0,
-      settingsMenu: [],
-      settingsBreadCrumbs: ['Settings'],
       isPullingMessages: false,
       offset: 0,
       limit: 10,
