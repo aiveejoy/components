@@ -47,6 +47,7 @@ class Messages extends Component{
   }
 
   componentDidMount(){
+    console.log('mmmmmmmmasdfasdfasdfasdfasdfasdfasdfdsfddddddssssssssss')
     const { user } = this.props.state
     if (user == null) return
 
