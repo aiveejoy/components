@@ -28,7 +28,7 @@ import CommonRequest from 'services/CommonRequest.js';
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
 
-class Messages extends Component{
+class MessagesV3 extends Component{
   constructor(props){
     super(props);
     this.state = {
@@ -39,6 +39,8 @@ class Messages extends Component{
       isImageModal: false,
       photo: null,
       keyRefresh: 0,
+      settingsMenu: [],
+      settingsBreadCrumbs: ['Settings'],
       isPullingMessages: false,
       offset: 0,
       limit: 10,
@@ -49,38 +51,11 @@ class Messages extends Component{
   componentDidMount(){
     const { user } = this.props.state
     if (user == null) return
-
-    // const { setMessengerGroup } = this.props
-    // const { navigation: { state: { params } } } = this.props
-    // const accountType = (user.account_type + '').toLowerCase()
-    
-    // const parameter = {
-    //   condition: [{
-    //     column: 'title',
-    //     clause: '=',
-    //     value: messengerTitle
-    //   }]
-    // }
-    
-    // this.setState({ isLoading: true, isLock: false })
-    // Api.request(Routes.messengerGroupRetrieve, parameter, response => {
-    //   if (response.data.length > 0) {
-    //     setMessengerGroup(response.data[0])
-    //     this.retrieve();
-    //   } else {
-    //     this.setState({ isLoading: false, isLock: true })
-    //   }
-    // }, (error) => {
-    //   this.setState({ isLoading: false })
-    //   console.log({ messengerGroupRetrieveError: error })
-    // })
-
     this.retrieve()
-
   }
 
   componentWillUnmount() {
-    const { setMessengerGroup, setMessagesOnGroup } = this.props;
+    const { setMessengerGroup, setMessagesOnGroup } = this.props
     setMessengerGroup(null)
     setMessagesOnGroup({
       groupId: null,
@@ -90,14 +65,12 @@ class Messages extends Component{
 
   retrieve = () => {
     const { offset, limit } = this.state
-    const { messengerGroup } = this.props.state;
-    // const { setMessagesOnGroup } = this.props;
 
     this.setState({ isLoading: true });
 
     const parameter = {
       condition: [{
-        value: messengerGroup.id,
+        value: this.props.navigation.state.params.data.id,
         column: 'messenger_group_id',
         clause: '='
       }],
@@ -105,13 +78,15 @@ class Messages extends Component{
         'created_at': 'DESC'
       },
       limit,
-      offset,
+      offset: offset * limit,
     }
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
+      console.log('[Messages] OnRetrieve', response);
       this.setState({ isLoading: false, offset: offset + limit });
+      const {setMessagesOnGroup} = this.props;
         setMessagesOnGroup({
         messages: response.data.reverse(),
-        groupId: messengerGroup.id
+        groupId: this.props.navigation.state.params.data.id
       })
     }, error => {
       this.setState({ isLoading: false });
@@ -119,46 +94,46 @@ class Messages extends Component{
     });
   }
 
-  createGroup(params, accountType) {
-    const { setMessengerGroup } = this.props
-    const checkoutId = params ? params.checkoutData.id : null
-    const merchantId = params ? params.checkoutData.merchantId : null
-    const messengerTitle = params ? params.checkoutData.code : null
+  // createGroup(params, accountType) {
+  //   const { setMessengerGroup } = this.props
+  //   const checkoutId = params ? params.checkoutData.id : null
+  //   const merchantId = params ? params.checkoutData.merchantId : null
+  //   const messengerTitle = params ? params.checkoutData.code : null
 
-    const { user } = this.props.state
+  //   const { user } = this.props.state
 
-    if (!merchantId || !checkoutId || !user ) {
-      this.setState({ isLoading: false })
-      return
-    }
+  //   if (!merchantId || !checkoutId || !user ) {
+  //     this.setState({ isLoading: false })
+  //     return
+  //   }
 
-    let parameter = {
-      member: merchantId,
-      creator: user.id,
-      title: messengerTitle,
-      payload: checkoutId
-    }
+  //   let parameter = {
+  //     member: merchantId,
+  //     creator: user.id,
+  //     title: messengerTitle,
+  //     payload: checkoutId
+  //   }
     
-    if (accountType === 'merchant') {
-      const customerId = params ? params.checkoutData.customerId : null
-      parameter = {
-        member: customerId,
-        creator: merchantId,
-        title: messengerTitle,
-        payload: checkoutId
-      }
-    }
+  //   if (accountType === 'merchant') {
+  //     const customerId = params ? params.checkoutData.customerId : null
+  //     parameter = {
+  //       member: customerId,
+  //       creator: merchantId,
+  //       title: messengerTitle,
+  //       payload: checkoutId
+  //     }
+  //   }
 
-    Api.request(Routes.customMessengerGroupCreate, parameter, response => {
-      if (response.data) {
-        setMessengerGroup({ id: response.data, account_id: user.id })
-        this.retrieve()
-      }
-    }, error => {
-      this.setState({ isLoading: false })
-      console.log({ messenger_groups_error: error })
-    })
-  }
+  //   Api.request(Routes.customMessengerGroupCreate, parameter, response => {
+  //     if (response.data) {
+  //       setMessengerGroup({ id: response.data, account_id: user.id })
+  //       this.retrieve()
+  //     }
+  //   }, error => {
+  //     this.setState({ isLoading: false })
+  //     console.log({ messenger_groups_error: error })
+  //   })
+  // }
 
   retrieveMoreMessages = () => {
     const { offset, limit } = this.state
@@ -795,4 +770,4 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Messages);
+)(MessagesV3);
