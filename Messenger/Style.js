@@ -94,5 +94,5 @@ export default {
     backgroundColor: Color.white,
     borderColor: Color.primary,
     borderWidth: 1
-  }
+  },
 }
