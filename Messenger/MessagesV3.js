@@ -91,7 +91,7 @@ class MessagesV3 extends Component{
       offset: offset * limit,
     }
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
-      console.log('[Messages] OnRetrieve', response);
+      console.log('[Messages] OnRetrieve', response, response.data[0].account);
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
         this.setState({sender_id: response.data[0].account_id});
@@ -838,11 +838,15 @@ class MessagesV3 extends Component{
       }
     }else if(data.payload === 'redirect') {
       if(data.title.toLowerCase() == 'details'){
-        const { request } = this.props.state.messengerGroup
-        this.props.navigation.navigate(data.payload_value, {data: {id: request.id}})
+        const { messengerGroup } = this.props.state
+        console.log('[Details]', this.props.state.messengerGroup)
+        console.log('[transfer fund]')
+        this.props.navigation.navigate(data.payload_value, {data: {id: messengerGroup.id}})
       }else if(data.title.toLowerCase() == 'rate'){
+        console.log('[transfer fund]')
         this.props.navigation.navigate(data.payload_value, {data: {data: this.props.state.messengerGroup}})
-      }else if(data.title.toLowerCase() == 'transfer fund'){
+      }else if(data.title.toLowerCase() == 'Transfer funds'){
+        console.log('[transfer fund]')
         this.props.navigation.navigate(data.payload_value)
       }else if(data.title.toLowerCase() == 'receiver picture') {
         let picture = this.state.settingsBreadCrumbs
