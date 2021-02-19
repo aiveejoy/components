@@ -826,7 +826,7 @@ class MessagesV3 extends Component{
                   onPress={() => {
                     this.setState({visible: true})
                   }}>
-                    <Text style={{color: Color.white}}> Upload {this.state.sender_id}</Text>
+                    <Text style={{color: Color.white}}> Upload </Text>
                   </TouchableOpacity>
                 </View>
                 }
