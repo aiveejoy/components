@@ -54,6 +54,7 @@ class MessagesV3 extends Component{
   }
 
   componentDidMount(){
+    this.menu(Helper.MessengerMenu)
     const { user } = this.props.state
     if (user == null) return
     this.retrieve()
