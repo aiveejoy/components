@@ -94,5 +94,63 @@ export default {
     backgroundColor: Color.white,
     borderColor: Color.primary,
     borderWidth: 1
+  },
+  settingsTitles: {
+    height: 50,
+    borderBottomWidth: 1,
+    borderBottomColor: Color.gray,
+    alignItems: 'center',
+    paddingLeft: 15,
+    paddingRight: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  settingsButton: {
+    width: 70,
+    borderWidth: 1,
+    borderRadius: 20,
+    alignItems: 'center',
+    borderColor: 'white',
+    paddingTop: 2,
+    paddingBottom: 2
+  },
+  signatureFrameContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    flexWrap: 'wrap',
+    alignItems: 'flex-start'
+  },
+  signatureFrame: {
+    height: 100,
+    width: (width / 2) - 4,
+    borderWidth: 1,
+    borderColor: Color.gray,
+    margin: 2
+  },
+  signatureAction: {
+    width: (width / 2) - 4,
+    borderWidth: 1,
+    height: 50,
+    margin: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10
+  },
+  signatureActionDanger: {
+    borderColor: Color.white,
+    backgroundColor: Color.danger
+  },
+  signatureActionSuccess: {
+    borderColor: Color.white,
+    backgroundColor: Color.success
+  },
+  signatureFullSuccess: {
+    width: width - 4,
+    borderWidth: 1,
+    height: 50,
+    margin: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10
   }
 }
