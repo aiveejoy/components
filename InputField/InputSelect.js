@@ -4,7 +4,7 @@ import { Color, BasicStyles} from 'common';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 
-class LocationInput extends Component{
+class InputSelect extends Component{
   constructor(props){
     super(props);
     this.state = {
@@ -22,12 +22,10 @@ class LocationInput extends Component{
   render() {
     return (
       <View style={{
-        position: 'absolute',
-        bottom: 10,
         marginLeft: 20}}>
         <Text style={{color: 'black', marginLeft: 20, marginBottom: 10 }}>{this.props.title}</Text>
         <TextInput
-          style={[BasicStyles.formControl, {marginLeft: 20 }]}
+          style={[BasicStyles.formControls, {marginLeft: 20 }]}
           onChangeText={(input) => this.setInput(input)}
           value={this.state.input}
           placeholder={this.props.placeholder ? this.props.placeholder : 'Type your Location'}
@@ -41,7 +39,7 @@ class LocationInput extends Component{
         }}
         underlayColor={Color.white}
         >
-        <FontAwesomeIcon style={{color: 'grey'}} icon={faMapMarkerAlt} size={20}/>
+        <Text>All</Text>
         </TouchableHighlight>
       </View>
     )
@@ -49,4 +47,4 @@ class LocationInput extends Component{
 
 }
 
-export default LocationInput;
+export default InputSelect;
