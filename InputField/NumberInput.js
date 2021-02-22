@@ -36,7 +36,7 @@ DecreaseItem = () => {
       <View style={{
         position: 'absolute',
         marginLeft: 20}}>
-        <Text style={{color: 'black', marginLeft: 20, marginBottom: 10 }}>{this.props.title}</Text>
+        <Text style={{color: 'black', marginLeft: 20, marginBottom: -10}}>{this.props.title}</Text>
         <TextInput
           style={[BasicStyles.formControls, {marginLeft: 20 }]}
           onChangeText={(clicks) => this.setInput(this.state.clicks)}
@@ -48,7 +48,7 @@ DecreaseItem = () => {
         style={{
           position: 'absolute',
           right: 15,
-          top: 30,
+          top: 15,
           marginLeft: 30,
         }}
         underlayColor={Color.white}
@@ -60,7 +60,7 @@ DecreaseItem = () => {
         style={{
           position: 'absolute',
           right:15,
-          top: 45,
+          top: 30,
           marginLeft: 30,
         }}
         underlayColor={Color.white}

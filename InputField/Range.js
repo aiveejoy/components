@@ -24,7 +24,7 @@ class Range extends Component{
       <View style={{
         position: 'absolute',
         marginLeft: 20}}>
-        <Text style={{color: 'black', marginLeft: 20, marginBottom: 10 }}>{this.props.title}</Text>
+        <Text style={{color: 'black', marginLeft: 20, marginBottom: -10 }}>{this.props.title}</Text>
         <TextInput
           style={[BasicStyles.formControls, {marginLeft: 20 }]}
           onChangeText={(input) => this.setInput(input)}

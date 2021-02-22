@@ -23,9 +23,8 @@ class LocationInput extends Component{
     return (
       <View style={{
         position: 'absolute',
-        bottom: 10,
         marginLeft: 20}}>
-        <Text style={{color: 'black', marginLeft: 20, marginBottom: 10 }}>{this.props.title}</Text>
+        <Text style={{color: 'black', marginLeft: 20, marginBottom: 5 }}>{this.props.title}</Text>
         <TextInput
           style={[BasicStyles.formControl, {marginLeft: 20 }]}
           onChangeText={(input) => this.setInput(input)}
@@ -36,7 +35,7 @@ class LocationInput extends Component{
         style={{
           position: 'absolute',
           right: 10,
-          top: 45,
+          top: 39,
           marginLeft: 30,
         }}
         underlayColor={Color.white}

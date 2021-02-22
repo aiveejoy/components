@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, TouchableHighlight, Animated, Text } from 'react-native'
-import RangeSlider, { Slider } from 'react-native-range-slider-expo';
+import { SliderPicker } from 'react-native-slider-picker';
 import { Color, BasicStyles} from 'common';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCaretUp } from '@fortawesome/free-solid-svg-icons';
@@ -9,23 +9,19 @@ class Sliders extends Component{
   constructor(props){
     super(props);
     this.state = {
-      input: null,
-      value: null
+      value: 1
     }
   }
 
   render() {
     return (
       <View style={{
-        marginLeft: 20}}>
-        <Text style={{color: 'black', marginLeft: 20, marginBottom: 10 }}>{this.props.title}</Text>
+        marginLeft: 20,
+        justifyContent: 'center' }}>
+        <Text style={{color: 'black', marginBottom: 0 }}>{this.props.title}</Text>
         <SliderPicker 
-          minLabel={'0'}
-          midLabel={'50'}
-          maxLabel={'100'}
-          maxValue={100}
           callback={position => {
-            this.setState({ value: position });
+            this.setState({ value: position })
           }}
           defaultValue={this.state.value}
           labelFontColor={"#6c7682"}
@@ -37,14 +33,18 @@ class Sliders extends Component{
           showSeparatorScale={true}
           buttonBackgroundColor={'#fff'}
           buttonBorderColor={"#6c7682"}
-          buttonBorderWidth={1}
+          buttonBorderWidth={2}
           scaleNumberFontWeight={'300'}
           buttonDimensionsPercentage={6}
+          buttonBorderColor={'#5842D7'}
           heightPercentage={1}
-          widthPercentage={80}
+          widthPercentage={90}
+          sliderInnerBackgroundColor={'gray'}
+          minLabel={'1km'}
+          midLabel={'25km'}
+          maxLabel={'50km'}
+          maxValue={50}
         />
-        
-        <Text>state.value: {this.state.value}</Text>
       </View>
     )
   }
