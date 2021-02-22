@@ -50,6 +50,7 @@ class MessagesV3 extends Component{
       pictures: [],
       visible: false,
       sender_id: null,
+      group: null
     }
   }
 
@@ -69,6 +70,9 @@ class MessagesV3 extends Component{
     if(user == null || data == null){
       return
     }
+    this.setState({
+      group: data
+    })
     fcmService.registerAppWithFCM()
     fcmService.registerOnOpen(this.onRegister, this.onNotification)
     fcmService.subscribeTopic('Message-' + data.id)
@@ -83,16 +87,16 @@ class MessagesV3 extends Component{
   }
 
   onNotification = (notify) => {
-    const { data } = this.props.navigation.state.params;
+    const { group } = this.state;
     const { user } = this.props.state;
     console.log("[Messages] onNotification", notify)
-    let message = notify.data
-    if(user == null || data == null || message == null){
+    let { data } = notify
+    if(user == null || data == null || group == null){
       return
     }
-    if(message.messenger_group_id === data.id && message.account_id != user.id){
+    if(parseInt(data.messenger_group_id) === group.id && parseInt(data.account_id) != user.id){
       const { updateMessagesOnGroup } = this.props;
-      updateMessagesOnGroup(message);
+      updateMessagesOnGroup(data);
     }
     // const options = {
     //   soundName: 'default',
