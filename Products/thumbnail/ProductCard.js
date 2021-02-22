@@ -26,11 +26,10 @@ class ProductCard extends Component {
   }
 
   render() {
-    const { item, theme, addedProduct, isAdded } = this.props;
-    console.log(item);
+    const { item, theme } = this.props;
     return (
       <TouchableOpacity
-        style={addedProduct && isAdded && addedProduct.product.id === item.id ? Style.selectedContainer : Style.cardContainer}
+        style={item.batch_number && item.batch_number.length > 0 ? Style.selectedContainer : Style.cardContainer}
         onPress={() => this.redirect()}
         
         >
@@ -54,20 +53,24 @@ class ProductCard extends Component {
                         fontWeight:'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
                         marginBottom:3,
-                        color: addedProduct && isAdded && addedProduct.product.id === item.id ? 'white' : '',
+                        color: item.batch_number && item.batch_number.length > 0 ? 'white' : '',
                       }}>{item.title}</Text>
                     </View>
-                    <View style={{flexDirection:'row'}}>
+                    {this.props.batch === true && (<View style={{flexDirection:'row'}}>
                       <Text style={{
-                        color: addedProduct && isAdded && addedProduct.product.id === item.id ? 'white' : '#C0C0C0',
+                        color: item.batch_number && item.batch_number.length > 0 ? 'white' : '#C0C0C0',
                         fontSize: BasicStyles.standardFontSize
                       }}>Batch Number:</Text>
-                      <Text style={{
+                      {item.batch_number && item.batch_number.length > 0 && item.batch_number.map(i => {
+                        return (
+                      <Text
+                        style={{
                         marginLeft: 5,
                         color: Color.blue,
                         fontSize: BasicStyles.standardFontSize
-                      }}>{item.batch_number}</Text>
+                      }}>{i}</Text>)})}
                     </View>
+                    )}
                   </View>
                 </View>
 
@@ -84,7 +87,7 @@ class ProductCard extends Component {
                       borderColor: Color.blue,
                       borderWidth: 0.5
                     }]}>
-                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.qty !=null ? parseFloat(item.qty).toFixed(1) + "L" : "N/A"}</Text>
+                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate !=null ? parseInt(item.rate).toFixed(1) + "L" : "N/A"}</Text>
                   </View>
                 </View>
               </View>
@@ -106,7 +109,7 @@ class ProductCard extends Component {
                     width: '100%'
                   }}>
                     <View style={{flexDirection:'row'}}>
-                      <FontAwesomeIcon icon={faCircle} color={item.qty > 0 ? Color.primary : Color.danger } size={10} style={{
+                      <FontAwesomeIcon icon={faCircle} color={this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty > 0 ? Color.primary : Color.danger) : (item.inventory && item.inventory.qty[0].total_remaining_product > 0 ? Color.primary : Color.danger)} size={10} style={{
                         marginTop: 6,
                         marginRight: 5
                       }}/>
@@ -136,12 +139,12 @@ class ProductCard extends Component {
                       justifyContent: 'center',
                       width: 40,
                       height: 40,
-                      backgroundColor: item.qty > 0 ? Color.blue : Color.danger
+                      backgroundColor: this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty > 0 ? Color.primary : Color.danger) : (item.inventory && item.inventory.qty[0].total_remaining_product > 0 ? Color.primary : Color.danger)
                     }]}>
                     <Text style={{
                       fontSize: BasicStyles.standardTitle2FontSize,
                       color: Color.white
-                    }}>{item.qty}</Text>
+                    }}>{ this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty) : (item.inventory ? item.inventory.qty[0].total_remaining_product : null)}</Text>
                   </View>
                 </View>
               </View>

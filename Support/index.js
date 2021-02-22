@@ -107,7 +107,7 @@ class Support extends Component {
                     onPress={() => {
                       this.props.navigation.push('updateTicketStack', {id: u.id});
                     }}>
-                  <View style={{alignSelf: 'flex-start', padding: 5, borderRadius: 15, backgroundColor: this.findColor(types, u.type)}}><Text style={{color: '#ffffff', fontSize:10}}>{u.type}</Text></View>
+                  <View style={{alignSelf: 'flex-start', padding: 5, borderRadius: 15, backgroundColor: this.findColor(types, u.type.toLowerCase())}}><Text style={{color: '#ffffff', fontSize:10}}>{u.type}</Text></View>
                   <Text style={Style.TextCard}>{u.content}</Text>
                   <Text style={Style.TextCard, {fontSize:11}} >{u.assigned_to ? 'Assigned to '+ u.assigned_to : 'Not assigned'}</Text>
                   <View style={{flexDirection: 'row-reverse'}}>
@@ -144,9 +144,9 @@ class Support extends Component {
         activeIndex={this.state.active}
         onChange={index => this.change(this.state.menu[index])}
       />
-      {this.state.isLoading ? <Spinner mode="overlay"/> : null }
       </View>
       <ScrollView>{div}</ScrollView>
+      {this.state.isLoading ? <Spinner mode="overlay"/> : null }
       <TouchableOpacity 
           style={Style.floatingButton}
           onPress={() => {

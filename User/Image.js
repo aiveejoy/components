@@ -15,14 +15,14 @@ class UserImage extends Component{
     return (
       <View>
         {
-          user.profile != null && user.profile.url != null && (
+          user?.profile != null && user?.profile?.url != null && (
             <Image
               source={{uri: Config.BACKEND_URL  + user.profile.url}}
               style={[BasicStyles.profileImageSize, this.props.style]}/>
           )
         }
         {
-          (user.profile == null || (user.profile != null && user.profile.url == null)) && (
+          (user?.profile == null || (user?.profile != null && user?.profile?.url == null)) && (
             <FontAwesomeIcon
               icon={faUserCircle}
               size={this.props.size}

@@ -23,13 +23,15 @@ class PasswordWithIcon extends Component{
   render () {
     return (
       <View style={{
-          position: 'relative',
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center'
         }}>
         <TextInput
-          style={BasicStyles.formControl}
+          style={[BasicStyles.formControl,
+            {
+            ...this.props.style
+          }]}
           onChangeText={(input) => this.setInput(input)}
           value={this.state.input}
           placeholder={this.props.placeholder ? this.props.placeholder : '*******'}
