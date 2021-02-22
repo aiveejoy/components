@@ -21,16 +21,12 @@ import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImage, faPaperPlane, faLock, faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-// import Review from './templates/Review.js';
-// import AddRequirements from './templates/AddRequirements.js';
-// import Transfer from './templates/Transfer.js';
-// import SendRequirements from './templates/SendRequirements.js';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import CommonRequest from 'services/CommonRequest.js';
 import Style from 'modules/messenger/Style.js'
 import Modal from 'components/Modal/Sketch';
-
+import { fcmService } from 'services/broadcasting/FCMService';
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
 
@@ -63,15 +59,70 @@ class MessagesV3 extends Component{
     if (user == null) return
     this.retrieve()
     this.retrieveReceiverPhoto()
+    this.firebaseNotification()
   }
 
+
+  firebaseNotification(){
+    const { user } = this.props.state;
+    const { data } = this.props.navigation.state.params;
+    if(user == null || data == null){
+      return
+    }
+    fcmService.registerAppWithFCM()
+    fcmService.registerOnOpen(this.onRegister, this.onNotification)
+    fcmService.subscribeTopic('Message-' + data.id)
+    // return () => {
+    //   console.log("[App] unRegister")
+    //   fcmService.unRegister()
+    // }
+  }
+
+  onRegister = (token) => {
+    console.log("[App] onRegister", token)
+  }
+
+  onNotification = (notify) => {
+    const { data } = this.props.navigation.state.params;
+    const { user } = this.props.state;
+    console.log("[Messages] onNotification", notify)
+    let message = notify.data
+    if(user == null || data == null || message == null){
+      return
+    }
+    if(message.messenger_group_id === data.id && message.account_id != user.id){
+      const { updateMessagesOnGroup } = this.props;
+      updateMessagesOnGroup(message);
+    }
+    // const options = {
+    //   soundName: 'default',
+    //   playSound: true
+    // }
+
+    // localNotificationService.showNotification(
+    //   0,
+    //   notify.title,
+    //   notify.body,
+    //   notify,
+    //   options,
+    //   "test"
+    // )
+  }
+
+
   componentWillUnmount() {
+    const { data } = this.props.navigation.state.params;
     const { setMessengerGroup, setMessagesOnGroup } = this.props
     setMessengerGroup(null)
     setMessagesOnGroup({
       groupId: null,
       messages: null
     })
+    if(data == null){
+      return
+    }
+    fcmService.unsubscribeTopic('message-' + data.id)
+    fcmService.unRegister()
   }
 
   retrieve = () => {
