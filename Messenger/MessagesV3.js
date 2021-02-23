@@ -60,59 +60,7 @@ class MessagesV3 extends Component{
     if (user == null) return
     this.retrieve()
     this.retrieveReceiverPhoto()
-    this.firebaseNotification()
   }
-
-
-  firebaseNotification(){
-    const { user } = this.props.state;
-    const { data } = this.props.navigation.state.params;
-    if(user == null || data == null){
-      return
-    }
-    this.setState({
-      group: data
-    })
-    fcmService.registerAppWithFCM()
-    fcmService.registerOnOpen(this.onRegister, this.onNotification)
-    fcmService.subscribeTopic('Message-' + data.id)
-    // return () => {
-    //   console.log("[App] unRegister")
-    //   fcmService.unRegister()
-    // }
-  }
-
-  onRegister = (token) => {
-    console.log("[App] onRegister", token)
-  }
-
-  onNotification = (notify) => {
-    const { group } = this.state;
-    const { user } = this.props.state;
-    console.log("[Messages] onNotification", notify)
-    let { data } = notify
-    if(user == null || data == null || group == null){
-      return
-    }
-    if(parseInt(data.messenger_group_id) === group.id && parseInt(data.account_id) != user.id){
-      const { updateMessagesOnGroup } = this.props;
-      updateMessagesOnGroup(data);
-    }
-    // const options = {
-    //   soundName: 'default',
-    //   playSound: true
-    // }
-
-    // localNotificationService.showNotification(
-    //   0,
-    //   notify.title,
-    //   notify.body,
-    //   notify,
-    //   options,
-    //   "test"
-    // )
-  }
-
 
   componentWillUnmount() {
     const { data } = this.props.navigation.state.params;
@@ -166,6 +114,10 @@ class MessagesV3 extends Component{
     const { offset, limit } = this.state
     const { messengerGroup, messagesOnGroup } = this.props.state;
     const { setMessagesOnGroup } = this.props;
+
+    if(messengerGroup == null){
+      return
+    }
 
     this.setState({ isLoading: true });
 
@@ -272,6 +224,9 @@ class MessagesV3 extends Component{
       noData: true,
       error: null
     }
+    if(messengerGroup == null){
+      return
+    }
     ImagePicker.launchImageLibrary(options, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
@@ -348,6 +303,9 @@ class MessagesV3 extends Component{
 
   updateValidation = (item, status) => {
     const { messengerGroup, user } = this.props.state;
+    if(messengerGroup == null){
+      return
+    }
     let parameter = {
       id: item.id,
       status: status,
@@ -896,6 +854,9 @@ class MessagesV3 extends Component{
         const { messengerGroup } = this.props.state
         console.log('[Details]', this.props.state.messengerGroup)
         console.log('[transfer fund]')
+        if(messengerGroup == null){
+          return
+        }
         this.props.navigation.navigate(data.payload_value, {data: {id: messengerGroup.id}})
       }else if(data.title.toLowerCase() == 'rate'){
         console.log('[transfer fund]')
