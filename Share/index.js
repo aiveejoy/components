@@ -11,9 +11,9 @@ class Share extends Component {
         super(props)
     }
     closeModal(){
-        const { viewMenu } = this.props
+        const { viewShare } = this.props
         console.log("false");
-        viewMenu(false);
+        viewShare(false);
     }
     render(){
         const { isViewing } = this.props.state
@@ -190,7 +190,7 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
+    viewShare: (isViewing) => dispatch(actions.viewShare(isViewing))
   };
 };
 
