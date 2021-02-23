@@ -60,7 +60,7 @@ class MessagesV3 extends Component{
     if (user == null) return
     this.retrieve()
     this.retrieveReceiverPhoto()
-    this.firebaseNotification()
+    // this.firebaseNotification()
   }
 
 
