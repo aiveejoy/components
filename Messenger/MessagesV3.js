@@ -26,6 +26,7 @@ import ImagePicker from 'react-native-image-picker';
 import CommonRequest from 'services/CommonRequest.js';
 import Style from 'modules/messenger/Style.js'
 import Modal from 'components/Modal/Sketch';
+import MessageOptions from './Options.js'
 import { fcmService } from 'services/broadcasting/FCMService';
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -998,6 +999,7 @@ class MessagesV3 extends Component{
       isPullingMessages,
       isLock
     } = this.state;
+    const { data } = this.props.navigation.state.params;
     const { messengerGroup, user, isViewing } = this.props.state;
     return (
       <SafeAreaView>
@@ -1037,8 +1039,9 @@ class MessagesV3 extends Component{
                   this.scrollView.scrollToEnd({animated: true});
                 }
               }}
+              showsVerticalScrollIndicator={false}
               style={[Style.ScrollView, {
-                height: isViewing ? '40%' : '100%'
+                height: '100%'
               }]}
               onScroll={({ nativeEvent }) => {
                 const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
@@ -1067,7 +1070,7 @@ class MessagesV3 extends Component{
                 {this._flatList()}
               </View>
             </ScrollView>
-            {isViewing &&
+        { /*isViewing && (
           <View
             style={
               {
@@ -1092,7 +1095,9 @@ class MessagesV3 extends Component{
                 {this.state.settingsMenu}
               </ScrollView>
           </View>
+          )*/
         }
+
             <View style={{
               position: 'absolute',
               bottom: 0,
@@ -1111,6 +1116,11 @@ class MessagesV3 extends Component{
             <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible}/>
           </View>
         </KeyboardAvoidingView>
+        {
+          isViewing && (
+            <MessageOptions data={data}/>
+          )
+        }
       </SafeAreaView>
     );
   }
