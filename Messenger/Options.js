@@ -94,6 +94,10 @@ class Options extends Component{
           this.retrieveRequest('requestItemStack')
         }
         break
+      case 'transferFundStack': {
+          this.retrieveRequest('transferFundStack')
+        }
+        break
       case 'reviewsStack': {
           // review stack
           this.retrieveRequest('reviewsStack')
