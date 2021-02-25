@@ -35,12 +35,50 @@ class Options extends Component{
     viewMenu(false)
   }
 
+  retrieveRequest(route){
+    const { user, request } = this.props.state;
+    const { data } = this.props;
+    if(user == null || data == null){
+      return
+    }
+    let parameter = {
+      condition: [{
+        value: data.title,
+        clause: '=',
+        column: 'code'
+      }],
+      account_id: user.id
+    };
+    if(request != null && request.code == data.title){
+      this.props.navigation.navigate(route, {
+        data: request,
+        from: 'messenger'
+      })
+      return
+    }
+    this.setState({isLoading: true});
+    Api.request(Routes.requestRetrieveItem, parameter, (response) => {
+      this.setState({isLoading: false});
+      if(response.data.length > 0){
+        const { setRequest } = this.props;
+        setRequest(response.data[0])
+        this.props.navigation.navigate(route, {
+          data: response.data[0],
+          from: 'messenger'
+        })
+      }
+    }, error => {
+      console.log('response', error)
+      this.setState({isLoading: false});
+    });
+  }
+
   onClick(item){
-    switch(item.title){
-      case 'Close':
+    switch(item.payload_value){
+      case 'close':
         this.close()
         break
-      case 'Requirements':
+      case 'requirements':
         this.setState({
           previous: {
             title: 'Settings',
@@ -52,7 +90,16 @@ class Options extends Component{
           }
         })
         break
-      case 'Back':
+      case 'requestItemStack': {
+          this.retrieveRequest('requestItemStack')
+        }
+        break
+      case 'reviewsStack': {
+          // review stack
+          this.retrieveRequest('reviewsStack')
+        }
+        break
+      case 'back':
         this.setState({
           previous: null,
           current: {
@@ -229,7 +276,8 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
+    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing)),
+    setRequest: (request) => dispatch(actions.setRequest(request))
   };
 };
 

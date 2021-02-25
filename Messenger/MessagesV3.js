@@ -1118,7 +1118,7 @@ class MessagesV3 extends Component{
         </KeyboardAvoidingView>
         {
           isViewing && (
-            <MessageOptions data={data}/>
+            <MessageOptions data={data} navigation={this.props.navigation}/>
           )
         }
       </SafeAreaView>
