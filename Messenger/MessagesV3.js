@@ -54,10 +54,12 @@ class MessagesV3 extends Component{
       pictures: [],
       visible: false,
       sender_id: null,
+      request_id: null
     }
   }
 
   componentDidMount(){
+    console.log(this.props.navigation, "========================props");
     this.menu(Helper.MessengerMenu)
     const { user } = this.props.state
     if (user == null) return
@@ -95,6 +97,7 @@ class MessagesV3 extends Component{
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
         this.setState({sender_id: response.data[0].account_id});
+        this.setState({request_id: response.data[0].id});
       }
       const {setMessagesOnGroup} = this.props;
         setMessagesOnGroup({
@@ -702,8 +705,24 @@ class MessagesV3 extends Component{
     );
   }
 
-  addToValidation = () => {
-    console.log('add to validation======================');
+  addToValidation = (payload) => {
+    let parameter = {
+      status: 'pending',
+      payload: payload,
+      account_id: this.props.state.user.id,
+      request_id: this.state.request_id
+    }
+    console.log(parameter, Routes.requestValidationCreate);
+    this.setState({ isLoading: true });
+    Api.request(Routes.requestValidationCreate, parameter, response => {
+      this.setState({ isLoading: false });
+      if(response.data !== null) {
+        console.log(response.data, "==================");
+      }
+    }, error => {
+      this.setState({ isLoading: false });
+      console.log({ retrieveMessagesError: error })
+    });
   }
 
   cloneMenu() {
@@ -727,7 +746,7 @@ class MessagesV3 extends Component{
             <View style={Style.settingsTitles}>
               {el.title != 'Close' && <Text style={{color: Color.black}}> {el.title} </Text>}
               {el.button != undefined && this.state.sender_id && this.props.state.user.id === this.state.sender_id && 
-                <TouchableOpacity onPress={()=>{this.addToValidation()}}>
+                <TouchableOpacity onPress={()=>{this.addToValidation(el.payload_value)}}>
                   <View style={[Style.settingsButton, {backgroundColor: el.button.color}]}> 
                     <Text style={{fontSize: BasicStyles.standardFontSize, color: 'white'}}> {el.button.title} </Text>
                   </View>
