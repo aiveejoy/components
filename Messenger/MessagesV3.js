@@ -21,16 +21,13 @@ import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImage, faPaperPlane, faLock, faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-// import Review from './templates/Review.js';
-// import AddRequirements from './templates/AddRequirements.js';
-// import Transfer from './templates/Transfer.js';
-// import SendRequirements from './templates/SendRequirements.js';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import CommonRequest from 'services/CommonRequest.js';
 import Style from 'modules/messenger/Style.js'
 import Modal from 'components/Modal/Sketch';
-
+import MessageOptions from './Options.js'
+import { fcmService } from 'services/broadcasting/FCMService';
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
 
@@ -54,7 +51,8 @@ class MessagesV3 extends Component{
       pictures: [],
       visible: false,
       sender_id: null,
-      request_id: null
+      request_id: null,
+      group: null
     }
   }
 
@@ -65,15 +63,22 @@ class MessagesV3 extends Component{
     if (user == null) return
     this.retrieve()
     this.retrieveReceiverPhoto()
+    // this.firebaseNotification()
   }
 
   componentWillUnmount() {
+    const { data } = this.props.navigation.state.params;
     const { setMessengerGroup, setMessagesOnGroup } = this.props
     setMessengerGroup(null)
     setMessagesOnGroup({
       groupId: null,
       messages: null
     })
+    if(data == null){
+      return
+    }
+    fcmService.unsubscribeTopic('message-' + data.id)
+    fcmService.unRegister()
   }
 
   retrieve = () => {
@@ -114,6 +119,10 @@ class MessagesV3 extends Component{
     const { offset, limit } = this.state
     const { messengerGroup, messagesOnGroup } = this.props.state;
     const { setMessagesOnGroup } = this.props;
+
+    if(messengerGroup == null){
+      return
+    }
 
     this.setState({ isLoading: true });
 
@@ -220,6 +229,9 @@ class MessagesV3 extends Component{
       noData: true,
       error: null
     }
+    if(messengerGroup == null){
+      return
+    }
     ImagePicker.launchImageLibrary(options, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
@@ -296,6 +308,9 @@ class MessagesV3 extends Component{
 
   updateValidation = (item, status) => {
     const { messengerGroup, user } = this.props.state;
+    if(messengerGroup == null){
+      return
+    }
     let parameter = {
       id: item.id,
       status: status,
@@ -860,6 +875,9 @@ class MessagesV3 extends Component{
         const { messengerGroup } = this.props.state
         console.log('[Details]', this.props.state.messengerGroup)
         console.log('[transfer fund]')
+        if(messengerGroup == null){
+          return
+        }
         this.props.navigation.navigate(data.payload_value, {data: {id: messengerGroup.id}})
       }else if(data.title.toLowerCase() == 'rate'){
         console.log('[transfer fund]')
@@ -1000,6 +1018,7 @@ class MessagesV3 extends Component{
       isPullingMessages,
       isLock
     } = this.state;
+    const { data } = this.props.navigation.state.params;
     const { messengerGroup, user, isViewing } = this.props.state;
     return (
       <SafeAreaView>
@@ -1039,8 +1058,9 @@ class MessagesV3 extends Component{
                   this.scrollView.scrollToEnd({animated: true});
                 }
               }}
+              showsVerticalScrollIndicator={false}
               style={[Style.ScrollView, {
-                height: isViewing ? '40%' : '100%'
+                height: '100%'
               }]}
               onScroll={({ nativeEvent }) => {
                 const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
@@ -1069,7 +1089,7 @@ class MessagesV3 extends Component{
                 {this._flatList()}
               </View>
             </ScrollView>
-            {isViewing &&
+        { /*isViewing && (
           <View
             style={
               {
@@ -1094,7 +1114,9 @@ class MessagesV3 extends Component{
                 {this.state.settingsMenu}
               </ScrollView>
           </View>
+          )*/
         }
+
             <View style={{
               position: 'absolute',
               bottom: 0,
@@ -1113,6 +1135,11 @@ class MessagesV3 extends Component{
             <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible}/>
           </View>
         </KeyboardAvoidingView>
+        {
+          isViewing && (
+            <MessageOptions data={data} navigation={this.props.navigation}/>
+          )
+        }
       </SafeAreaView>
     );
   }
