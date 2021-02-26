@@ -16,11 +16,11 @@ class Share extends Component {
         viewShare(false);
     }
     render(){
-        const { isViewing } = this.props.state
+        const { isShow } = this.props.state
         return (
             <View>
                 <ScrollView onScroll={() => this.closeModal}>
-                <Modal visible={isViewing} animationType="slide" transparent={true} style={{backgroundColor: 'rgba(0,0,0, 0.5)'}}>
+                <Modal visible={isShow} animationType="slide" transparent={true} style={{backgroundColor: 'rgba(0,0,0, 0.5)'}}>
                 <View style={styles.bottomNavigationView} >
                         <View
                         style={{
