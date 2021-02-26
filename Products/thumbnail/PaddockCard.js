@@ -22,7 +22,6 @@ class PaddockCard extends Component {
     setPaddock({
       ...item
     })
-
     this.props.navigation.navigate('paddockStack', {
       data: {
         ...item
