@@ -48,7 +48,8 @@ class MessagesV3 extends Component{
       isLock: false,
       settingsMenu: [],
       settingsBreadCrumbs: ['Settings'],
-      group: null
+      group: null,
+      request_id: null
     }
   }
 
@@ -724,7 +725,7 @@ class MessagesV3 extends Component{
         </KeyboardAvoidingView>
         {
           isViewing && (
-            <MessageOptions data={data} navigation={this.props.navigation}/>
+            <MessageOptions requestId={this.state.request_id} messengerId={this.props.navigation.state.params.data.id} data={data} navigation={this.props.navigation}/>
           )
         }
       </SafeAreaView>
