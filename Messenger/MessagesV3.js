@@ -80,6 +80,7 @@ class MessagesV3 extends Component{
   }
 
   retrieve = () => {
+    console.log("[NAVIGATION]",this.props.navigation.state.params);
     const { offset, limit } = this.state
     this.setState({ isLoading: true });
 
