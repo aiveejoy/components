@@ -34,6 +34,7 @@ class Options extends Component{
 
   componentDidMount(){
     this.retrieveReceiverPhoto();
+    this.retrieveValidation();
   }
 
   sendSketch = (result) => {
@@ -102,6 +103,7 @@ class Options extends Component{
     this.setState({isLoading: true});
     Api.request(Routes.requestRetrieveItem, parameter, (response) => {
       this.setState({isLoading: false});
+      console.log(response, "====================================responseeeee");
       if(response.data.length > 0){
         const { setRequest } = this.props;
         setRequest(response.data[0])
@@ -122,14 +124,42 @@ class Options extends Component{
       status: 'pending',
       payload: payload,
       account_id: this.props.state.user.id,
-      request_id: this.state.request_id
+      request_id: this.props.requestId,
+      messages: {
+        messenger_group_id: this.props.messengerId,
+        account_id: this.props.state.user.id
+      }
     }
-    console.log(parameter, Routes.requestValidationCreate);
     this.setState({ isLoading: true });
     Api.request(Routes.requestValidationCreate, parameter, response => {
       this.setState({ isLoading: false });
       if(response.data !== null) {
-        console.log(response.data, "==================");
+      }
+    }, error => {
+      this.setState({ isLoading: false });
+      console.log({ retrieveMessagesError: error })
+    });
+  }
+
+  retrieveValidation = () => {
+    const { user } = this.props.state;
+    let parameter = { 
+      condition: [{
+        value: user.id,
+        clause: '=',
+        column: 'account_id'
+      }, {
+        value: this.props.requestId,
+        clause: '=',
+        column: 'request_id'
+      }]
+    }
+    console.log(parameter, "==================parameter");
+    this.setState({ isLoading: true });
+    Api.request(Routes.requestValidationRetreive, parameter, response => {
+      this.setState({ isLoading: false });
+      if(response.data !== null) {
+        console.log(response.data, "=================d=");
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -175,7 +205,8 @@ class Options extends Component{
         let parameter = {
           account_id: user.id,
           payload: payload,
-          payload_value: response.uri
+          payload_value: response.uri,
+          category: this.props.messengerId
         }
         this.setState({isLoading: true})
         Api.request(Routes.uploadImage, parameter, response => {
@@ -505,6 +536,8 @@ class Options extends Component{
   render() {
     const { current } = this.state;
     return (
+      <View>
+        {this.state.isLoading ? <Spinner mode="full"/> : null }
       <View style={{
         position: 'absolute',
         zIndex: 1000,
@@ -518,6 +551,7 @@ class Options extends Component{
         borderTopWidth: 1,
         borderTopColor: Color.lightGray
       }}>
+
         <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible}/>
         {this.header(this.state.current)}
         {current.title == 'Settings' && this.body(this.state.current.menu)}
@@ -525,6 +559,7 @@ class Options extends Component{
         {current.title == 'signature' && this.renderImages(this.state.current.title)}
         {current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
         {current.title == 'valid_id' && this.renderImages(this.state.current.title)}
+      </View>
       </View>
     );
   }

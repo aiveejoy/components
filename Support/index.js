@@ -148,7 +148,7 @@ class Support extends Component {
       <ScrollView>{div}</ScrollView>
       {this.state.isLoading ? <Spinner mode="overlay"/> : null }
       <TouchableOpacity 
-          style={Style.floatingButton}
+          style={[Style.floatingButton, {width: 70, height: 70, borderRadius: 35}]}
           onPress={() => {
             this.props.navigation.push('createTicketStack', {user: this.state.user});
           }}>
@@ -157,7 +157,7 @@ class Support extends Component {
             style={{
               color: Color.white
             }}
-            size={20}
+            size={16}
           />
         </TouchableOpacity>
       </View>
