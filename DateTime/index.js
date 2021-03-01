@@ -24,13 +24,14 @@ class DateTime extends Component{
 
   setDate = (event, date) => {
     if(this.props.type == 'date'){
+      console.log('[date]', date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
       this.setState({
         showDatePicker: false,
         date: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
         dateLabel: Currency.getMonth(date.getMonth()) + ' ' + date.getDate() + ', ' + date.getFullYear()
       });
       this.props.onFinish({
-        date: this.state.date,
+        date: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
         time: null
       })  
     }else if(this.props.type == 'datetime'){
