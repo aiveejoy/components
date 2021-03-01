@@ -27,7 +27,6 @@ import CommonRequest from 'services/CommonRequest.js';
 import Style from 'modules/messenger/Style.js'
 import Modal from 'components/Modal/Sketch';
 import MessageOptions from './Options.js'
-import { fcmService } from 'services/broadcasting/FCMService';
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
 
@@ -70,11 +69,10 @@ class MessagesV3 extends Component{
     if(data == null){
       return
     }
-    fcmService.unsubscribeTopic('message-' + data.id)
-    fcmService.unRegister()
   }
 
   retrieve = () => {
+    console.log("[NAVIGATION]",this.props.navigation.state.params);
     const { offset, limit } = this.state
     this.setState({ isLoading: true });
 
