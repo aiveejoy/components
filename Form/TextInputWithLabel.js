@@ -45,12 +45,14 @@ class TextInputWithLabel extends Component {
         <View style={BasicStyles.standardTextInput}>
           <TextInput
             value={this.props.variable}
-            multiline={this.props.multiline}
             maxLength={this.props.maxLength}
             keyboardType={this.props.keyboardType}
             editable={this.props.editable}
             onChangeText={(input) => {
               this.props.onChange(input);
+            }}
+            style={{
+              alignItems: 'center'
             }}
             placeholder={this.props.placeholder ? this.props.placeholder : 'Type here'}
           />
