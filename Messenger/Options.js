@@ -100,6 +100,7 @@ class Options extends Component{
       })
       return
     }
+    console.log('[retrieveRequest] parameter', parameter)
     this.setState({isLoading: true});
     Api.request(Routes.requestRetrieveItem, parameter, (response) => {
       this.setState({isLoading: false});
