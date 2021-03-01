@@ -7,6 +7,7 @@ import { Color, BasicStyles } from 'common'
 import Config from 'src/config.js'
 import Style from './Style';
 import {connect} from 'react-redux';
+import Conversion from 'services/Conversion';
 
 class ProductCard extends Component {
   constructor(props) {
@@ -45,7 +46,7 @@ class ProductCard extends Component {
                 paddingRight: 10,
               }}>
                 <View style={[Style.paddockInfo, {
-                  width: '80%'
+                  width: '70%'
                 }]}>
                   <View>
                     <View style={{flexDirection:'row'}}>
@@ -75,7 +76,7 @@ class ProductCard extends Component {
                 </View>
 
                 <View style={{
-                  width: '20%',
+                  width: '30%',
                   alignItems: 'flex-end',
                   justifyContent: 'center'
                 }}>
@@ -87,7 +88,7 @@ class ProductCard extends Component {
                       borderColor: Color.blue,
                       borderWidth: 0.5
                     }]}>
-                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate !=null ? parseInt(item.rate).toFixed(1) + "L" : "N/A"}</Text>
+                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate !=null ? parseInt(item.rate).toFixed(1) + (item.units ? Conversion.getUnitsAbbreviation(item.units).toUpperCase() : null) : "N/A"}</Text>
                   </View>
                 </View>
               </View>
