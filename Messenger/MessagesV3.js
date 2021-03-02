@@ -723,7 +723,14 @@ class MessagesV3 extends Component{
         </KeyboardAvoidingView>
         {
           isViewing && (
-            <MessageOptions requestId={this.state.request_id} messengerId={this.props.navigation.state.params.data.id} data={data} navigation={this.props.navigation}/>
+            <MessageOptions
+              requestId={this.state.request_id}
+              messengerId={this.props.navigation.state.params.data.id}
+              data={data}
+              navigation={this.props.navigation}
+              updateMessagesOnGroup={this.props.updateMessagesOnGroup}
+              updateMessageByCode={this.props.updateMessageByCode}
+            />
           )
         }
       </SafeAreaView>
