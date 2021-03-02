@@ -12,7 +12,6 @@ class UserImage extends Component{
 
   render () {
     const { user } = this.props;
-    console.log(Config.BACKEND_URL  + user?.profile?.url);
     return (
       <View>
         {

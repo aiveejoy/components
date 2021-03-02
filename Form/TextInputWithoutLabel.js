@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Text, View, TextInput } from 'react-native';
+import { Text, View, TextInput, Platform } from 'react-native';
 import { BasicStyles, Color } from 'common';
 class TextInputWithoutLabel extends Component {
   constructor(props) {
@@ -11,11 +11,12 @@ class TextInputWithoutLabel extends Component {
     return (
       <View style={{
         width: '100%',
-        ...this.props.style
+        ...this.props.style,
+        minHeight: Platform.OS == 'ios' ? 100 : 'auto'
       }}>
         <View style={{
-          ...BasicStyles.standardTextInput,
-          height: 'auto'
+          ...BasicStyles.standardTextInputNotCentered,
+          minHeight: Platform.OS == 'ios' ? 100 : 'auto'
         }}>
           <TextInput
             value={this.props.variable}
@@ -28,6 +29,9 @@ class TextInputWithoutLabel extends Component {
               this.props.onChange(input);
             }}
             placeholder={this.props.placeholder ? this.props.placeholder : 'Type here'}
+            style={{
+              textAlignVertical: 'top'
+            }}
           />
         </View>
       </View>
