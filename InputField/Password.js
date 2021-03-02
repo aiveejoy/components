@@ -23,30 +23,36 @@ class PasswordWithIcon extends Component{
   render () {
     return (
       <View style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center'
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        position: 'relative'
         }}>
         <TextInput
-          style={[BasicStyles.formControl,
-            {
+          style={{
+            ...BasicStyles.standardFormControl,
             ...this.props.style
-          }]}
+          }}
           onChangeText={(input) => this.setInput(input)}
           value={this.state.input}
           placeholder={this.props.placeholder ? this.props.placeholder : '*******'}
           secureTextEntry={this.state.flag == false ? true : false}
         />
-        <TouchableHighlight onPress={() => this.setState({
-          flag: !this.state.flag
-        })}
-        style={{
-          position: 'absolute',
-          right: 10,
-          top: 15
-        }}
-        underlayColor={Color.white}
-        >
+        <TouchableHighlight
+          onPress={() => this.setState({
+            flag: !this.state.flag
+          })}
+          style={{
+            position: 'absolute',
+            right: 0,
+            width: 50,
+            height: 50,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          underlayColor={Color.white}
+          >
           <FontAwesomeIcon icon={this.state.flag == false ? faEyeSlash : faEye} size={20}/>
         </TouchableHighlight>
       </View>
