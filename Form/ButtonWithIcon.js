@@ -8,8 +8,8 @@ class ButtonWithIcon extends Component {
       <TouchableOpacity
         style={{
           ...BasicStyles.standardButton,
-          ...this.props.style,
           height: 'auto',
+          ...this.props.style,
           paddingTop: 20,
           paddingBottom: 20
         }}
@@ -23,6 +23,17 @@ class ButtonWithIcon extends Component {
           ...this.props.textStyle,
           paddingTop: 10
         }}>{this.props.title}</Text>
+        {
+          this.props.description && (
+            <Text style={{
+              color: Color.white,
+              textAlign: 'center',
+              ...this.props.descriptionStyle,
+              paddingTop: 10
+            }}>{this.props.description}</Text>
+          )
+        }
+        
       </TouchableOpacity>
     );
   }

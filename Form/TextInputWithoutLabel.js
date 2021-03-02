@@ -12,11 +12,11 @@ class TextInputWithoutLabel extends Component {
       <View style={{
         width: '100%',
         ...this.props.style,
-        minHeight: Platform.OS == 'ios' ? 100 : 'auto'
+        minHeight: Platform.OS == 'ios' ? 100 : 100
       }}>
         <View style={{
           ...BasicStyles.standardTextInputNotCentered,
-          minHeight: Platform.OS == 'ios' ? 100 : 'auto'
+          minHeight: Platform.OS == 'ios' ? 100 : 100
         }}>
           <TextInput
             value={this.props.variable}
