@@ -518,7 +518,7 @@ class Options extends Component {
       >
         {this.state.isLoading ? <Spinner mode="full" /> : null}
         {
-          options.map((item, index) => (
+          this.state.isLoading === false && options.map((item, index) => (
             <View>
               {data && user && data.account_id == user.id && (
                 <TouchableOpacity style={{
