@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 // import Style from './Style.js';
-import { View, Text, Dimensions, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 import { Routes, Color, BasicStyles, Helper } from 'common';
 import { Spinner, UserImage } from 'components';
 import Api from 'services/api/index.js';
@@ -48,7 +48,7 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.uploadImage, parameter, response => {
       this.setState({ isLoading: false })
-      this.retrieveReceiverPhoto();
+      this.retrieveReceiverPhoto(this.state.currentValidation?.id);
     })
   }
 
@@ -56,18 +56,13 @@ class Options extends Component {
     this.setState({ visible: false })
   }
 
-  retrieveReceiverPhoto = () => {
-    const { currentValidation } = this.state;
+  retrieveReceiverPhoto = (id) => {
     const { user } = this.props.state;
     let parameter = {
       condition: [{
         clause: "=",
-        column: "account_id",
-        value: user.id
-      }, {
-        clause: "=",
         column: "category",
-        value: currentValidation?.id
+        value: id
       }]
     }
     this.setState({ isLoading: true })
@@ -141,6 +136,7 @@ class Options extends Component {
     Api.request(Routes.requestValidationCreate, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
+        this.retrieveValidation();
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -233,7 +229,7 @@ class Options extends Component {
         this.setState({ isLoading: true })
         Api.request(Routes.uploadImage, parameter, response => {
           this.setState({ isLoading: false })
-          this.retrieveReceiverPhoto();
+          this.retrieveReceiverPhoto(this.state.currentValidation?.id);
         })
       }
     })
@@ -268,6 +264,7 @@ class Options extends Component {
         account_id: this.props.state.user.id
       }
     }
+    console.log(parameter, "==============params");
     this.setState({isLoading: true})
     Api.request(Routes.requestValidationUpdate, parameter, response => {
       this.setState({isLoading: false})
@@ -318,7 +315,7 @@ class Options extends Component {
         let result = this.checkValidation('signature');
         if(result.result === true ) {
           this.setState({currentValidation: result.item})
-          this.retrieveReceiverPhoto();
+          this.retrieveReceiverPhoto(result.item.id);
           this.setState({
             showPhotos: true,
             current: {
@@ -330,8 +327,9 @@ class Options extends Component {
       case 'receiver_picture':
         let result1 = this.checkValidation('receiver_picture');
         if(result1.result === true ) {
+          console.log(result1.item.id, "=========================result");
           this.setState({currentValidation: result1.item})
-          this.retrieveReceiverPhoto();
+          this.retrieveReceiverPhoto(result1.item.id);
           this.setState({
             showPhotos: true,
             current: {
@@ -344,7 +342,7 @@ class Options extends Component {
         let result2 = this.checkValidation('valid_id');
         if(result2.result === true ) {
           this.setState({currentValidation: result2.item})
-          this.retrieveReceiverPhoto();
+          this.retrieveReceiverPhoto(result2.item.id);
           this.setState({
             showPhotos: true,
             current: {
@@ -555,7 +553,6 @@ class Options extends Component {
     const { data } = this.props;
     const { user } = this.props.state;
     const { currentValidation } = this.state;
-    console.log(currentValidation, "=============currentvalidation");
     return (
       <ScrollView>
         {this.state.isLoading ? <Spinner mode="full" /> : null}
@@ -603,15 +600,6 @@ class Options extends Component {
                 </TouchableOpacity>
               </View>
             )}
-            {data && data.account_id === user.id && currentValidation?.status === 'accepted' && (
-              <View style={Style.signatureFrameContainer}>
-                <TouchableOpacity style={[
-                  Style.signatureAction,
-                  Style.signatureActionSuccess]}>
-                  <Text style={{ color: Color.white }}> Accepted </Text>
-                </TouchableOpacity>
-              </View>
-            )}
             {data && data.account_id !== user.id && (
               <View style={Style.signatureFrameContainer}>
                 <TouchableOpacity style={[
@@ -625,6 +613,26 @@ class Options extends Component {
                     }
                   }}>
                   <Text style={{ color: Color.white }}> Upload </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {data && data.account_id === user.id && currentValidation?.status === 'accepted' && (
+              <View style={Style.signatureFrameContainer}>
+                <TouchableOpacity style={[
+                  Style.signatureAction,
+                  Style.signatureActionSuccess,
+                  { width: '99%' }]}>
+                  <Text style={{ color: Color.white }}> Accepted </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {data && data.account_id === user.id && currentValidation?.status === 'declined' && (
+              <View style={Style.signatureFrameContainer}>
+                <TouchableOpacity style={[
+                  Style.signatureAction,
+                  Style.signatureActionDanger,
+                  { width: '99%' }]}>
+                  <Text style={{ color: Color.white }}> Declined </Text>
                 </TouchableOpacity>
               </View>
             )}
