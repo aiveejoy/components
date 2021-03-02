@@ -30,20 +30,23 @@ class Options extends Component {
       sender_id: null,
       visible: false,
       validations: [],
-      currentValidation: null
+      currentValidation: null,
+      requestId: null
     }
   }
 
   componentDidMount() {
-    this.retrieveValidation();
+    this.retrieveRequestId();
   }
 
   sendSketch = (result) => {
     const { user } = this.props.state;
+    const { currentValidation } = this.state;
     let parameter = {
       account_id: user.id,
       payload: 'signature',
-      payload_value: result
+      payload_value: result,
+      category: currentValidation?.id
     }
     this.setState({ isLoading: true })
     Api.request(Routes.uploadImage, parameter, response => {
@@ -57,7 +60,6 @@ class Options extends Component {
   }
 
   retrieveReceiverPhoto = (id) => {
-    const { user } = this.props.state;
     let parameter = {
       condition: [{
         clause: "=",
@@ -80,6 +82,65 @@ class Options extends Component {
   close() {
     const { viewMenu } = this.props;
     viewMenu(false)
+  }
+
+  sendNewMessage = (payload) => {
+    const { messengerGroup, user, messagesOnGroup} = this.props.state;
+    const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
+
+    if(messengerGroup == null || user == null){
+      return
+    }
+
+    let parameter = {
+      messenger_group_id: messengerGroup.id,
+      message: `Your ${payload} request has been declined. Please send more photos.`,
+      account_id: user.id,
+      status: 0,
+      payload: 'text',
+      payload_value: null,
+      code: messagesOnGroup.messages.length + 1
+    }
+    let newMessageTemp = {
+      ...parameter,
+      account: user,
+      created_at_human: null,
+      sending_flag: true,
+      error: null
+    }
+    updateMessagesOnGroup(newMessageTemp);
+    this.setState({newMessage: null})
+    this.setState({isLoading: true})
+    Api.request(Routes.messengerMessagesCreate, parameter, response => {
+      this.setState({isLoading: false})
+      if(response.data != null){
+        updateMessageByCode(response.data);
+      }
+    });
+  }
+
+  retrieveRequestId() {
+    const { user, request } = this.props.state;
+    const { data } = this.props;
+    if (user == null || data == null) {
+      return
+    }
+    let parameter = {
+      condition: [{
+        value: data.title,
+        clause: '=',
+        column: 'code'
+      }],
+      account_id: user.id
+    };
+    this.setState({ isLoading: true });
+    Api.request(Routes.requestRetrieveItem, parameter, (response) => {
+      this.setState({ isLoading: false });
+      if (response.data.length > 0) {
+        this.setState({ requestId: response.data[0].id });
+        this.retrieveValidation();
+      }
+    })
   }
 
   retrieveRequest(route) {
@@ -122,11 +183,12 @@ class Options extends Component {
   }
 
   addToValidation = (payload) => {
+    const { requestId } = this.state;
     let parameter = {
       status: 'pending',
       payload: payload,
       account_id: this.props.state.user.id,
-      request_id: this.props.requestId,
+      request_id: requestId,
       messages: {
         messenger_group_id: this.props.messengerId,
         account_id: this.props.state.user.id
@@ -166,9 +228,10 @@ class Options extends Component {
 
   retrieveValidation = () => {
     const { user } = this.props.state;
+    const { requestId } = this.state;
     let parameter = {
       condition: [{
-        value: this.props.requestId,
+        value: requestId,
         clause: '=',
         column: 'request_id'
       }]
@@ -200,6 +263,7 @@ class Options extends Component {
   }
 
   uploadPhoto = (payload) => {
+    const { currentValidation } = this.state;
     const options = {
       noData: true,
       error: null
@@ -224,12 +288,12 @@ class Options extends Component {
           account_id: user.id,
           payload: payload,
           payload_value: response.uri,
-          category: this.state.currentValidation?.id
+          category: currentValidation?.id
         }
         this.setState({ isLoading: true })
         Api.request(Routes.uploadImage, parameter, response => {
           this.setState({ isLoading: false })
-          this.retrieveReceiverPhoto(this.state.currentValidation?.id);
+          this.retrieveReceiverPhoto(currentValidation?.id);
         })
       }
     })
@@ -249,7 +313,7 @@ class Options extends Component {
 
   updateValidation = (status) => {
     const { messengerGroup, user } = this.props.state;
-    const { currentValidation } = this.state;
+    const { currentValidation, requestId } = this.state;
     if(messengerGroup == null){
       return
     }
@@ -258,18 +322,16 @@ class Options extends Component {
       id: currentValidation?.id,
       payload: currentValidation?.payload,
       account_id: this.props.state.user.id,
-      request_id: this.props.requestId,
+      request_id: requestId,
       messages: {
         messenger_group_id: this.props.messengerId,
         account_id: this.props.state.user.id
       }
     }
-    console.log(parameter, "==============params");
     this.setState({isLoading: true})
     Api.request(Routes.requestValidationUpdate, parameter, response => {
       this.setState({isLoading: false})
     })
-    console.log(status, "========current status");
   }
 
   onClick(item) {
@@ -553,6 +615,7 @@ class Options extends Component {
     const { data } = this.props;
     const { user } = this.props.state;
     const { currentValidation } = this.state;
+    console.log(currentValidation, "======current validation");
     return (
       <ScrollView>
         {this.state.isLoading ? <Spinner mode="full" /> : null}
@@ -589,13 +652,13 @@ class Options extends Component {
                   Style.signatureAction,
                   Style.signatureActionDanger,
                   { width: '49%' }]}
-                  onPress={() => { this.updateValidation('declined') }}>
+                  onPress={() => { this.sendNewMessage(currentValidation.payload) }}>
                   <Text style={{ color: Color.white }}> Decline </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[
                   Style.signatureAction,
                   Style.signatureActionSuccess]}
-                  onPress={() => { this.updateValidation('accept') }}>
+                  onPress={() => { this.updateValidation('accepted') }}>
                   <Text style={{ color: Color.white }}> Accept </Text>
                 </TouchableOpacity>
               </View>
@@ -616,24 +679,24 @@ class Options extends Component {
                 </TouchableOpacity>
               </View>
             )}
-            {data && data.account_id === user.id && currentValidation?.status === 'accepted' && (
+            {data && data.account_id === user.id && (currentValidation?.status === 'accepted') && (
               <View style={Style.signatureFrameContainer}>
-                <TouchableOpacity style={[
+                <View style={[
                   Style.signatureAction,
                   Style.signatureActionSuccess,
                   { width: '99%' }]}>
                   <Text style={{ color: Color.white }}> Accepted </Text>
-                </TouchableOpacity>
+                </View>
               </View>
             )}
             {data && data.account_id === user.id && currentValidation?.status === 'declined' && (
               <View style={Style.signatureFrameContainer}>
-                <TouchableOpacity style={[
+                <View style={[
                   Style.signatureAction,
                   Style.signatureActionDanger,
                   { width: '99%' }]}>
                   <Text style={{ color: Color.white }}> Declined </Text>
-                </TouchableOpacity>
+                </View>
               </View>
             )}
           </View>
