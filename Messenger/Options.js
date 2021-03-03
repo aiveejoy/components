@@ -334,6 +334,20 @@ class Options extends Component {
     })
   }
 
+  enableSupport = () => {
+    const { user } = this.props.state;
+    let parameter = {
+      account_id: user.id,
+      payload: 'support',
+      payload_value: 'test'
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.uploadImage, parameter, response => {
+      console.log(response, "======support enabled");
+      this.setState({ isLoading: false })
+    })
+  }
+
   onClick(item) {
     switch (item.payload_value) {
       case 'close':
@@ -362,6 +376,10 @@ class Options extends Component {
       case 'reviewsStack': {
         // review stack
         this.retrieveRequest('reviewsStack')
+      }
+        break
+      case 'enableSupport': {
+        this.enableSupport();
       }
         break
       case 'back':
