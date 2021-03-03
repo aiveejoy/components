@@ -24,7 +24,7 @@ class TextInputWithoutLabel extends Component {
             numberOfLines={this.props.numberOfLines}
             maxLength={this.props.maxLength}
             keyboardType={this.props.keyboardType}
-            editable={this.props.editabl}
+            editable={this.props.editable}
             onChangeText={(input) => {
               this.props.onChange(input);
             }}
