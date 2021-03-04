@@ -140,12 +140,12 @@ class ProductCard extends Component {
                       justifyContent: 'center',
                       width: 40,
                       height: 40,
-                      backgroundColor: this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty > 0 ? Color.primary : Color.danger) : (item.inventory && item.inventory.qty[0].total_remaining_product > 0 ? Color.primary : Color.danger)
+                      backgroundColor: parseFloat(item.qty) ? Color.primary : Color.danger
                     }]}>
                     <Text style={{
                       fontSize: BasicStyles.standardTitle2FontSize,
                       color: Color.white
-                    }}>{ this.props.state.user && this.props.state.user.account_type === 'MANUFACTURER' ? (item.qty) : (item.inventory ? item.inventory.qty[0].total_remaining_product : null)}</Text>
+                    }}>{ item.qty }</Text>
                   </View>
                 </View>
               </View>
