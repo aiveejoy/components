@@ -24,13 +24,14 @@ class DateTime extends Component{
 
   setDate = (event, date) => {
     if(this.props.type == 'date'){
+      console.log('[date]', date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
       this.setState({
         showDatePicker: false,
         date: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
         dateLabel: Currency.getMonth(date.getMonth()) + ' ' + date.getDate() + ', ' + date.getFullYear()
       });
       this.props.onFinish({
-        date: this.state.date,
+        date: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
         time: null
       })  
     }else if(this.props.type == 'datetime'){
@@ -84,6 +85,7 @@ class DateTime extends Component{
           mode={this.props.type}
           display="default"
           date={new Date()}
+          minimumDate={this.props.minimumDate}
           onCancel={() => this.setState({showDatePicker: false})}
           onConfirm={this.setDate} 
           onChange={this.setDate} />
@@ -98,6 +100,7 @@ class DateTime extends Component{
           mode={type}
           display="default"
           date={new Date()}
+          minimumDate={this.props.minimumDate}
           onCancel={() => this.setState({showDatePicker: false})}
           onConfirm={this.setDate} 
           onChange={this.setDate} />

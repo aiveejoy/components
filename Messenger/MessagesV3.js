@@ -21,16 +21,12 @@ import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImage, faPaperPlane, faLock, faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-// import Review from './templates/Review.js';
-// import AddRequirements from './templates/AddRequirements.js';
-// import Transfer from './templates/Transfer.js';
-// import SendRequirements from './templates/SendRequirements.js';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import CommonRequest from 'services/CommonRequest.js';
 import Style from 'modules/messenger/Style.js'
 import Modal from 'components/Modal/Sketch';
-
+import MessageOptions from './Options.js'
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
 
@@ -51,30 +47,32 @@ class MessagesV3 extends Component{
       isLock: false,
       settingsMenu: [],
       settingsBreadCrumbs: ['Settings'],
-      pictures: [],
-      visible: false,
-      sender_id: null,
+      group: null,
+      request_id: null
     }
   }
 
   componentDidMount(){
-    this.menu(Helper.MessengerMenu)
     const { user } = this.props.state
     if (user == null) return
     this.retrieve()
-    this.retrieveReceiverPhoto()
   }
 
   componentWillUnmount() {
+    const { data } = this.props.navigation.state.params;
     const { setMessengerGroup, setMessagesOnGroup } = this.props
     setMessengerGroup(null)
     setMessagesOnGroup({
       groupId: null,
       messages: null
     })
+    if(data == null){
+      return
+    }
   }
 
   retrieve = () => {
+    console.log("[NAVIGATION]",this.props.navigation.state.params);
     const { offset, limit } = this.state
     this.setState({ isLoading: true });
 
@@ -95,6 +93,7 @@ class MessagesV3 extends Component{
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
         this.setState({sender_id: response.data[0].account_id});
+        this.setState({request_id: response.data[0].id});
       }
       const {setMessagesOnGroup} = this.props;
         setMessagesOnGroup({
@@ -111,6 +110,10 @@ class MessagesV3 extends Component{
     const { offset, limit } = this.state
     const { messengerGroup, messagesOnGroup } = this.props.state;
     const { setMessagesOnGroup } = this.props;
+
+    if(messengerGroup == null){
+      return
+    }
 
     this.setState({ isLoading: true });
 
@@ -217,6 +220,9 @@ class MessagesV3 extends Component{
       noData: true,
       error: null
     }
+    if(messengerGroup == null){
+      return
+    }
     ImagePicker.launchImageLibrary(options, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
@@ -290,98 +296,6 @@ class MessagesV3 extends Component{
     }, 500)
   }
 
-
-  updateValidation = (item, status) => {
-    const { messengerGroup, user } = this.props.state;
-    let parameter = {
-      id: item.id,
-      status: status,
-      messages: {
-        messenger_group_id: messengerGroup.id,
-        account_id: user.id
-      }
-    }
-    this.setState({isLoading: true})
-    Api.request(Routes.requestValidationUpdate, parameter, response => {
-      this.setState({isLoading: false})
-      // this.retrieveGroup()
-    })
-  }
-
-  retrieveReceiverPhoto() {
-    const { user } = this.props.state;
-    let parameter = {
-      condition: [{
-        clause: "=",
-        column: "account_id",
-        value: user.id
-      }]
-    }
-    this.setState({isLoading: true})
-    Api.request(Routes.retrieveImage, parameter, response => {
-      this.setState({pictures: response.data})
-    })
-  }
-
-  closeSketch = () => {
-    this.setState({visible: false})
-  }
-
-  sendSketch = (result) => {
-    const { user } = this.props.state;
-    let parameter = {
-      account_id: user.id,
-      payload: 'signature',
-      payload_value: result
-    }
-    this.state.pictures.push(parameter)
-    this.setState({isLoading: true})
-    Api.request(Routes.uploadImage, parameter, response => {
-      this.setState({isLoading: false})
-      if(response.data !== null) {
-        this.settingsRemove();
-      }
-    })
-  }
-
-  uploadPhoto = (payload) => {
-    const options = {
-      noData: true,
-      error: null
-    }
-    const { user } = this.props.state;
-    ImagePicker.launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-        this.setState({ photo: null })
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-        this.setState({ photo: null })
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-        this.setState({ photo: null })
-      }else {
-        if(response.fileSize >= 1000000){
-          Alert.alert('Notice', 'File size exceeded to 1MB')
-          return
-        }
-        let parameter = {
-          account_id: user.id,
-          payload: payload,
-          payload_value: response.uri
-        }
-        this.state.pictures.push(parameter)
-        this.setState({isLoading: true})
-        Api.request(Routes.uploadImage, parameter, response => {
-          this.setState({isLoading: false})
-          if(response.data !== null) {
-            this.settingsRemove();
-          }
-          console.log(response, "=====================response upon create");
-        })
-      }
-    })
-  }
 
   _image = (item) => {
     const { messengerGroup, user, theme } = this.props.state;
@@ -702,274 +616,10 @@ class MessagesV3 extends Component{
     );
   }
 
-  addToValidation = () => {
-    console.log('add to validation======================');
-  }
-
   cloneMenu() {
     const { viewMenu } = this.props // new
     viewMenu(false) // new
   }
-
-  menu(data) {
-    /**
-    * returns Settings Menu
-    */
-    this.setState({settingsMenu: data.map((el, ndx) => {
-      return (
-        <View key={'msgmenu'+ndx}>
-          {el.title == 'Close' && <TouchableOpacity onPress={()=>{this.cloneMenu()}}>
-            <View style={Style.settingsTitles}>
-              <Text style={{color: Color.danger}}> Cancel </Text>
-            </View>
-          </TouchableOpacity>}
-          <TouchableOpacity onPress={()=>{this.settingsAction(el)}}>
-            <View style={Style.settingsTitles}>
-              {el.title != 'Close' && <Text style={{color: Color.black}}> {el.title} </Text>}
-              {el.button != undefined && this.state.sender_id && this.props.state.user.id === this.state.sender_id && 
-                <TouchableOpacity onPress={()=>{this.addToValidation()}}>
-                  <View style={[Style.settingsButton, {backgroundColor: el.button.color}]}> 
-                    <Text style={{fontSize: BasicStyles.standardFontSize, color: 'white'}}> {el.button.title} </Text>
-                  </View>
-                </TouchableOpacity>
-              }
-              {(el.button == undefined && el.title != 'Close') &&
-                <FontAwesomeIcon
-                  icon={ faChevronRight }
-                  size={BasicStyles.iconSize}
-                  style={{color: Color.primary}}/>
-              }
-            </View>
-          </TouchableOpacity>
-        </View>
-      )
-    })})
-  }
-
-  settingsRemove() {
-    /**
-    * when x button is click
-    */
-    if(this.state.settingsBreadCrumbs.length > 1){
-      this.state.settingsBreadCrumbs.pop();
-    }else{
-      this.cloneMenu()
-    }
-    switch(this.state.settingsBreadCrumbs.length){
-      case 1:
-        this.menu(Helper.MessengerMenu)
-        break;
-      case 2:
-        this.menu(Helper.requirementsMenu)
-        break;
-    }
-  }
-
-  settingsAction(data) {
-    /**
-    * When one of the settings menu is clicked
-    */
-    if(data.payload == 'same_page'){
-      switch(data.payload_value){
-        case 'requirements':
-          let temp = this.state.settingsBreadCrumbs
-          temp.push('Requirements')
-          this.setState({settingsBreadCrumbs: temp})
-          this.menu(Helper.requirementsMenu)
-          break;
-        case 'signature':
-          let sign = this.state.settingsBreadCrumbs
-          sign.push('On App Signature')
-          this.setState({settingsBreadCrumbs: sign})
-          let frame = [
-            <View>
-              <ScrollView>
-                <View style={Style.signatureFrameContainer}>
-                {
-                    this.state.pictures.map((ndx, el)=>{
-                      if(ndx.payload === 'signature') {
-                        return (
-                          <View style={{
-                            height: 100,
-                            width: '49%',
-                            borderWidth: 1,
-                            borderColor: Color.gray,
-                            margin: 2
-                          }}
-                          key={el}>
-                            <Image
-                              source={{ uri: ndx.payload_value.includes('content') ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}`}}
-                              style={{
-                                width: 205,
-                                height: 98
-                              }}
-                            />
-                          </View>
-                        )
-                      }
-                    })
-                  }
-                </View>
-              </ScrollView>
-              <View style={{paddingTop: 50}}>
-                {this.state.sender_id && this.props.state.user.id === this.state.sender_id ?
-                  <View style={Style.signatureFrameContainer}>
-                  <TouchableOpacity style={[Style.signatureAction, Style.signatureActionDanger, {width: '49%'}]}>
-                    <Text style={{color: Color.white}}> Decline </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[Style.signatureAction, Style.signatureActionSuccess]}>
-                    <Text style={{color: Color.white}}> Accept </Text>
-                  </TouchableOpacity>
-                </View>
-                : 
-                <View style={Style.signatureFrameContainer}>
-                  <TouchableOpacity style={[Style.signatureFullSuccess, Style.signatureActionSuccess]}
-                  onPress={() => {
-                    this.setState({visible: true})
-                  }}>
-                    <Text style={{color: Color.white}}> Upload </Text>
-                  </TouchableOpacity>
-                </View>
-                }
-              </View>
-            </View>
-          ]
-          this.setState({settingsMenu: frame})
-      }
-    }else if(data.payload === 'redirect') {
-      if(data.title.toLowerCase() == 'details'){
-        const { messengerGroup } = this.props.state
-        console.log('[Details]', this.props.state.messengerGroup)
-        console.log('[transfer fund]')
-        this.props.navigation.navigate(data.payload_value, {data: {id: messengerGroup.id}})
-      }else if(data.title.toLowerCase() == 'rate'){
-        console.log('[transfer fund]')
-        this.props.navigation.navigate(data.payload_value, {data: {data: this.props.state.messengerGroup}})
-      }else if(data.title.toLowerCase() == 'Transfer funds'){
-        console.log('[transfer fund]')
-        this.props.navigation.navigate(data.payload_value)
-      }else if(data.title.toLowerCase() == 'receiver picture') {
-        let picture = this.state.settingsBreadCrumbs
-          picture.push('Receiver Picture')
-          this.setState({settingsBreadCrumbs: picture})
-          let frame = [
-            <View>
-              <ScrollView>
-                <View style={Style.signatureFrameContainer}>
-                  {
-                    this.state.pictures.map((ndx, el)=>{
-                      if(ndx.payload === 'receiver_sender_picture') {
-                        return (
-                          <View style={{
-                            height: 100,
-                            width: '49%',
-                            borderWidth: 1,
-                            borderColor: Color.gray,
-                            margin: 2
-                          }}
-                          key={el}>
-                            <Image
-                              source={{ uri: ndx.payload_value}}
-                              style={{
-                                width: 205,
-                                height: 98
-                              }}
-                            />
-                          </View>
-                        )
-                      }
-                    })
-                  }
-                </View>
-              </ScrollView>
-              <View style={{paddingTop: 50}}>
-              {this.state.sender_id && this.props.state.user.id === this.state.sender_id ?
-                <View style={Style.signatureFrameContainer}>
-                  <TouchableOpacity style={[Style.signatureAction, Style.signatureActionDanger, {width: '49%'}]}>
-                    <Text style={{color: Color.white}}> Decline </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[Style.signatureAction, Style.signatureActionSuccess]}>
-                    <Text style={{color: Color.white}}> Accept </Text>
-                  </TouchableOpacity>
-                </View>
-                :
-                  <View style={Style.signatureFrameContainer}>
-                  <TouchableOpacity
-                    style={[Style.signatureFullSuccess, Style.signatureActionSuccess]}
-                    onPress={() => {
-                      this.uploadPhoto('receiver_sender_picture');
-                    }}>
-                    <Text style={{color: Color.white}}> Upload </Text>
-                  </TouchableOpacity>
-                </View>
-                }
-              </View>
-            </View>
-          ]
-          this.setState({settingsMenu: frame})
-      } else if(data.title.toLowerCase() == 'valid id') {
-        let picture = this.state.settingsBreadCrumbs
-          picture.push('Valid ID')
-          this.setState({settingsBreadCrumbs: picture})
-          let frame = [
-            <View>
-              <ScrollView>
-                <View style={Style.signatureFrameContainer}>
-                  {
-                    this.state.pictures.map((ndx, el)=>{
-                      if(ndx.payload === 'valid_id') {
-                        return (
-                          <View style={{
-                            height: 100,
-                            width: '49%',
-                            borderWidth: 1,
-                            borderColor: Color.gray,
-                            margin: 2
-                          }}
-                          key={el}>
-                            <Image
-                              source={{ uri: ndx.payload_value}}
-                              style={{
-                                width: 205,
-                                height: 98
-                              }}
-                            />
-                          </View>
-                        )
-                      }
-                    })
-                  }
-                </View>
-              </ScrollView>
-              <View style={{paddingTop: 50}}>
-              {this.state.sender_id && this.props.state.user.id === this.state.sender_id ?
-                <View style={Style.signatureFrameContainer}>
-                <TouchableOpacity style={[Style.signatureAction, Style.signatureActionDanger, {width: '49%'}]}>
-                  <Text style={{color: Color.white}}> Decline </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[Style.signatureAction, Style.signatureActionSuccess]}>
-                  <Text style={{color: Color.white}}> Accept </Text>
-                </TouchableOpacity>
-              </View>
-              :
-              <View style={Style.signatureFrameContainer}>
-                <TouchableOpacity
-                  style={[Style.signatureFullSuccess, Style.signatureActionSuccess]}
-                  onPress={() => {
-                    this.uploadPhoto('valid_id');
-                  }}>
-                  <Text style={{color: Color.white}}> Upload </Text>
-                </TouchableOpacity>
-              </View>
-              }
-              </View>
-            </View>
-          ]
-          this.setState({settingsMenu: frame})
-      }
-    }
-  }
-
 
   render() {
     const { 
@@ -981,6 +631,7 @@ class MessagesV3 extends Component{
       isPullingMessages,
       isLock
     } = this.state;
+    const { data } = this.props.navigation.state.params;
     const { messengerGroup, user, isViewing } = this.props.state;
     return (
       <SafeAreaView>
@@ -1020,8 +671,9 @@ class MessagesV3 extends Component{
                   this.scrollView.scrollToEnd({animated: true});
                 }
               }}
+              showsVerticalScrollIndicator={false}
               style={[Style.ScrollView, {
-                height: isViewing ? '40%' : '100%'
+                height: '100%'
               }]}
               onScroll={({ nativeEvent }) => {
                 const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
@@ -1050,32 +702,7 @@ class MessagesV3 extends Component{
                 {this._flatList()}
               </View>
             </ScrollView>
-            {isViewing &&
-          <View
-            style={
-              {
-                height: '60%', 
-                paddingBottom: 51, 
-                paddingTop: 0, 
-                borderTopWidth: 1, 
-                borderTopColor: Color.gray
-              }
-            }
-          >
-            <View style={Style.settingsTitles}>
-              <Text> {this.state.settingsBreadCrumbs.join(' > ')} </Text>
-              <TouchableOpacity onPress={() => {this.settingsRemove()}}>
-                <FontAwesomeIcon
-                  icon={ faTimes }
-                  size={20}
-                  style={{color: 'red'}}/>
-              </TouchableOpacity>
-            </View>
-              <ScrollView>
-                {this.state.settingsMenu}
-              </ScrollView>
-          </View>
-        }
+
             <View style={{
               position: 'absolute',
               bottom: 0,
@@ -1094,6 +721,18 @@ class MessagesV3 extends Component{
             <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible}/>
           </View>
         </KeyboardAvoidingView>
+        {
+          isViewing && (
+            <MessageOptions
+              requestId={this.state.request_id}
+              messengerId={this.props.navigation.state.params.data.id}
+              data={data}
+              navigation={this.props.navigation}
+              updateMessagesOnGroup={this.props.updateMessagesOnGroup}
+              updateMessageByCode={this.props.updateMessageByCode}
+            />
+          )
+        }
       </SafeAreaView>
     );
   }
