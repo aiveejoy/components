@@ -26,8 +26,9 @@ class Sliders extends Component{
           defaultValue={this.state.value}
           labelFontColor={"#6c7682"}
           labelFontWeight={'600'}
-          showFill={false}
-          labelFontSize={13}
+          showFill={true}
+          fillColor={'red'}
+          labelFontWeight={'bold'}
           showNumberScale={true}
           showSeparatorScale={true}
           buttonBackgroundColor={'#fff'}
