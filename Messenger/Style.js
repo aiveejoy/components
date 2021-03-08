@@ -117,8 +117,8 @@ export default {
   signatureFrameContainer: {
     flexDirection: 'row',
     flex: 1,
-    flexWrap: 'wrap',
-    alignItems: 'flex-start'
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   signatureFrame: {
     height: 100,
