@@ -43,6 +43,11 @@ class LocationWithMap extends Component {
       type: null,
       address_region: null,
       watchID: null,
+      province: null,
+      route: null,
+      locality: null,
+      country: null,
+      postal: null
     };
   }
 
@@ -100,23 +105,58 @@ class LocationWithMap extends Component {
 
   getCurrentLocation = () => {
     Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
-    let watchID = Geolocation.watchPosition(position => {
-      this.setState({
-        region: {
-          ...this.state.region,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        },
-        pinnedLocation: false,
-        address: null,
-      });
-    },
-    (error) => {
-      console.log(error.message);
-    },
-    { enableHighAccuracy: false, timeout: 30000, maximumAge: 1000 }
-    )
+    // let watchID = Geolocation.watchPosition(position => {
+    //   console.log('-------------------------------------------TESTING----------------------------------------------', position)
+    //   this.setState({
+    //     region: {
+    //       ...this.state.region,
+    //       latitude: position.coords.latitude,
+    //       longitude: position.coords.longitude,
+    //     },
+    //     pinnedLocation: false,
+    //     address: null,
+    //   });
+    // },
+    // (error) => {
+    //   console.log(error.message);
+    // },
+    // { enableHighAccuracy: false, timeout: 30000, maximumAge: 1000 }
+    // )
 
+    // this.setState({
+    //   watchID: watchID
+    // })
+    let watchID = Geolocation.getCurrentPosition(
+      //Will give you the current location
+      position => {
+        //getting the Longitude from the location json
+        const currentLongitude = JSON.stringify(position.coords.longitude);
+
+        //getting the Latitude from the location json
+        const currentLatitude = JSON.stringify(position.coords.latitude);
+        const currentLocation = {
+          longitude: currentLongitude,
+          latitude: currentLatitude,
+        };
+        this.setState({
+          region: {
+            ...this.state.region,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          },
+          pinnedLocation: true,
+          address: null,
+        });
+        // this.onRegionChange(this.state.region);
+        console.log('-------------------------------------------TESTING----------------------------------------------', position)
+      },
+      error => alert(error.message),
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 1000,
+      },
+    );
     this.setState({
       watchID: watchID
     })
@@ -179,24 +219,56 @@ class LocationWithMap extends Component {
   };
 
   manageLocation = (location) => {
+    let address = null;
+    let route = null;
+    let locality = null;
+    let province = null;
+    let region = null;
+    let country = null;
+    let latitude = null;
+    let longitude = null;
+    let postal = null;
+
+    address = location.formatted_address;
+    location.address_components.forEach(el => {
+      if(el.types.includes('route')) {
+        route = el.long_name;
+      }else if(el.types.includes('locality')){
+        locality = el.long_name;
+      }else if(el.types.includes('administrative_area_level_2')){
+        province = el.long_name;
+      }else if(el.types.includes('administrative_area_level_1')){
+        region = el.long_name;
+      }else if(el.types.includes('country')){
+        country = el.long_name;
+      }else if(el.types.includes('postal_code')){
+        postal = el.long_name;
+      }
+    })
+    longitude = location.geometry.location.lng;
+    latitude = location.geometry.location.lat;
     this.setState(
       {
         region: {
           ...this.state.region,
-          latitude: location.geometry.location.lat,
-          longitude: location.geometry.location.lng,
-          formatted_address: location.formatted_address,
+          latitude: latitude,
+          longitude: longitude,
+          formatted_address: address,
         },
-        address: location.formatted_address,
+        address: address,
         area: location.region,
-        locality: (location.address_components.length < 5) ? location.address_components[0].long_name : location.address_components[1].long_name,
-        address_region: (location.address_components.length < 5) ? location.address_components[2].long_name : location.address_components[3].long_name,
-        country: (location.address_components.length < 5) ? location.address_components[3].long_name : location.address_components[4].long_name,
+        locality: locality,
+        address_region: region,
+        country: country,
+        postal: postal,
+        province: province,
+        route: route
       },
       () => {
         console.log('ADDRESS', this.state.region.formatted_address);
       },
-    );
+      );
+    // console.log('TESTING: ', location);
   };
 
   onFinish = () => {
@@ -206,10 +278,13 @@ class LocationWithMap extends Component {
     } else
       this.setState({locationPicked: true}, () => {
         const location = {
+          route: this.state.route,
           address: this.state.address,
+          province: this.state.province,
           locality: this.state.locality,
           region: this.state.address_region,
           country: this.state.country,
+          postal: this.state.postal,
           latitude: this.state.region.latitude,
           longtitude: this.state.region.longitude,
         };
@@ -254,6 +329,8 @@ class LocationWithMap extends Component {
         }}>
         <TouchableOpacity
           onPress={() => {
+            const{setLocation} = this.props;
+            setLocation(null);
             this.props.navigation.pop();
           }}
           style={{
