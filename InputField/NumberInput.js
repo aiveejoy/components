@@ -35,21 +35,20 @@ DecreaseItem = () => {
     return (
       <View style={{
         position: 'absolute',
-        marginLeft: 20}}>
-        <Text style={{color: 'black', marginLeft: 20, marginBottom: -10}}>{this.props.title}</Text>
+        marginLeft: 20,
+        width: 100}}>
+        <Text style={{color: 'black', marginLeft: 20, marginBottom: -10, width: 100}}>{this.props.title}</Text>
         <TextInput
-          style={[BasicStyles.formControls, {marginLeft: 20 }]}
-          onChangeText={(clicks) => this.setInput(this.state.clicks)}
-          value={this.state.clicks}
-          keyboardType={'numeric'}
+          style={[BasicStyles.formControls, {marginLeft: 20, width: 315}]}
+          onChangeText={(clicks) => this.setInput(this.state.clicks)}  
           placeholder={this.props.placeholder ? this.props.placeholder : '0'}
         />
         <TouchableHighlight
         style={{
           position: 'absolute',
-          right: 15,
+          // right: 15,
           top: 15,
-          marginLeft: 30,
+          marginLeft: '305%',
         }}
         underlayColor={Color.white}
         // onPress={this.IncrementItem()}
@@ -59,9 +58,9 @@ DecreaseItem = () => {
         <TouchableHighlight
         style={{
           position: 'absolute',
-          right:15,
+          // right: 15,
           top: 30,
-          marginLeft: 30,
+          marginLeft: '305%',
         }}
         underlayColor={Color.white}
         onPress={this.DecreaseItem()}
