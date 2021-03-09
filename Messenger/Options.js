@@ -662,20 +662,26 @@ class Options extends Component {
               }
             })
           }
-          <View style={{ paddingTop: 50 }}>
+          <View style={{
+            paddingTop: 50,
+            width: '100%',
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center' 
+          }}>
 
             {data && data.account_id === user.id && currentValidation?.status === 'pending' && (
               <View style={Style.signatureFrameContainer}>
                 <TouchableOpacity style={[
                   Style.signatureAction,
                   Style.signatureActionDanger,
-                  { width: '49%' }]}
+                  { width: '45%' }]}
                   onPress={() => { this.sendNewMessage(currentValidation.payload) }}>
                   <Text style={{ color: Color.white }}> Decline </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[
                   Style.signatureAction,
-                  Style.signatureActionSuccess]}
+                  Style.signatureActionSuccess,  { width: '45%' }]}
                   onPress={() => { this.updateValidation('accepted') }}>
                   <Text style={{ color: Color.white }}> Accept </Text>
                 </TouchableOpacity>
