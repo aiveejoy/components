@@ -34,6 +34,7 @@ class Sliders extends Component{
           buttonBackgroundColor={'#fff'}
           buttonBorderColor={"#6c7682"}
           buttonBorderWidth={2}
+          labelFontSize={15}
           scaleNumberFontWeight={'300'}
           buttonDimensionsPercentage={6}
           buttonBorderColor={'#5842D7'}
@@ -45,6 +46,7 @@ class Sliders extends Component{
           maxLabel={'50km'}
           maxValue={50}
         />
+        {/* <Text>state.value: {this.state.value}</Text> */}
       </View>
     )
   }
