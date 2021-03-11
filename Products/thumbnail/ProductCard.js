@@ -16,6 +16,7 @@ class ProductCard extends Component {
 
   redirect(){
     const { item } = this.props;
+    console.log("[ITEM]", item);
     const { setProduct } = this.props;
     if(item == null){
       return
