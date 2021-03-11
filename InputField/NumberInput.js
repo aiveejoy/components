@@ -35,8 +35,7 @@ DecreaseItem = () => {
     return (
       <View style={{
         position: 'absolute',
-        marginLeft: 20,
-        width: 100}}>
+        marginLeft: 20}}>
         <Text style={{color: 'black', marginLeft: 20, marginBottom: -10, width: 100}}>{this.props.title}</Text>
         <TextInput
           style={[BasicStyles.formControls, {marginLeft: 20, width: 315}]}
