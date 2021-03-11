@@ -27,7 +27,11 @@ class UserImage extends Component{
               icon={faUserCircle}
               size={this.props.size}
               style={{
-                color: this.props.color ? this.props.color : Color.primary
+                color: this.props.color ? this.props.color : Color.primary,
+                borderColor: this.props.borderColor ? this.props.borderColor : Color.white,
+                borderWidth: this.props.borderWidth ? this.props.borderWidth : 1,
+                borderRadius: this.props.borderRadius ? this.props.borderRadius : 50,
+                marginLeft: this.props.marginLeft ? this.props.marginLeft : 3
               }}
             />
           )

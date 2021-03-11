@@ -23,10 +23,11 @@ class Range extends Component{
     return (
       <View style={{
         position: 'absolute',
-        marginLeft: 20}}>
+        marginLeft: 20,
+        width: '100%'}}>
         <Text style={{color: 'black', marginLeft: 20, marginBottom: -10 }}>{this.props.title}</Text>
         <TextInput
-          style={[BasicStyles.formControls, {marginLeft: 20, width: 315 }]}
+          style={[BasicStyles.formControls, {marginLeft: 20, width: 315}]}
           onChangeText={(input) => this.setInput(input)}
           value={this.state.input}
           placeholder={this.props.placeholder ? this.props.placeholder : 'Range'}
