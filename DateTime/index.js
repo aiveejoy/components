@@ -175,7 +175,7 @@ class DateTime extends Component{
             width: '100%',
             paddingLeft: 10,
             justifyContent: 'center',
-            borderRadius: 5,
+            borderRadius: BasicStyles.inputBorderRadius,
             borderColor: Color.lightGray,
             borderWidth: 1,
             marginTop: 20,

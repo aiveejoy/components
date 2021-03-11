@@ -81,20 +81,26 @@ class PickerWithLabel extends Component{
           <View style={{
             borderWidth: 1,
             borderColor: Color.lightGray,
-            borderRadius: 5
+            borderRadius: BasicStyles.inputBorderRadius
           }}>
             {
               Platform.OS == 'android' && (
                 <Picker selectedValue={this.state.input}
                   onValueChange={(input) => this.onChange(input)}
-                  style={BasicStyles.pickerStyleCreate}
+                  style={{
+                    ...BasicStyles.pickerStyleCreate,
+                    fontSize: BasicStyles.standardFontSize
+                  }}
                   >
                     {
                       data.map((item, index) => {
                         return (
                           <Picker.Item
                           key={index}
-                          label={item.title} 
+                          label={item.title}
+                          style={{
+                            fontSize: BasicStyles.standardFontSize
+                          }}
                           value={item.value}/>
                         );
                       })
@@ -107,7 +113,10 @@ class PickerWithLabel extends Component{
                 <RNPickerSelect
                   onValueChange={(input) => this.onChange(input)}
                   items={iosData}
-                  style={BasicStyles.pickerStyleIOSNoMargin}
+                  style={{
+                    ...BasicStyles.pickerStyleIOSNoMargin,
+                    fontSize: BasicStyles.standardFontSize
+                  }}
                   placeholder={{
                     label: placeholder ? placeholder : 'Click to select',
                     value: null,
