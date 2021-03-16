@@ -72,10 +72,12 @@ class MessagesV3 extends Component{
   }
 
   retrieve = () => {
-    console.log("[NAVIGATION]",this.props.navigation.state.params);
+    console.log("[NAVIGATION]",this.props.navigation.state.params.data);
+    const { messengerGroup } = this.props.state
+    const { setMessengerGroup } = this.props
     const { offset, limit } = this.state
     this.setState({ isLoading: true });
-
+    setMessengerGroup(this.props.navigation.state.params.data)
     const parameter = {
       condition: [{
         value: this.props.navigation.state.params.data.id,
@@ -96,7 +98,7 @@ class MessagesV3 extends Component{
         this.setState({request_id: response.data[0].id});
       }
       const {setMessagesOnGroup} = this.props;
-        setMessagesOnGroup({
+      setMessagesOnGroup({
         messages: response.data.reverse(),
         groupId: this.props.navigation.state.params.data.id
       })
