@@ -192,28 +192,37 @@ class LocationWithMap extends Component {
   };
 
   onRegionChange = (regionUpdate) => {
+    const { setDeviceLocation } = this.props
+    const { deviceLocation } = this.props.state
     if (this.state.isDraggingMap) {
       this.setState({
         isDraggingMap: false,
       });
     }
-
+    
     if (!this.state.isDraggingMap) {
       return;
     }
     this.setState({region: regionUpdate, pinnedLocation: true});
     Geocoder.from(regionUpdate.latitude, regionUpdate.longitude)
-      .then((json) => {
-        var addressComponent = json.results[0].formatted_address.split(', ');
-        this.setState({
-          address:
-            addressComponent[0] != 'Unnamed Road'
-              ? addressComponent[0]
-              : 'Pinned Location',
-          locality: addressComponent[1],
-          area: addressComponent[2],
-          country: addressComponent[3],
-        });
+    .then((json) => {
+      var addressComponent = json.results[0].formatted_address.split(', ');
+      this.setState({
+        address:
+        addressComponent[0] != 'Unnamed Road'
+        ? addressComponent[0]
+        : 'Pinned Location',
+        locality: addressComponent[1],
+        area: addressComponent[2],
+        country: addressComponent[3],
+      });
+      let add = {
+        address: this.state.address, 
+        locality: this.state.locality, 
+        area: this.state.area, 
+        country: this.state.country
+      }
+      setDeviceLocation(add)
       })
       .catch((error) => console.warn(error));
   };
@@ -523,6 +532,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     // updateUser: (user) => dispatch(actions.updateUser(user)),
     setLocation: (location) => dispatch(actions.setLocation(location)),
+    setDeviceLocation: (deviceLocation) => dispatch(actions.setDeviceLocation(deviceLocation))
   };
 };
 

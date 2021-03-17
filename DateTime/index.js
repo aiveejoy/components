@@ -173,10 +173,10 @@ class DateTime extends Component{
             height: this.props.height ? this.props.height : 50,
             backgroundColor: 'white',
             width: '100%',
-            paddingLeft: 10,
+            paddingLeft: this.props.paddingLeft ? this.props.paddingLeft : 10,
             justifyContent: 'center',
             borderRadius: BasicStyles.inputBorderRadius,
-            borderColor: Color.lightGray,
+            borderColor: this.props.borderColor ? this.props.borderColor : Color.lightGray,
             borderWidth: 1,
             marginTop: 20,
             marginBottom: 20
