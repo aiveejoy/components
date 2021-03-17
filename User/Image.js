@@ -12,11 +12,10 @@ class UserImage extends Component{
 
   render () {
     const { user } = this.props;
-    console.log("[PROFILE]", user, user?.profile?.url != null);
     return (
       <View>
         {
-          (user?.profile && user?.profile?.url != null) && (
+          (user || user?.profile?.url != null) && (
             <Image
               source={{uri: Config.BACKEND_URL  + user.profile.url}}
               style={[BasicStyles.profileImageSize, this.props.style]}/>
