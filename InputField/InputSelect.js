@@ -21,27 +21,30 @@ class InputSelect extends Component{
 
   render() {
     return (
-      <View style={{
-        marginLeft: 20}}>
-        <Text style={{color: 'black', marginLeft: 20, marginBottom: -10 }}>{this.props.title}</Text>
-        <TextInput
-          style={[BasicStyles.formControls, {marginLeft: 20, width: 315 }]}
-          onChangeText={(input) => this.setInput(input)}
-          value={this.state.input}
-          placeholder={this.props.placeholder ? this.props.placeholder : 'Type your Location'}
-        />
+      <TouchableHighlight>
+        <View style={{
+          marginLeft: 20,
+          width: '90%'}}>
+          <Text style={{color: 'black', marginBottom: -10 }}>{this.props.title}</Text>
+          <TextInput
+            style={[BasicStyles.formControls, {width: '100%' }]}
+            onFocus={() => this.props.routeTo()
+            }
+            value={this.state.input}
+            placeholder={this.props.placeholder ? this.props.placeholder : 'Categories'}
+          />
         <TouchableHighlight
-        style={{
-          position: 'absolute',
-          right: 10,
-          top: 30,
-          marginLeft: 30,
-        }}
-        underlayColor={Color.white}
-        >
-        <Text>All</Text>
+          style={{
+            position: 'absolute',
+            right: 10,
+            top: 30
+          }}
+          underlayColor={Color.white}
+          >
+          <Text>All</Text>
         </TouchableHighlight>
       </View>
+    </TouchableHighlight>
     )
   }
 
