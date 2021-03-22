@@ -192,8 +192,6 @@ class LocationWithMap extends Component {
   };
 
   onRegionChange = (regionUpdate) => {
-    const { setDeviceLocation } = this.props
-    const { deviceLocation } = this.props.state
     if (this.state.isDraggingMap) {
       this.setState({
         isDraggingMap: false,
@@ -216,13 +214,6 @@ class LocationWithMap extends Component {
         area: addressComponent[2],
         country: addressComponent[3],
       });
-      let add = {
-        address: this.state.address, 
-        locality: this.state.locality, 
-        area: this.state.area, 
-        country: this.state.country
-      }
-      setDeviceLocation(add)
       })
       .catch((error) => console.warn(error));
   };
@@ -531,8 +522,7 @@ const mapDispatchToProps = (dispatch) => {
   const {actions} = require('@redux');
   return {
     // updateUser: (user) => dispatch(actions.updateUser(user)),
-    setLocation: (location) => dispatch(actions.setLocation(location)),
-    setDeviceLocation: (deviceLocation) => dispatch(actions.setDeviceLocation(deviceLocation))
+    setLocation: (location) => dispatch(actions.setLocation(location))
   };
 };
 
