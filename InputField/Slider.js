@@ -23,7 +23,7 @@ class Sliders extends Component{
           callback={position => {
             this.setState({ value: position })
           }}
-          defaultValue={this.state.value}
+          defaultValue={this.props.value}
           labelFontColor={"#6c7682"}
           labelFontWeight={'600'}
           showFill={true}

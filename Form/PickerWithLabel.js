@@ -80,8 +80,10 @@ class PickerWithLabel extends Component{
           </View>
           <View style={{
             borderWidth: 1,
-            borderColor: Color.lightGray,
-            borderRadius: BasicStyles.inputBorderRadius
+            borderColor: this.props.borderColor ? this.props.borderColor : Color.lightGray,
+            borderRadius: BasicStyles.inputBorderRadius,
+            paddingLeft: this.props.paddingLeft ? this.props.paddingLeft : 0,
+            marginBottom: this.props.marginBottom ? this.props.marginBottom : 0
           }}>
             {
               Platform.OS == 'android' && (
