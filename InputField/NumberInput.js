@@ -9,60 +9,62 @@ class NumberInput extends Component{
     super(props);
     this.state = {
       input: 0,
-      clicks: 1,
+      count: 1,
     }
   }
 
-setInput(clicks){
-    this.setState({
-        clicks: clicks
-    })
-    this.props.onTyping(clicks)
-}
-
-IncrementItem = () => {
-    this.setState({ clicks: this.state.clicks + 1 })
-}
-
-DecreaseItem = () => {
-    console.log('here')
-    if(this.state.clicks - 1 >= 1){
-    this.setState({ clicks: this.state.clicks - 1 })
+  increment = () => {
+    if(this.state.count >= 1){
+      this.setState({
+        count: this.state.count + 1
+      });
     }
-}
+    console.log('[[herr]', this.state.count);
+  }
+  
+  decrement = () => {
+    if(this.state.count > 1 ){
+      this.setState({
+        count: this.state.count - 1
+      });
+    }
+    console.log('[lower]', this.state.count);
+  }
 
   render() {
     return (
       <View style={{
         position: 'absolute',
-        marginLeft: 20}}>
-        <Text style={{color: 'black', marginLeft: 20, marginBottom: -10, width: 100}}>{this.props.title}</Text>
+        marginLeft: 20,
+        width: '90%'}}>
+         <Text style={{color: 'black', marginBottom: -10}}>{this.props.title}</Text>
         <TextInput
-          style={[BasicStyles.formControls, {marginLeft: 20, width: 315}]}
-          onChangeText={(clicks) => this.setInput(this.state.clicks)}  
-          placeholder={this.props.placeholder ? this.props.placeholder : '0'}
+          style={[BasicStyles.formControls, {width: '100%'}]}
+          onChangeText={(count) => this.setState({ count })}
+          value={ this.state.count }
+          keyboardType={'numeric'}
+          placeholder={this.state.count.toString()}
         />
         <TouchableHighlight
         style={{
           position: 'absolute',
-          // right: 15,
           top: 15,
-          marginLeft: '305%',
+          marginLeft: '90%',
         }}
         underlayColor={Color.white}
-        // onPress={this.IncrementItem()}
+        onPress={() => this.increment()}
         >
-        <FontAwesomeIcon style={{color: 'grey'}} icon={faCaretUp} size={25}/>
+         <FontAwesomeIcon style={{color: 'grey'}} icon={faCaretUp} size={25}/>
         </TouchableHighlight>
         <TouchableHighlight
         style={{
           position: 'absolute',
           // right: 15,
           top: 30,
-          marginLeft: '305%',
+          marginLeft: '90%',
         }}
         underlayColor={Color.white}
-        onPress={this.DecreaseItem()}
+        onPress={() => this.decrement()}
         >
         <FontAwesomeIcon style={{color: 'grey'}} icon={faCaretDown} size={25}/>
         </TouchableHighlight>
