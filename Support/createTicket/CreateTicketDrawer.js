@@ -2,11 +2,8 @@ import React, {Component} from 'react';
 import {View, TouchableOpacity, Text} from 'react-native';
 import {createStackNavigator} from 'react-navigation-stack';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faQrcode, faBars} from '@fortawesome/free-solid-svg-icons';
-import UpdateTicket from 'components/Support/UpdateTicket';
-import {NavigationActions} from 'react-navigation';
 import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
-import {BasicStyles} from 'common';
+import CreateTicket from 'components/Support/createTicket';
 import {connect} from 'react-redux';
 
 class HeaderOptions extends Component {
@@ -14,10 +11,7 @@ class HeaderOptions extends Component {
     super(props);
   }
   back = () => {
-    const navigateAction = NavigationActions.navigate({
-      routeName: 'Support',
-    });
-    this.props.navigationProps.dispatch(navigateAction);
+    this.props.navigationProps.navigate('drawerStack');
   };
   render() {
     return (
@@ -54,16 +48,18 @@ const mapStateToProps = (state) => ({state: state});
 
 const mapDispatchToProps = (dispatch) => {
   const {actions} = require('@redux');
-  return {};
+  return {
+    logout: () => dispatch(actions.logout()),
+  };
 };
 
-const UpdateTicketStack = createStackNavigator({
-  supportScreen: {
-    screen: UpdateTicket,
+const CreateTicketStack = createStackNavigator({
+  createTicketScreen: {
+    screen: CreateTicket,
     navigationOptions: ({navigation}) => ({
-      title: 'Ticket Details',
+      title: 'Create Ticket',
+      drawerLabel: 'Create Ticket',
       headerLeft: <HeaderOptions navigationProps={navigation} />,
-      drawerLabel: 'Ticket Details',
       headerStyle: {
         backgroundColor: 'white',
       },
@@ -72,7 +68,4 @@ const UpdateTicketStack = createStackNavigator({
   },
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(UpdateTicketStack);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateTicketStack);
