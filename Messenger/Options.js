@@ -338,11 +338,13 @@ class Options extends Component {
     const { user } = this.props.state;
     let parameter = {
       account_id: user.id,
-      payload: 'support',
-      payload_value: 'test'
+      payload: 'request_id',
+      payload_value: this.state.requestId,
+      status: 1,
+      assigned_to: ''
     }
     this.setState({ isLoading: true })
-    Api.request(Routes.uploadImage, parameter, response => {
+    Api.request(Routes.enableSupportCreate, parameter, response => {
       console.log(response, "======support enabled");
       this.setState({ isLoading: false })
     })

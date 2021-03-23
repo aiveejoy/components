@@ -22,10 +22,10 @@ const styles = StyleSheet.create({
     Card: {
         borderBottomColor: Color.gray,
         borderTopColor: Color.gray,
-        borderBottomWidth: 1,
+        borderBottomWidth: .3,
         justifyContent: 'center',
         paddingLeft: 30,
-        padding: 6,
+        padding: 10,
     },
     TextCard: {
         justifyContent: 'center',
