@@ -174,15 +174,12 @@ class UpdateTicket extends Component {
   update() {
     let parameter = {
       id: this.state.id,
-      content: this.state.title,
-      type: this.state.type,
-      assigned_to: this.state.assignee,
-      status: this.state.status
+      status: 'closed'
     };
     this.setState({ isLoading: true })
     Api.request(Routes.ticketsUpdate, parameter, tickets => {
       this.setState({ isLoading: false })
-      if (tickets.data == true) {
+      if (tickets.data !== null) {
         this.props.navigation.push('supportStack');
       }
     })
@@ -296,7 +293,7 @@ class UpdateTicket extends Component {
               <Text style={{ fontWeight: 'bold', textDecorationLine: 'underline' }}>{this.state.title?.toUpperCase()}</Text>
             </View>
             <View style={{marginTop: 20}}>
-              <Text>Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industry's standard dummy text ever since the 1500s when an unknown printer took a galley of type and scrambled it to make a type specimen book it has</Text>
+              <Text>{this.state.description}</Text>
             </View>
             <Text style={{
               fontStyle: 'italic',
@@ -345,12 +342,12 @@ class UpdateTicket extends Component {
           {/* )} */}
           <View style={styles.TicketButtonContainer}>
             <TicketButton
-              buttonColor="#22B173"
+              buttonColor={Color.danger}
               buttonWidth="90%"
               buttonHeight={50}
               fontSize={14}
               textColor="#FFFFFF"
-              buttonText="Update Ticket"
+              buttonText="Close Ticket"
               onPress={this.update.bind(this)}
             />
           </View>

@@ -34,6 +34,10 @@ class Support extends Component {
   retrieve() {
     let parameter = {
       condition: [{
+        value: this.props.state.user.id,
+        column: 'account_id',
+        clause: '='
+      }, {
         value: this.state.status,
         column: 'status',
         clause: '='
@@ -82,7 +86,7 @@ class Support extends Component {
 
   findColor(array, value) {
     let type = array.find(array => array.type == value );
-    let color = type.color
+    let color = type?.color
     return color
   }
 
@@ -92,7 +96,7 @@ class Support extends Component {
 
   render() {
     let div;
-    const types = [{type: 'bug', color: Color.danger}, {type: 'invalid', color: Color.warning}, {type: 'question', color: Color.info}, {type: 'help wanted', color: Color.secondary}, {type: 'enhancement', color: Color.gray}, {type: 'duplicate', color: Color.darkGray}]
+    const types = [{type: 'verification issue', color: Color.danger}, {type: 'account issue', color: Color.warning}, {type: 'transaction issue', color: Color.info}, {type: 'others', color: Color.secondary}]
     if (this.state.data != null) {
       div = <View>
       <View>

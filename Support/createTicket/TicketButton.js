@@ -16,6 +16,7 @@ class TicketButton extends Component {
             backgroundColor: this.props.buttonColor,
             width: this.props.buttonWidth,
             height: this.props.buttonHeight,
+            borderRadius: 100
           },
         ]}
         onPress={() => {
