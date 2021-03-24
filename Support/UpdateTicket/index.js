@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Image, TouchableNativeFeedbackBase } from 'react-native';
 import styles from './Styles.js';
+import Modal from "react-native-modal";
 import Style from 'components/Support/Style';
 import Api from 'services/api/index.js';
 import { Routes, BasicStyles } from 'common';
@@ -16,6 +17,7 @@ import { Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import PostCard from 'modules/generic/PostCard.js';
 const width = Math.round(Dimensions.get('window').width);
+const height = Math.round(Dimensions.get('window').height);
 
 class UpdateTicket extends Component {
 
@@ -35,7 +37,9 @@ class UpdateTicket extends Component {
       comments: [],
       showComments: false,
       reply: null,
-      date: null
+      date: null,
+      modalVisible: false,
+      image: null
     };
   }
 
@@ -149,6 +153,7 @@ class UpdateTicket extends Component {
       comment_id: this.props.navigation.state.params.id,
       text: this.state.reply
     }
+    console.log(parameter, "===========");
     this.setState({ isLoading: true });
     Api.request(Routes.replyCreate, parameter, response => {
       this.setState({ isLoading: false });
@@ -183,6 +188,44 @@ class UpdateTicket extends Component {
         this.props.navigation.push('supportStack');
       }
     })
+  }
+
+  showImage = () => {
+    return (
+      <View>
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={this.state.modalVisible}
+        style={{
+          height: height - 50,
+          padding: 20,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Image
+          source={{ uri: this.state.image && this.state.image }}
+          style={{
+            width: width - 100,
+            height: height / 2,
+            marginBottom: 20
+          }}
+        />
+        <View style={[styles.TicketButtonContainer, {marginLeft: 10}]}>
+            <TicketButton
+              buttonColor={Color.danger}
+              buttonWidth="90%"
+              buttonHeight={50}
+              fontSize={14}
+              textColor="#FFFFFF"
+              buttonText="Close"
+              onPress={() => {this.setState({modalVisible: false})}}
+            />
+          </View>
+      </Modal>
+      </View>
+    )
   }
 
   choosePhoto = () => {
@@ -307,10 +350,19 @@ class UpdateTicket extends Component {
                 {this.state.images.map((u, i) => {
                   return (
                     <View key={i} style={{ flexDirection: 'row' }}>
-                      <Image
-                        source={{ uri: u }}
-                        style={styles.Image}
-                      />
+                      <TouchableOpacity
+                        onPress={() => {
+                          this.setState({
+                            image: u,
+                            modalVisible: true
+                          })
+                        }}
+                      >
+                        <Image
+                          source={{ uri: u }}
+                          style={styles.Image}
+                        />
+                      </TouchableOpacity>
                     </View>
                   )
                 })}
@@ -351,6 +403,7 @@ class UpdateTicket extends Component {
               onPress={this.update.bind(this)}
             />
           </View>
+          {this.showImage()}
         </ScrollView>
       </View>
     );
