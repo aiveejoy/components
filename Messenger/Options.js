@@ -339,13 +339,13 @@ class Options extends Component {
     let parameter = {
       account_id: user.id,
       payload: 'request_id',
-      payload_value: this.state.requestId,
+      payload_value: this.props.requestId,
       status: 1,
       assigned_to: ''
     }
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportCreate, parameter, response => {
-      console.log(response, "======support enabled");
+      console.log(response.error, "======support enabled");
       this.setState({ isLoading: false })
     })
   }

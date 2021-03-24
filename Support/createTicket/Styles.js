@@ -45,7 +45,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   TicketInputTitleContainer: {
-    marginBottom: 5
+    marginBottom: 5,
+    fontWeight: 'bold'
   },
   TicketInputTitleTextStyle: {
     fontSize: 15,
@@ -65,19 +66,16 @@ const styles = StyleSheet.create({
     width: 100,
   },
   CardContainer: {
-    width: width / 2,
+    width: (width - 100) / 2,
     borderRadius: BasicStyles.standardBorderRadius,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
     marginRight: 10,
-    paddingLeft: 5,
-    paddingRight: 5
+    padding: 10
   },
   title: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: '40%',
-    paddingBottom: '10%',
+    paddingTop: '20%',
+    paddingBottom: '20%',
   },
   titleText: {
     fontSize: BasicStyles.standardFontSize,
