@@ -83,7 +83,8 @@ class CreateTicket extends Component {
     let account_id = this.props.navigation.state.params.user.id
     let parameter = {
       account_id: account_id,
-      content: this.state.title,
+      title: this.state.title,
+      content: this.state.content,
       status: 'pending',
       type: this.state.type,
       images: this.state.images.join(' ')
@@ -225,7 +226,7 @@ class CreateTicket extends Component {
         {this.state.type === null && this.chooseTicketType2()}
         {this.state.type && (
         <ScrollView>
-          <View>
+          <View style={{marginBottom: 40}}>
           <View style={styles.InputContainer}>
               <Text style={styles.TicketInputTitleContainer}>Type of Ticket:</Text>
               <TextInput

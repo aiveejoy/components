@@ -58,14 +58,15 @@ class UpdateTicket extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.ticketsRetrieve, parameter, response => {
       this.setState({ isLoading: false })
+      console.log(response.data[0].created_at_human, response.data[0].content, response.data[0].title, "===");
       if (response.data.length > 0) {
         this.setState({
-          title: 'Test (TO BE ADDED)',
+          title: response.data[0].title,
           description: response.data[0].content,
           type: response.data[0].type,
           id: response.data[0].id,
           images: response.data[0].images.split(' '),
-          date: response.data[0].created_at,
+          date: response.data[0].created_at_human,
           status: response.data[0].status
         })
         this.retrieveAssignees();
@@ -153,7 +154,6 @@ class UpdateTicket extends Component {
       comment_id: this.props.navigation.state.params.id,
       text: this.state.reply
     }
-    console.log(parameter, "===========");
     this.setState({ isLoading: true });
     Api.request(Routes.replyCreate, parameter, response => {
       this.setState({ isLoading: false });
