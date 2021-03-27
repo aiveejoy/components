@@ -5,6 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
 import CreateTicket from 'components/Support/createTicket';
 import {connect} from 'react-redux';
+import { BasicStyles } from 'common';
 
 class HeaderOptions extends Component {
   constructor(props) {
@@ -60,10 +61,7 @@ const CreateTicketStack = createStackNavigator({
       title: 'Create Ticket',
       drawerLabel: 'Create Ticket',
       headerLeft: <HeaderOptions navigationProps={navigation} />,
-      headerStyle: {
-        backgroundColor: 'white',
-      },
-      headerTintColor: '#4c4c4c',
+      ...BasicStyles.headerDrawerStyle
     }),
   },
 });
