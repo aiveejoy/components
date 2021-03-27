@@ -187,8 +187,7 @@ class DateTime extends Component{
             borderColor: this.props.borderColor ? this.props.borderColor : Color.lightGray,
             borderWidth: 1,
             marginTop: 20,
-            marginBottom: 20,
-            height: this.props.style.height
+            marginBottom: 20
           }}
           onPress={() => {this._showComponent()}}
           underlayColor={Color.white}
@@ -201,7 +200,7 @@ class DateTime extends Component{
                 (dateLabel == null && timeLabel == null) && (
                   <Text style={{
                       color: Color.gray,
-                      width: '90%',
+                      width: this.props.icon ? '100%' : '90%',
                       ...this.props.textStyle
                     }}>
                       {this.props.placeholder ? this.props.placeholder : 'Select Date'}
@@ -212,7 +211,7 @@ class DateTime extends Component{
                 (dateLabel != null || timeLabel != null)  && (
                   <Text style={{
                       color: Color.gray,
-                      width: '90%',
+                      width: this.props.icon ? '100%' : '90%',
                       ...this.props.textStyle
                     }}>
                       {(dateLabel != null && timeLabel == null) && (dateLabel)}
