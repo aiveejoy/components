@@ -5,6 +5,7 @@ import { faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { Color, BasicStyles } from 'common';
 import Currency from 'services/Currency.js';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Dimensions } from 'react-native';
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -22,7 +23,7 @@ class DateTime extends Component{
     }
   }
 
-  setDate = (event, date) => {
+  dateHandler = (date) => {
     if(this.props.type == 'date'){
       console.log('[date]', date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
       this.setState({
@@ -72,6 +73,10 @@ class DateTime extends Component{
     }
   }
 
+  setDate = (event, date) => {
+    this.dateHandler(date)  
+  }
+
   _showComponent = () => {
     this.setState({
       showDatePicker: true
@@ -81,14 +86,15 @@ class DateTime extends Component{
   _datePickerIOS = () => {
     return (
       <View>
-        <DateTimePicker value={new Date()}
+        <DateTimePickerModal value={new Date()}
+          isVisible={this.state.showDatePicker}
           mode={this.props.type}
           display="default"
           date={new Date()}
           minimumDate={this.props.minimumDate}
           onCancel={() => this.setState({showDatePicker: false})}
-          onConfirm={this.setDate} 
-          onChange={this.setDate} />
+          onConfirm={this.dateHandler} 
+          onChange={this.dateHandler} />
       </View>
     );
   }
@@ -168,8 +174,10 @@ class DateTime extends Component{
     const { type } = this.props;
     const { dateLabel, timeLabel } = this.state; 
     return (
-      <View>
-        <TouchableHighlight style={[{
+      <View style={{
+        ...this.props.style
+      }}>
+        <TouchableHighlight style={{
             height: this.props.height ? this.props.height : 50,
             backgroundColor: 'white',
             width: '100%',
@@ -179,8 +187,9 @@ class DateTime extends Component{
             borderColor: this.props.borderColor ? this.props.borderColor : Color.lightGray,
             borderWidth: 1,
             marginTop: 20,
-            marginBottom: 20
-          }, this.props.style]}
+            marginBottom: 20,
+            height: this.props.style.height
+          }}
           onPress={() => {this._showComponent()}}
           underlayColor={Color.white}
             >
@@ -193,6 +202,7 @@ class DateTime extends Component{
                   <Text style={{
                       color: Color.gray,
                       width: '90%',
+                      ...this.props.textStyle
                     }}>
                       {this.props.placeholder ? this.props.placeholder : 'Select Date'}
                   </Text>
@@ -203,6 +213,7 @@ class DateTime extends Component{
                   <Text style={{
                       color: Color.gray,
                       width: '90%',
+                      ...this.props.textStyle
                     }}>
                       {(dateLabel != null && timeLabel == null) && (dateLabel)}
                       {(timeLabel != null && dateLabel == null) && (timeLabel)}
@@ -210,14 +221,19 @@ class DateTime extends Component{
                   </Text>
                 )
               }
-              <FontAwesomeIcon 
-                icon={faCalendar}
-                size={20}
-                style={[{
-                  color: Color.gray,
-                  width: '10%'
-                }, this.props.iconStyle]}
-               />
+              {
+                this.props.icon && (
+                  <FontAwesomeIcon 
+                    icon={faCalendar}
+                    size={20}
+                    style={[{
+                      color: Color.gray,
+                      width: '10%'
+                    }, this.props.iconStyle]}
+                   />
+                )
+              }
+              
             </View>
         </TouchableHighlight>
         {type == 'date' && (this._date())}
