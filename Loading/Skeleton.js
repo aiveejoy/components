@@ -7,8 +7,8 @@ class Skeleton extends Component {
     super(props);
   }
 
-  render() {
-    return (
+  renderSkeleton = () => {
+    return(
       <SkeletonPlaceholder>
         <View style={{
           paddingLeft: 20,
@@ -32,7 +32,7 @@ class Skeleton extends Component {
             </View>
             
             <View style={{
-              width: '80%'
+              width: '90%'
             }}>
               <View style={{
                 width: '100%',
@@ -60,6 +60,22 @@ class Skeleton extends Component {
           </View>
         </View>
       </SkeletonPlaceholder>
+    )
+  }
+  render() {
+    const { size } =  this.props;
+    let content = []
+    for (var i = 0; i < size; i++) {
+      content.push(
+        <View key={i}>
+          {this.renderSkeleton()}
+        </View>
+      )
+    }
+    return (
+      <View>
+        {content}
+      </View>
     );
   }
 }
