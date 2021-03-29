@@ -286,7 +286,7 @@ class LocationWithMap extends Component {
           country: this.state.country,
           postal: this.state.postal,
           latitude: this.state.region.latitude,
-          longtitude: this.state.region.longitude,
+          longitude: this.state.region.longitude,
         };
         console.log('LOCATION IN COMPONENT', location);
         setLocation(location);

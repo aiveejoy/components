@@ -123,7 +123,7 @@ class CurrentLocation extends Component{
         country: country,
         postal: postal,
         latitude: latitude,
-        longtitude: longitude,
+        longitude: longitude,
       };
 
       const{setLocation} = this.props

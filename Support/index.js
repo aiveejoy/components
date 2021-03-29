@@ -34,10 +34,15 @@ class Support extends Component {
   retrieve() {
     let parameter = {
       condition: [{
+        value: this.props.state.user.id,
+        column: 'account_id',
+        clause: '='
+      }, {
         value: this.state.status,
         column: 'status',
         clause: '='
-      }]
+      }],
+      limit: 7
     };
     this.setState({isLoading: true})
     Api.request(Routes.ticketsRetrieve, parameter, tickets => {
@@ -82,7 +87,7 @@ class Support extends Component {
 
   findColor(array, value) {
     let type = array.find(array => array.type == value );
-    let color = type.color
+    let color = type?.color
     return color
   }
 
@@ -91,8 +96,9 @@ class Support extends Component {
   }
 
   render() {
+    console.log(this.state.data && this.state.data);
     let div;
-    const types = [{type: 'bug', color: Color.danger}, {type: 'invalid', color: Color.warning}, {type: 'question', color: Color.info}, {type: 'help wanted', color: Color.secondary}, {type: 'enhancement', color: Color.gray}, {type: 'duplicate', color: Color.darkGray}]
+    const types = [{type: 'verification issue', color: Color.danger}, {type: 'account issue', color: Color.warning}, {type: 'transaction issue', color: Color.info}, {type: 'others', color: Color.secondary}]
     if (this.state.data != null) {
       div = <View>
       <View>
@@ -110,7 +116,7 @@ class Support extends Component {
               <View style={{alignSelf: 'flex-start', padding: 5, borderRadius: 15, backgroundColor: this.findColor(types, u.type.toLowerCase())}}>
                 <Text style={{color: '#ffffff', fontSize:11}}>{u.type}</Text>
               </View>
-              <Text style={Style.TextCard}>{u.content}</Text>
+              <Text style={Style.TextCard}>{u.title}</Text>
               <Text style={Style.TextCard, {fontSize:11}} >{u.assigned_to ? 'Assigned to '+ u.assigned_to : 'Not assigned'}</Text>
               <View style={{flexDirection: 'row-reverse'}}>
               </View>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Picker, Text, ScrollView, TextInput, TouchableOpacity, Image, Button, Alert } from 'react-native';
+import { View, Picker, Text, ScrollView, TextInput, TouchableOpacity, Image, Button, Alert, Dimensions } from 'react-native';
 import TicketButton from 'components/Support/createTicket/TicketButton.js';
 import styles from 'components/Support/createTicket/Styles.js';
 import Api from 'services/api/index.js';
@@ -11,6 +11,9 @@ import ImagePicker from 'react-native-image-picker';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImages } from '@fortawesome/free-solid-svg-icons';
 import Color from 'common/Color';
+import {connect} from 'react-redux';
+const width = Math.round(Dimensions.get('window').width);
+
 class CreateTicket extends Component {
 
   constructor(props) {
@@ -18,18 +21,52 @@ class CreateTicket extends Component {
     this.state = {
       title: null,
       description: null,
-      type: 'bug',
+      type: null,
       isLoading: false,
       imageModalUrl: null,
       photo: null,
       isImageModal: false,
       images: [],
+      ticketTypes1: [
+        {
+          id: 1,
+          type: 'VERIFICATION ISSUE',
+          description: 'Send cash and allow our partners to process or deliver the cash to your receiver.'
+        },
+        {
+          id: 2,
+          type: 'ACCOUNT ISSUE',
+          description: 'Withdraw cash from your wallet and let our partners nearby process or deliver the cash to your specified location.'
+        }
+      ],
+      ticketTypes2: [
+        {
+          id: 3,
+          type: 'TRANSACTION ISSUE',
+          description: 'Cash In to your wallet and let our nearby partners process or pickup the cash from your specified location.'
+        },
+        {
+          id: 4,
+          type: 'OTHERS',
+          description: "Don't have time and want to pay your bills either online or onsite? Our partners will handle your payments"
+        }
+      ],
+      selected: null,
+      active: null
     };
   }
 
   selectedValue = value => {
     this.setState({ type: value });
   };
+
+  onSelect(item, index){
+    this.setState({
+      active: this.active == index ? null : index,
+      selected: item,
+      type: item.type
+    })
+  }
 
   create = () => {
     if(this.state.images.length === 0 || this.state.title === '' || this.state.description === '' || this.state.title === null || this.state.description === null) {
@@ -46,7 +83,8 @@ class CreateTicket extends Component {
     let account_id = this.props.navigation.state.params.user.id
     let parameter = {
       account_id: account_id,
-      content: this.state.title,
+      title: this.state.title,
+      content: this.state.content,
       status: 'pending',
       type: this.state.type,
       images: this.state.images.join(' ')
@@ -83,12 +121,120 @@ class CreateTicket extends Component {
     }, 500)
   }
 
+  chooseTicketType1 = () => {
+    const { theme } = this.props.state;
+    return (
+      <View style={{
+        flexDirection: 'row',
+      }}>
+        {
+          this.state.ticketTypes1 && this.state.ticketTypes1.map((item, index) => (
+           
+            <TouchableOpacity
+              style={[styles.CardContainer, {justifyContent: 'center', backgroundColor: (this.state.selected && this.state.selected.id == item.id) ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)}]}
+              onPress={() => {
+                this.onSelect(item, index);
+              }}
+              key={index}>
+              <View style={styles.title}>
+                <Text
+                  style={[
+                    styles.titleText,
+                    {fontSize: BasicStyles.titleText.fontSize},
+                  ]}>
+                  {item.type}
+                </Text>
+              </View>
+              <View style={[styles.description, {
+                paddingBottom: 10
+              }]}>
+                <Text
+                  style={[
+                    styles.descriptionText,
+                    {
+                      fontSize: BasicStyles.titleText.fontSize
+                    },
+                  ]}>
+                  {item.description}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            
+          ))
+        }
+      </View>
+    );
+  }
+
+  chooseTicketType2 = () => {
+    const { theme } = this.props.state;
+    return (
+      <View style={{
+        flexDirection: 'row',
+        marginTop: 10,
+        padding: 10
+      }}>
+        {
+          this.state.ticketTypes2 && this.state.ticketTypes2.map((item, index) => (
+           
+            <TouchableOpacity
+              style={[styles.CardContainer, {justifyContent: 'center', backgroundColor: (this.state.selected && this.state.selected.id == item.id) ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)}]}
+              onPress={() => {
+                this.onSelect(item, index);
+              }}
+              key={index}>
+              <View style={styles.title}>
+                <Text
+                  style={[
+                    styles.titleText,
+                    {fontSize: BasicStyles.titleText.fontSize},
+                  ]}>
+                  {item.type}
+                </Text>
+              </View>
+              <View style={[styles.description, {
+                paddingBottom: 10
+              }]}>
+                <Text
+                  style={[
+                    styles.descriptionText,
+                    {
+                      fontSize: BasicStyles.titleText.fontSize
+                    },
+                  ]}>
+                  {item.description}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            
+          ))
+        }
+      </View>
+    );
+  }
+
   render() {
     let data = [{ title: 'Bug', value: 'bug' }, { title: 'Question', value: 'question' }, { title: 'Enhancement', value: 'enhancement' }, { title: 'Invalid', value: 'invalid' }, { title: 'Duplicate', value: 'duplicate' }, { title: 'Help wanted', value: 'help wanted' }]
     return (
       <View style={styles.CreateTicketContainer}>
+        {this.state.type === null && (<Text style={{
+          fontWeight: 'bold',
+          paddingTop: 10,
+          paddingBottom: 40
+        }}>Select type of ticket:</Text>)}
+        {this.state.type === null && this.chooseTicketType1()}
+        {this.state.type === null && this.chooseTicketType2()}
+        {this.state.type && (
         <ScrollView>
-          <View>
+          <View style={{marginBottom: 40}}>
+          <View style={styles.InputContainer}>
+              <Text style={styles.TicketInputTitleContainer}>Type of Ticket:</Text>
+              <TextInput
+                style={[BasicStyles.formControl, {backgroundColor: Color.gray}]}
+                value={this.state.type}
+                editable={false}
+              />
+            </View>
             <View style={styles.InputContainer}>
               <Text style={styles.TicketInputTitleContainer}>Title</Text>
               <TextInput
@@ -101,19 +247,24 @@ class CreateTicket extends Component {
             <View style={styles.InputContainer}>
               <Text style={styles.TicketInputTitleContainer}>Description</Text>
               <TextInput
-                style={BasicStyles.formControl}
+                style={{
+                  borderColor: Color.lightGray,
+                  borderWidth: 1,
+                  width: width - 40,
+                  paddingLeft: 10,
+                  marginBottom: 20,
+                  borderRadius: 25,
+                  height: 140
+                }}
                 onChangeText={(description) => this.setState({ description })}
                 value={this.state.description}
                 placeholder={'Description'}
+                numberOfLines={6}
+                multiline = {true}
               />
             </View>
-            <View style={[styles.InputContainer, {marginTop: 7}]}>
-              <Text style={styles.TicketInputTitleContainer}>Type</Text>
-              <View style={styles.Dropdown}>
-                <Dropdown selectedValue={this.state.type} onChange={this.selectedValue} data={data}></Dropdown>
-              </View>
-            </View>
             {this.state.isLoading ? <Spinner mode="overlay" /> : null}
+            <Text style={{fontWeight: 'bold'}}>Attached file(s)</Text>
             <View style={{flexDirection: 'row', padding: 15, width: '90%'}}>
               <TouchableOpacity
                 style={{marginBottom: 25, padding: 15}}
@@ -153,11 +304,18 @@ class CreateTicket extends Component {
             onPress={this.create.bind(this)}
           />
           </View>
-        </ScrollView>
-        
+        </ScrollView>)}
       </View>
     );
   }
 }
 
-export default CreateTicket;
+const mapStateToProps = (state) => ({state: state});
+
+const mapDispatchToProps = (dispatch) => {
+  const {actions} = require('@redux');
+  return {
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateTicket);

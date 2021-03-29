@@ -7,6 +7,9 @@ class TextInputWithLabel extends Component {
   }
 
   redirect(route){
+    if(this.props.closeOnClick){
+      this.props.closeOnClick()
+    }
     this.props.navigation.navigate(route)
   }
 
