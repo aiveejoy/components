@@ -533,6 +533,7 @@ class Options extends Component {
   requirements(options) {
     const { data } = this.props;
     const { user } = this.props.state;
+    console.log(data && data.request.id, user && user.id, "======");
     return (
       <ScrollView
       >
@@ -540,7 +541,7 @@ class Options extends Component {
         {
           options.map((item, index) => (
             <View>  
-              {data && user && data.account_id == user.id && (
+              {data && user && data.request.id == user.id && (
                 <TouchableOpacity style={{
                   width: '100%',
                   height: 50,
@@ -557,10 +558,10 @@ class Options extends Component {
                   <Text style={{
                     color: item.color,
                     fontSize: BasicStyles.standardFontSize,
-                    width: (data && data.account_id == user.id) ? '70%' : '90%',
+                    width: (data && data.request.id == user.id) ? '70%' : '90%',
                   }}>{item.title}</Text>
                   {
-                    (item.title != 'Back' && (data && data.account_id == user.id)) && (
+                    (item.title != 'Back' && (data && data.request.id == user.id)) && (
                       <View style={{
                         width: '30%',
                         justifyContent: 'center',
@@ -593,7 +594,7 @@ class Options extends Component {
                   }
                 </TouchableOpacity>)}
                 {
-                    (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && data && data.account_id != user.id) && (
+                    (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && data && data.request.id != user.id) && (
                       <TouchableOpacity style={{
                         width: '100%',
                         height: 50,
@@ -608,7 +609,7 @@ class Options extends Component {
                         <Text style={{
                           color: item.color,
                           fontSize: BasicStyles.standardFontSize,
-                          width: (data && data.account_id == user.id) ? '70%' : '90%',
+                          width: (data && data.request.id == user.id) ? '70%' : '90%',
                         }}>{item.title}</Text>
                         <View style={{
                           width: '10%',
@@ -664,7 +665,8 @@ class Options extends Component {
               }
             })
           }
-          <View style={{
+        </View>
+        <View style={{
             paddingTop: 50,
             width: '100%',
             flex: 1,
@@ -672,7 +674,7 @@ class Options extends Component {
             alignItems: 'center' 
           }}>
 
-            {data && data.account_id === user.id && currentValidation?.status === 'pending' && (
+            {data && data.request.id === user.id && currentValidation?.status === 'pending' && (
               <View style={Style.signatureFrameContainer}>
                 <TouchableOpacity style={[
                   Style.signatureAction,
@@ -689,11 +691,17 @@ class Options extends Component {
                 </TouchableOpacity>
               </View>
             )}
-            {data && data.account_id !== user.id && (
-              <View style={Style.signatureFrameContainer}>
+            {data && data.request.id !== user.id && (
+              <View style={{
+                flex: 1,
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
                 <TouchableOpacity style={[
-                  Style.signatureFullSuccess,
-                  Style.signatureActionSuccess]}
+                  Style.signatureAction,
+                  Style.signatureActionSuccess,
+                  { width: '99%' }]}
                   onPress={() => {
                     if (payload_value === 'signature') {
                       this.setState({ visible: true })
@@ -705,7 +713,7 @@ class Options extends Component {
                 </TouchableOpacity>
               </View>
             )}
-            {data && data.account_id === user.id && (currentValidation?.status === 'accepted') && (
+            {data && data.request.id === user.id && (currentValidation?.status === 'accepted') && (
               <View style={Style.signatureFrameContainer}>
                 <View style={[
                   Style.signatureAction,
@@ -715,7 +723,7 @@ class Options extends Component {
                 </View>
               </View>
             )}
-            {data && data.account_id === user.id && currentValidation?.status === 'declined' && (
+            {data && data.request.id === user.id && currentValidation?.status === 'declined' && (
               <View style={Style.signatureFrameContainer}>
                 <View style={[
                   Style.signatureAction,
@@ -726,7 +734,6 @@ class Options extends Component {
               </View>
             )}
           </View>
-        </View>
       </ScrollView>
     )
   }

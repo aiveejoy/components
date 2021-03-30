@@ -5,7 +5,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
 import CreateTicket from 'components/Support/createTicket';
 import {connect} from 'react-redux';
-import { BasicStyles } from 'common';
+import { BasicStyles, Color } from 'common';
 
 class HeaderOptions extends Component {
   constructor(props) {
@@ -15,6 +15,7 @@ class HeaderOptions extends Component {
     this.props.navigationProps.navigate('drawerStack');
   };
   render() {
+    const { theme } = this.props.state;
     return (
       <View
         style={{
@@ -36,8 +37,8 @@ class HeaderOptions extends Component {
           {/*Donute Button Image */}
           <FontAwesomeIcon
             icon={faChevronLeft}
-            size={30}
-            style={{color: '#3F0050'}}
+            size={BasicStyles.headerBackIconSize}
+            style={{color: theme ? theme.primary : Color.primary }}
           />
         </TouchableOpacity>
       </View>
@@ -46,6 +47,12 @@ class HeaderOptions extends Component {
 }
 
 const mapStateToProps = (state) => ({state: state});
+
+let HeaderOptionsConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HeaderOptions);
+
 
 const mapDispatchToProps = (dispatch) => {
   const {actions} = require('@redux');
@@ -60,7 +67,7 @@ const CreateTicketStack = createStackNavigator({
     navigationOptions: ({navigation}) => ({
       title: 'Create Ticket',
       drawerLabel: 'Create Ticket',
-      headerLeft: <HeaderOptions navigationProps={navigation} />,
+      headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
       ...BasicStyles.headerDrawerStyle
     }),
   },

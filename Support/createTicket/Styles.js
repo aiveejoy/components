@@ -26,7 +26,8 @@ const styles = StyleSheet.create({
   },
   TicketButtonContainer: {
     width: '100%',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   CustomButtonContainer: {
     borderRadius: 10,
