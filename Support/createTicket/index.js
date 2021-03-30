@@ -235,12 +235,16 @@ class CreateTicket extends Component {
           }}>
             <TicketButton
               buttonColor={theme ? theme.primary : Color.primary}
-              buttonWidth={350}
+              buttonWidth={310}
               buttonHeight={50}
               fontSize={14}
               textColor="#FFFFFF"
               buttonText="Proceed"
-              onPress={() => { this.setState({ proceed: true }) }}
+              onPress={() => {
+                if(this.state.type) {
+                  this.setState({ proceed: true })
+                }
+              }}
             />
           </View>)}
           {this.state.proceed == true && (
@@ -255,7 +259,10 @@ class CreateTicket extends Component {
                   />
                 </View>
                 <View style={styles.InputContainer}>
-                  <Text style={styles.TicketInputTitleContainer}>Title</Text>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.TicketInputTitleContainer}>Title </Text>
+                    <Text style={{color: 'red'}}> *</Text>
+                  </View>
                   <TextInput
                     style={BasicStyles.formControl}
                     onChangeText={(title) => this.setState({ title })}
@@ -264,7 +271,10 @@ class CreateTicket extends Component {
                   />
                 </View>
                 <View style={styles.InputContainer}>
-                  <Text style={styles.TicketInputTitleContainer}>Description</Text>
+                <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.TicketInputTitleContainer}>Description </Text>
+                    <Text style={{color: 'red'}}> *</Text>
+                  </View>
                   <TextInput
                     style={{
                       borderColor: Color.lightGray,
@@ -283,7 +293,10 @@ class CreateTicket extends Component {
                   />
                 </View>
                 {this.state.isLoading ? <Spinner mode="overlay" /> : null}
-                <Text style={{ fontWeight: 'bold' }}>Attached file(s)</Text>
+                <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.TicketInputTitleContainer}>Attached file(s) </Text>
+                    <Text style={{color: 'red'}}> *</Text>
+                  </View>
                 <View style={{ flexDirection: 'row', padding: 15, width: '90%' }}>
                   <TouchableOpacity
                     style={{ marginBottom: 25, padding: 15 }}
