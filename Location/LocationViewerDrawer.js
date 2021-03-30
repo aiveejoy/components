@@ -17,7 +17,7 @@ class HeaderOptions extends Component {
   render() {
     return (
       <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity onPress={this.back.bind(this)}>
+        <TouchableOpacity onPress={this.back.bind(this)} >
           {/*Donute Button Image */}
           <FontAwesomeIcon
             icon={faChevronLeft}
@@ -44,12 +44,13 @@ const WebViewStack = createStackNavigator({
         screen: LocationViewer,
         navigationOptions: ({navigation}) => ({
         title: '',
+        headerTransparent: true,
         headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
-
+          
         headerTintColor: BasicStyles.headerTintColor,
         headerTitleContainerStyle: BasicStyles.headerTitleContainerStyle,
         headerTitleStyle: BasicStyles.headerTitleStyle,
-        }),
+        })
     },
 });
 

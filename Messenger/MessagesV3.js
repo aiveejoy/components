@@ -48,7 +48,8 @@ class MessagesV3 extends Component{
       settingsMenu: [],
       settingsBreadCrumbs: ['Settings'],
       group: null,
-      request_id: null
+      request_id: null,
+      noProfile: false
     }
   }
 
@@ -91,7 +92,10 @@ class MessagesV3 extends Component{
       offset: offset * limit,
     }
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
-      console.log('[Messages] OnRetrieve', response, response.data[0].account);
+      console.log('[Messages] OnRetrieve', response.data[response.data.lastIndexOf(response.data[response.data.length - 1])].account_id);
+      // if(response.data[0].account_id == response.data[1].account_id) {
+      //   response.data[response.data.lastIndexOf(response.data[response.data.length - 1])] = this.setState({ noProfile: true })
+      // }
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
         this.setState({sender_id: response.data[0].account_id});
@@ -198,6 +202,7 @@ class MessagesV3 extends Component{
     this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
       if(response.data != null){
+        console.log('[responseByUpdatingMessages]', response.data);
         updateMessageByCode(response.data);
       }
     });
@@ -433,13 +438,20 @@ class MessagesV3 extends Component{
   }
 
   _headerLeft = (item) => {
+    const {noProfile} = this.state
     return (
       <View style={{flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-        <Text style={{
-          lineHeight: 30,
-          paddingRight: 10
-        }}>{item.account.username}</Text>
-        <UserImage user={item.account}/>
+      {
+        (noProfile == true) && (
+          <View>
+            <Text style={{
+              lineHeight: 30,
+              paddingRight: 10
+            }}>{item.account.username}</Text>
+            <UserImage user={item.account}/>
+          </View>
+          )
+        }
       </View>
     );
   }
