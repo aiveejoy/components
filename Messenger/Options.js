@@ -536,10 +536,10 @@ class Options extends Component {
     return (
       <ScrollView
       >
-        {this.state.isLoading ? <Spinner mode="full" /> : null}
+        {this.state.isLoading ? <Spinner mode="overlay" /> : null}
         {
-          this.state.isLoading === false && options.map((item, index) => (
-            <View>
+          options.map((item, index) => (
+            <View>  
               {data && user && data.account_id == user.id && (
                 <TouchableOpacity style={{
                   width: '100%',

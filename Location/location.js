@@ -72,7 +72,7 @@ class CurrentLocation extends Component{
       error => alert(error.message),
       {
         enableHighAccuracy: true,
-        // timeout: 20000,
+        // timeout: 360000,
         // maximumAge: 1000,
       },
     );

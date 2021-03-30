@@ -52,7 +52,8 @@ class CreateTicket extends Component {
         }
       ],
       selected: null,
-      active: null
+      active: null,
+      proceed: false
     };
   }
 
@@ -84,13 +85,14 @@ class CreateTicket extends Component {
     let parameter = {
       account_id: account_id,
       title: this.state.title,
-      content: this.state.content,
+      content: this.state.description,
       status: 'pending',
       type: this.state.type,
       images: this.state.images.join(' ')
     }
     this.setState({ isLoading: true })
     Api.request(Routes.ticketsCreate, parameter, response => {
+      console.log(response);
       this.setState({ isLoading: false })
       if (response.data != null) {
         this.props.navigation.push('supportStack');
@@ -214,17 +216,32 @@ class CreateTicket extends Component {
   }
 
   render() {
+    const { theme } = this.props.state;
     let data = [{ title: 'Bug', value: 'bug' }, { title: 'Question', value: 'question' }, { title: 'Enhancement', value: 'enhancement' }, { title: 'Invalid', value: 'invalid' }, { title: 'Duplicate', value: 'duplicate' }, { title: 'Help wanted', value: 'help wanted' }]
     return (
       <View style={styles.CreateTicketContainer}>
-        {this.state.type === null && (<Text style={{
+        {this.state.proceed === false && (<Text style={{
           fontWeight: 'bold',
           paddingTop: 10,
           paddingBottom: 40
         }}>Select type of ticket:</Text>)}
-        {this.state.type === null && this.chooseTicketType1()}
-        {this.state.type === null && this.chooseTicketType2()}
-        {this.state.type && (
+        {this.state.proceed === false && this.chooseTicketType1()}
+        {this.state.proceed === false && this.chooseTicketType2()}
+        {this.state.proceed === false && (<View style={{
+          marginTop: 80,
+          width: '100%',
+          alignItems: 'center'}}>
+          <TicketButton
+            buttonColor={theme ? theme.primary : Color.primary}
+            buttonWidth={350}
+            buttonHeight={50}
+            fontSize={14}
+            textColor="#FFFFFF"
+            buttonText="Proceed"
+            onPress={() => {this.setState({proceed: true})}}
+          />
+          </View>)}
+        {this.state.proceed == true && (
         <ScrollView>
           <View style={{marginBottom: 40}}>
           <View style={styles.InputContainer}>
