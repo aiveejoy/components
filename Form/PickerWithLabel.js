@@ -86,7 +86,8 @@ class PickerWithLabel extends Component{
           }}>
             {
               Platform.OS == 'android' && (
-                <Picker selectedValue={this.state.input}
+                <Picker 
+                  selectedValue={this.state.input}
                   onValueChange={(input) => this.onChange(input)}
                   style={{
                     ...BasicStyles.pickerStyleCreate,
