@@ -6,7 +6,7 @@ import {faQrcode, faBars} from '@fortawesome/free-solid-svg-icons';
 import UpdateTicket from 'components/Support/UpdateTicket';
 import {NavigationActions} from 'react-navigation';
 import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
-import {BasicStyles} from 'common';
+import {BasicStyles, Color} from 'common';
 import {connect} from 'react-redux';
 
 class HeaderOptions extends Component {
@@ -20,6 +20,7 @@ class HeaderOptions extends Component {
     this.props.navigationProps.dispatch(navigateAction);
   };
   render() {
+    const { theme } = this.props.state;
     return (
       <View
         style={{
@@ -41,8 +42,8 @@ class HeaderOptions extends Component {
           {/*Donute Button Image */}
           <FontAwesomeIcon
             icon={faChevronLeft}
-            size={30}
-            style={{color: '#3F0050'}}
+            size={BasicStyles.headerBackIconSize}
+            style={{color: theme ? theme.primary : Color.primary }}
           />
         </TouchableOpacity>
       </View>
@@ -51,6 +52,11 @@ class HeaderOptions extends Component {
 }
 
 const mapStateToProps = (state) => ({state: state});
+
+let HeaderOptionsConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HeaderOptions);
 
 const mapDispatchToProps = (dispatch) => {
   const {actions} = require('@redux');
@@ -62,7 +68,7 @@ const UpdateTicketStack = createStackNavigator({
     screen: UpdateTicket,
     navigationOptions: ({navigation}) => ({
       title: 'Ticket Details',
-      headerLeft: <HeaderOptions navigationProps={navigation} />,
+      headerLeft: <HeaderOptionsConnect navigationProps={navigation}/>,
       drawerLabel: 'Ticket Details',
       headerStyle: {
         backgroundColor: 'white',
