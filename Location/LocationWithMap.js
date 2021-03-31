@@ -20,6 +20,7 @@ import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Config from 'src/config.js';
+import BasicStyles from '../../common/BasicStyles';
 
 class LocationWithMap extends Component {
   constructor(props) {
@@ -369,7 +370,7 @@ class LocationWithMap extends Component {
           focusable={true}
           styles={{
             container: {
-              width: '100%',
+              width: '100%'
             },
             textInputContainer: {
               width: '100%',
@@ -377,11 +378,12 @@ class LocationWithMap extends Component {
               borderColor: Color.gray,
               borderWidth: 1,
               height: 50,
-              borderRadius: 10,
+              borderRadius: BasicStyles.formControl.borderRadius ? BasicStyles.formControl.borderRadius : 10,
             },
             textInput: {
               height: 48,
               marginTop: 1,
+              borderRadius: 25
             },
             description: {
               fontWeight: 'bold',
@@ -489,7 +491,7 @@ class LocationWithMap extends Component {
             height: 50,
             width: '90%',
             backgroundColor: this.state.address ? '#22B173' : '#CCCCCC',
-            borderRadius: 15,
+            borderRadius: BasicStyles.formControl.borderRadius ? BasicStyles.formControl.borderRadius : 15,
             bottom: 20,
           }}>
           <Text
@@ -497,7 +499,7 @@ class LocationWithMap extends Component {
               color: 'white',
               fontSize: 15,
               fontWeight: 'bold',
-              textAlign: 'center',
+              textAlign: 'center'
             }}>
             Use Location
           </Text>
