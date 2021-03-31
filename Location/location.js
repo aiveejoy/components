@@ -69,10 +69,13 @@ class CurrentLocation extends Component{
 
         this.#onRegionChange(this.#region)
       },
-      error => alert(error.message),
+      error => {
+        alert(error.message)
+        // this.#getCurrentLocation();
+      },
       {
         enableHighAccuracy: true,
-        // timeout: 360000,
+        timeout: 360000,
         // maximumAge: 1000,
       },
     );
