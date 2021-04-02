@@ -34,8 +34,8 @@ class LocationWithMap extends Component {
       region: {
         latitude: 0,
         longitude: 0,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
         formatted_address: null,
       },
       isDraggingMap: false,

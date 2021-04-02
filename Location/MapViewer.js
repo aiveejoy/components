@@ -20,8 +20,8 @@ class MapViewer extends Component {
       region: {
         latitude: 0,
         longitude: 0,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
         formatted_address: null,
       }
     }
@@ -35,7 +35,9 @@ class MapViewer extends Component {
 
   renderMap = () => {
     return (
-      <View>
+      <View style={{
+        borderRadius: BasicStyles.standardBorderRadius
+      }}>
         <MapView
           style={{
             width: '100%',
@@ -47,13 +49,21 @@ class MapViewer extends Component {
           region={{
             ...this.props.data,
             latitudeDelta: 0.005,
-            longitudeDelta: 0.005
+            longitudeDelta: 0.005,
+            longitude: parseFloat(this.props.data.longitude),
+            latitude: parseFloat(this.props.data.latitude)
           }}
           onRegionChangeComplete={(e) => this.onRegionChange(e)}
         >
           <Marker
             key={0}
-            coordinate={this.props.data}
+            coordinate={{
+              ...this.props.data,
+              latitudeDelta: 0.005,
+              longitudeDelta: 0.005,
+              longitude: parseFloat(this.props.data.longitude),
+              latitude: parseFloat(this.props.data.latitude)
+            }}
             title={this.props.data.route}
           />
         </MapView>
@@ -63,7 +73,7 @@ class MapViewer extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{borderRadius: BasicStyles.standardBorderRadius}}>
         {this.renderMap()}
       </View>
     )
