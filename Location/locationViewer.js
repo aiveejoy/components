@@ -11,6 +11,7 @@ import Geocoder from 'react-native-geocoding';
 import { connect } from 'react-redux';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import Style from './LocationWithMapStyles';
+import Config from 'src/config.js'
 
 class CurrentLocation extends Component {
   #region = {
@@ -55,7 +56,7 @@ class CurrentLocation extends Component {
   };
 
   #getCurrentLocation = () => {
-    Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
+    Geocoder.init(Config.GOOGLE.API_KEY);
     const { data } = this.props.navigation.state.params
     this.#region = {
       ...this.#region,
