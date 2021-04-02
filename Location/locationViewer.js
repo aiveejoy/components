@@ -17,8 +17,8 @@ class CurrentLocation extends Component {
   #region = {
     latitude: 0,
     longitude: 0,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
     formatted_address: null,
   };
 
@@ -142,7 +142,6 @@ class CurrentLocation extends Component {
           ref={(ref) => (this.mapView = ref)}
           provider={PROVIDER_GOOGLE}
           region={this.#region}
-          draggable={false}
           // onPanDrag={this.setMapDragging}
           // onRegionChangeComplete={(e) => this.onRegionChange(e)}
         />
