@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableHighlight, Platform, TextInput} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faThList } from '@fortawesome/free-solid-svg-icons';
 import { Color, BasicStyles } from 'common';
 import Currency from 'services/Currency.js';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -74,7 +74,11 @@ class DateTime extends Component{
   }
 
   setDate = (event, date) => {
-    this.dateHandler(date)  
+    if(event.type == "set"){
+      this.dateHandler(date)  
+    }else{
+      this.state.showDatePicker = false
+    }
   }
 
   _showComponent = () => {

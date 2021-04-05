@@ -48,8 +48,7 @@ class MessagesV3 extends Component{
       settingsMenu: [],
       settingsBreadCrumbs: ['Settings'],
       group: null,
-      request_id: null,
-      noProfile: false
+      request_id: null
     }
   }
 
@@ -92,10 +91,6 @@ class MessagesV3 extends Component{
       offset: offset * limit,
     }
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
-      console.log('[Messages] OnRetrieve', response.data[response.data.lastIndexOf(response.data[response.data.length - 1])].account_id);
-      // if(response.data[0].account_id == response.data[1].account_id) {
-      //   response.data[response.data.lastIndexOf(response.data[response.data.length - 1])] = this.setState({ noProfile: true })
-      // }
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
         this.setState({sender_id: response.data[0].account_id});
@@ -427,40 +422,49 @@ class MessagesV3 extends Component{
 
   _headerRight = (item) => {
     return (
-      <View style={{flexDirection: 'row', marginTop: 10}}>
-        <UserImage user={item.account}/>
+      <View style={{
+          flexDirection: 'row',
+          height: 30,
+          alignItems: 'center'
+        }}>
+        <UserImage user={item.account} style={{
+          width: 25,
+          height: 25
+        }}/>
         <Text style={{
-          lineHeight: 30,
           paddingLeft: 10
-        }}>{item.account.username}</Text>
+        }}>{item.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item.account.username}</Text>
       </View>
     );
   }
 
   _headerLeft = (item) => {
-    const {noProfile} = this.state
     return (
-      <View style={{flexDirection: 'row', marginTop: 10, justifyContent: 'flex-end' }}>
-      {
-        (noProfile == true) && (
-          <View>
-            <Text style={{
-              lineHeight: 30,
-              paddingRight: 10
-            }}>{item.account.username}</Text>
-            <UserImage user={item.account}/>
-          </View>
-          )
-        }
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        height: 30,
+        alignItems: 'center'
+      }}>
+        <Text style={{
+          paddingRight: 10
+        }}>{item.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item.account.username}</Text>
+        <UserImage user={item.account} style={{
+          width: 25,
+          height: 25
+        }}/>
       </View>
     );
   }
 
-  _rightTemplate = (item) => {
-    const { theme } = this.props.state;
+  _rightTemplate = (item, index) => {
+    const { theme, messagesOnGroup } = this.props.state;
     return (
       <View>
-        {this._headerRight(item)}
+        {(index > 0 && messagesOnGroup && messagesOnGroup.messages != null) && item.account_id != (messagesOnGroup.messages[index - 1].account_id) && (this._headerRight(item, index))}
+        {
+          index == 0 && (this._headerRight(item, index))
+        }
         <Text style={[Style.dateText, {
           textAlign: 'left'
         }]}>{item.created_at_human}</Text>
@@ -487,11 +491,14 @@ class MessagesV3 extends Component{
     );
   }
 
-  _leftTemplate = (item) => {
-    const { theme } = this.props.state;
+  _leftTemplate = (item, index) => {
+    const { theme, messagesOnGroup } = this.props.state;
     return (
       <View>
-        {this._headerLeft(item)}
+        {(index > 0 && messagesOnGroup && messagesOnGroup.messages != null) && item.account_id != (messagesOnGroup.messages[index - 1].account_id) && (this._headerLeft(item, index))}
+        {
+          index == 0 && (this._headerLeft(item, index))
+        }
         <Text style={[Style.dateText, {
           textAlign: 'right'
         }]}>{item.created_at_human}</Text>
@@ -537,12 +544,12 @@ class MessagesV3 extends Component{
         <View style={{
           alignItems: 'flex-end'
         }}>
-          {item.account_id == user.id && (this._leftTemplate(item))}
+          {item.account_id == user.id && (this._leftTemplate(item, index))}
         </View>
         <View style={{
           alignItems: 'flex-start' 
         }}>
-          {item.account_id != user.id && (this._rightTemplate(item))}
+          {item.account_id != user.id && (this._rightTemplate(item, index))}
         </View>
       </View>
     );

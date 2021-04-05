@@ -133,11 +133,7 @@ class Support extends Component {
           >
             <View>
               <View style={{ padding: 10 }}>
-                <View
-                  style={{ height: 40, padding: 10 }}
-                >
-                  <Text style={{ fontWeight: 'bold' }}>TICKETS</Text>
-                </View>
+                <Text style={{ fontWeight: 'bold' }}>TICKETS</Text>
                 {
                   this.state.data.map((u, i) => {
                     return (

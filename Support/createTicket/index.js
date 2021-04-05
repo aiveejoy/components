@@ -13,6 +13,7 @@ import { faImages } from '@fortawesome/free-solid-svg-icons';
 import Color from 'common/Color';
 import { connect } from 'react-redux';
 const width = Math.round(Dimensions.get('window').width);
+const height = Math.round(Dimensions.get('window').height);
 
 class CreateTicket extends Component {
 
@@ -70,10 +71,10 @@ class CreateTicket extends Component {
   }
 
   create = () => {
-    if (this.state.images.length === 0 || this.state.title === '' || this.state.description === '' || this.state.title === null || this.state.description === null) {
+    if (this.state.title === '' || this.state.description === '' || this.state.title === null || this.state.description === null) {
       Alert.alert(
         'Error in creating ticket.',
-        'Please complete the fields including image.',
+        'Please complete all the required fields.',
         [
           { text: 'Ok' }
         ],
@@ -219,37 +220,24 @@ class CreateTicket extends Component {
     const { theme } = this.props.state;
     let data = [{ title: 'Bug', value: 'bug' }, { title: 'Question', value: 'question' }, { title: 'Enhancement', value: 'enhancement' }, { title: 'Invalid', value: 'invalid' }, { title: 'Duplicate', value: 'duplicate' }, { title: 'Help wanted', value: 'help wanted' }]
     return (
+      <View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.CreateTicketContainer}>
-          {this.state.proceed === false && (<Text style={{
-            fontWeight: 'bold',
-            paddingTop: 10,
-            paddingBottom: 40
-          }}>Select type of ticket:</Text>)}
-          {this.state.proceed === false && this.chooseTicketType1()}
-          {this.state.proceed === false && this.chooseTicketType2()}
-          {this.state.proceed === false && (<View style={{
-            marginTop: 80,
-            width: '100%',
+        {this.state.proceed === false && (<View style={{
+            height: height,
             alignItems: 'center'
           }}>
-            <TicketButton
-              buttonColor={theme ? theme.primary : Color.primary}
-              buttonWidth={310}
-              buttonHeight={50}
-              fontSize={14}
-              textColor="#FFFFFF"
-              buttonText="Proceed"
-              onPress={() => {
-                if(this.state.type) {
-                  this.setState({ proceed: true })
-                }
-              }}
-            />
+            <Text style={{
+              fontWeight: 'bold',
+              paddingTop: 10,
+              paddingBottom: 40
+            }}>Select type of ticket:</Text>
+            {this.chooseTicketType1()}
+            {this.chooseTicketType2()}
           </View>)}
           {this.state.proceed == true && (
             <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={{ marginBottom: 40 }}>
+              <View style={{ height: height}}>
                 <View style={styles.InputContainer}>
                   <Text style={styles.TicketInputTitleContainer}>Type of Ticket:</Text>
                   <TextInput
@@ -293,10 +281,7 @@ class CreateTicket extends Component {
                   />
                 </View>
                 {this.state.isLoading ? <Spinner mode="overlay" /> : null}
-                <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.TicketInputTitleContainer}>Attached file(s) </Text>
-                    <Text style={{color: 'red'}}> *</Text>
-                  </View>
+                <Text style={styles.TicketInputTitleContainer}>Attached file(s) </Text>
                 <View style={{ flexDirection: 'row', padding: 15, width: '90%' }}>
                   <TouchableOpacity
                     style={{ marginBottom: 25, padding: 15 }}
@@ -324,8 +309,12 @@ class CreateTicket extends Component {
                     })}
                   </ScrollView>
                 </View>
-              </View>
-              <View style={styles.TicketButtonContainer}>
+              <View style={{
+                width: '100%',
+                alignItems: 'center',
+                position: 'absolute',
+                bottom: 100
+              }}>
                 <TicketButton
                   buttonColor="#22B173"
                   buttonWidth={320}
@@ -336,9 +325,31 @@ class CreateTicket extends Component {
                   onPress={this.create.bind(this)}
                 />
               </View>
+              </View>
             </ScrollView>)}
         </View>
       </ScrollView>
+      {this.state.proceed === false && (<View style={{
+        width: '100%',
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: 15
+      }}>
+        <TicketButton
+          buttonColor={theme ? theme.primary : Color.primary}
+          buttonWidth={310}
+          buttonHeight={50}
+          fontSize={14}
+          textColor="#FFFFFF"
+          buttonText="Proceed"
+          onPress={() => {
+            if(this.state.type) {
+              this.setState({ proceed: true })
+            }
+          }}
+        />
+      </View>)}
+      </View>
     );
   }
 }

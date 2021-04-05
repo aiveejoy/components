@@ -5,19 +5,15 @@ import {
   View,
   Image
 } from 'react-native';
-import {Color} from 'common';
+import {Color, BasicStyles} from 'common';
 import Geolocation from '@react-native-community/geolocation';
 import Geocoder from 'react-native-geocoding';
 import { connect } from 'react-redux';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
-import Style from './LocationWithMapStyles';
 import Config from 'src/config.js'
 import { Marker } from 'react-native-maps';
 
-class CurrentLocation extends Component {
-
-  #location = {}
-
+class MapViewer extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -31,48 +27,44 @@ class CurrentLocation extends Component {
     }
   }
 
-  componentDidMount() {
-  }
+  onRegionChange = (region) => {
+    this.setState({
+      region: region
+    })
+  };
 
   renderMap = () => {
     return (
-      <View style={Style.container}
-      >
-        <View
-          style={{
-            position: 'absolute',
-            backgroundColor: Color.white,
-            zIndex: 100,
-            width: '100%',
-          }}
-        />
-
+      <View style={{
+        borderRadius: BasicStyles.standardBorderRadius
+      }}>
         <MapView
-          style={Style.map}
+          style={{
+            width: '100%',
+            height: '100%',
+            borderRadius: BasicStyles.standardBorderRadius
+          }}
           ref={(ref) => (this.mapView = ref)}
           provider={PROVIDER_GOOGLE}
           region={{
-            ...this.state.region,
-            latitude: parseFloat(this.props.navigation.state.params.data.latitude),
-            longitude: parseFloat(this.props.navigation.state.params.data.longitude)
+            ...this.props.data,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+            longitude: parseFloat(this.props.data.longitude),
+            latitude: parseFloat(this.props.data.latitude)
           }}
-          // onPanDrag={this.setMapDragging}
-          onRegionChangeComplete={(e) => {
-            this.setState({
-              region: this.state.region
-            })
-          }}
+          onRegionChangeComplete={(e) => this.onRegionChange(e)}
         >
           <Marker
             key={0}
             coordinate={{
-              ...this.state.region,
+              ...this.props.data,
               latitudeDelta: 0.005,
               longitudeDelta: 0.005,
-              latitude: parseFloat(this.props.navigation.state.params.data.latitude),
-              longitude: parseFloat(this.props.navigation.state.params.data.longitude)
+              longitude: parseFloat(this.props.data.longitude),
+              latitude: parseFloat(this.props.data.latitude)
             }}
-            title={this.props.navigation.state.params.data.route}
+            title={this.props.data.route}
           />
         </MapView>
       </View>
@@ -81,7 +73,7 @@ class CurrentLocation extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{borderRadius: BasicStyles.standardBorderRadius}}>
         {this.renderMap()}
       </View>
     )
@@ -92,8 +84,7 @@ const mapStateToProps = (state) => ({ state: state });
 const mapDispatchToProps = (dispatch) => {
   const { actions } = require('@redux');
   return {
-    setLocation: (location) => dispatch(actions.setLocation(location))
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(CurrentLocation);
+export default connect(mapStateToProps, mapDispatchToProps)(MapViewer);
