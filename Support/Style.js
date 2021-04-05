@@ -20,12 +20,13 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start'
     },
     Card: {
-        borderBottomColor: Color.gray,
-        borderTopColor: Color.gray,
-        borderBottomWidth: 1,
+        borderColor: Color.gray,
+        borderWidth: 1,
         justifyContent: 'center',
-        paddingLeft: 30,
-        padding: 6,
+        padding: 10,
+        borderRadius: 10,
+        marginTop: 10,
+        height: 90
     },
     TextCard: {
         justifyContent: 'center',

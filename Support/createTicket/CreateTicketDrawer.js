@@ -2,25 +2,20 @@ import React, {Component} from 'react';
 import {View, TouchableOpacity, Text} from 'react-native';
 import {createStackNavigator} from 'react-navigation-stack';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faQrcode, faBars} from '@fortawesome/free-solid-svg-icons';
-import Support from 'components/Support';
-import {NavigationActions} from 'react-navigation';
-import {BasicStyles} from 'common';
-import {connect} from 'react-redux';
 import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
+import CreateTicket from 'components/Support/createTicket';
+import {connect} from 'react-redux';
+import { BasicStyles, Color } from 'common';
 
 class HeaderOptions extends Component {
   constructor(props) {
     super(props);
   }
   back = () => {
-    const navigateAction = NavigationActions.navigate({
-      routeName: 'Support',
-    });
-    this.props.navigationProps.dispatch(navigateAction);
+    this.props.navigationProps.navigate('drawerStack');
   };
   render() {
-    // const { theme } = this.props.state;
+    const { theme } = this.props.state;
     return (
       <View
         style={{
@@ -43,7 +38,7 @@ class HeaderOptions extends Component {
           <FontAwesomeIcon
             icon={faChevronLeft}
             size={BasicStyles.headerBackIconSize}
-            // style={{color: theme ? theme.primary : Color.primary }}
+            style={{color: theme ? theme.primary : Color.primary }}
           />
         </TouchableOpacity>
       </View>
@@ -53,27 +48,29 @@ class HeaderOptions extends Component {
 
 const mapStateToProps = (state) => ({state: state});
 
+let HeaderOptionsConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HeaderOptions);
+
+
 const mapDispatchToProps = (dispatch) => {
   const {actions} = require('@redux');
-  return {};
+  return {
+    logout: () => dispatch(actions.logout()),
+  };
 };
 
-const SupportStack = createStackNavigator({
-  supportScreen: {
-    screen: Support,
+const CreateTicketStack = createStackNavigator({
+  createTicketScreen: {
+    screen: CreateTicket,
     navigationOptions: ({navigation}) => ({
-      title: 'Support',
-      headerLeft: <HeaderOptions navigationProps={navigation} />,
-      drawerLabel: 'Support',
-      headerStyle: {
-        backgroundColor: 'white',
-      },
-      headerTintColor: '#4c4c4c',
+      title: 'Create Ticket',
+      drawerLabel: 'Create Ticket',
+      headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
+      ...BasicStyles.headerDrawerStyle
     }),
   },
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SupportStack);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateTicketStack);
