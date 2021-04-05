@@ -16,6 +16,8 @@ import Picker from '@react-native-community/picker';
 import { Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import PostCard from 'modules/generic/PostCard.js';
+import ImageModal from 'components/Modal/ImageModal';
+
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
 
@@ -113,7 +115,7 @@ class UpdateTicket extends Component {
     let parameter = {
       account_id: this.props.state.user.id,
       payload_value: id,
-      payload: 'tickets',
+      payload: 'ticket_id',
       text: this.state.comment
     };
     this.setState({ isLoading: true })
@@ -190,44 +192,6 @@ class UpdateTicket extends Component {
         this.setState({closeTicket: false})
       }
     })
-  }
-
-  showImage = () => {
-    return (
-      <View>
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={this.state.modalVisible}
-        style={{
-          height: height - 50,
-          padding: 20,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Image
-          source={{ uri: this.state.image && this.state.image }}
-          style={{
-            width: width - 100,
-            height: height / 2,
-            marginBottom: 20
-          }}
-        />
-        <View style={[styles.TicketButtonContainer, {marginLeft: 10}]}>
-            <TicketButton
-              buttonColor={Color.danger}
-              buttonWidth="90%"
-              buttonHeight={50}
-              fontSize={14}
-              textColor="#FFFFFF"
-              buttonText="Close"
-              onPress={() => {this.setState({modalVisible: false})}}
-            />
-          </View>
-      </Modal>
-      </View>
-    )
   }
 
   choosePhoto = () => {
@@ -429,7 +393,7 @@ class UpdateTicket extends Component {
               onPress={this.update.bind(this)}
             />
           </View> */}
-          {this.showImage()}
+          <ImageModal visible={this.state.modalVisible} url={this.state.image} action={() => {this.setState({modalVisible: false})}}></ImageModal>
         </ScrollView>
       </View>
     );
