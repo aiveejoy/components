@@ -11,6 +11,9 @@ import { faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Style from 'modules/messenger/Style.js';
 import Modal from 'components/Modal/Sketch';
 import ImagePicker from 'react-native-image-picker';
+import Button from 'components/Form/Button';
+import ImageModal from 'components/Modal/ImageModal';
+import ImageResizer from 'react-native-image-resizer';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -31,7 +34,9 @@ class Options extends Component {
       visible: false,
       validations: [],
       currentValidation: null,
-      requestId: null
+      requestId: null,
+      imageModal: false,
+      url: null
     }
   }
 
@@ -280,21 +285,26 @@ class Options extends Component {
         console.log('User tapped custom button: ', response.customButton);
         this.setState({ photo: null })
       } else {
-        // if (response.fileSize >= 1000000) {
-        //   Alert.alert('Notice', 'File size exceeded to 1MB')
-        //   return
-        // }
-        let parameter = {
-          account_id: user.id,
-          payload: payload,
-          payload_value: response.uri,
-          category: currentValidation?.id
-        }
-        this.setState({ isLoading: true })
-        Api.request(Routes.uploadImage, parameter, response => {
-          this.setState({ isLoading: false })
-          this.retrieveReceiverPhoto(currentValidation?.id);
+        ImageResizer.createResizedImage(response.uri, 240, 240, 'JPEG', 90, 0)
+        .then(res => {
+          let parameter = {
+            account_id: user.id,
+            payload: payload,
+            payload_value: res.uri,
+            category: currentValidation?.id
+          }
+          this.setState({ isLoading: true })
+          Api.request(Routes.uploadImage, parameter, response => {
+            this.setState({ isLoading: false })
+            this.retrieveReceiverPhoto(currentValidation?.id);
+          })
+          console.log(res, "resultttttttt");
         })
+        .catch(err => {
+          // Oops, something went wrong. Check that the filename is correct and
+          // inspect err to get more details.
+          console.log(err)
+        });
       }
     })
   }
@@ -644,22 +654,23 @@ class Options extends Component {
             this.state.pictures.length > 0 && this.state.pictures.map((ndx, el) => {
               if (ndx.payload === payload_value) {
                 return (
-                  <View style={{
+                  <TouchableOpacity style={{
                     height: 100,
                     width: '48%',
                     borderWidth: 1,
                     borderColor: Color.gray,
                     margin: 1
                   }}
+                  onPress={() => {this.setState({imageModal: true, url: ndx.payload_value.includes('content') ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}`})}}
                     key={el}>
                     <Image
-                      source={{ uri: ndx.payload_value.includes('content') ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}` }}
+                      source={{ uri: ndx.payload_value.includes('content') === false ? (ndx.payload_value.includes('file') === true ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}`) : ndx.payload_value}}
                       style={{
                         width: 205,
                         height: 98
                       }}
                     />
-                  </View>
+                  </TouchableOpacity>
                 )
               }
             })
@@ -675,42 +686,40 @@ class Options extends Component {
 
             {data && data.request?.account?.code === user.code && currentValidation?.status === 'pending' && (
               <View style={Style.signatureFrameContainer}>
-                <TouchableOpacity style={[
-                  Style.signatureAction,
-                  Style.signatureActionDanger,
-                  { width: '45%' }]}
-                  onPress={() => { this.sendNewMessage(currentValidation.payload) }}>
-                  <Text style={{ color: Color.white }}> Decline </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[
-                  Style.signatureAction,
-                  Style.signatureActionSuccess,  { width: '45%' }]}
-                  onPress={() => { this.updateValidation('accepted') }}>
-                  <Text style={{ color: Color.white }}> Accept </Text>
-                </TouchableOpacity>
+                <Button
+                  title={'Decline'}
+                  onClick={() => this.sendNewMessage(currentValidation.payload)}
+                  style={{
+                    width: '45%',
+                    marginRight: '1%',
+                    backgroundColor: Color.danger
+                  }}
+                />
+                <Button
+                  title={'Decline'}
+                  onClick={() => this.updateValidation('accepted')}
+                  style={{
+                    width: '45%',
+                    backgroundColor: Color.success
+                  }}
+                />
               </View>
             )}
             {data && data.request?.account?.code != user.code && (
-              <View style={{
-                flex: 1,
-                width: '100%',
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}>
-                <TouchableOpacity style={[
-                  Style.signatureAction,
-                  Style.signatureActionSuccess,
-                  { width: '99%' }]}
-                  onPress={() => {
-                    if (payload_value === 'signature') {
-                      this.setState({ visible: true })
-                    } else {
-                      this.uploadPhoto(payload_value);
-                    }
-                  }}>
-                  <Text style={{ color: Color.white }}>{payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}</Text>
-                </TouchableOpacity>
-              </View>
+              <Button
+              title={payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}
+              onClick={() => {
+                if (payload_value === 'signature') {
+                  this.setState({ visible: true })
+                } else {
+                  this.uploadPhoto(payload_value);
+                }
+              }}
+              style={{
+                width: '50%',
+                backgroundColor: Color.success
+              }}
+            />
             )}
             {data && data.request?.account?.code === user.code && (currentValidation?.status === 'accepted') && (
               <View style={Style.signatureFrameContainer}>
@@ -754,7 +763,7 @@ class Options extends Component {
           borderTopWidth: 1,
           borderTopColor: Color.lightGray
         }}>
-
+          <ImageModal visible={this.state.imageModal} url={this.state.url} action={() => {this.setState({imageModal: false})}}></ImageModal>
           <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
           {this.state.isLoading ? <Spinner mode="overlay" /> : null}
