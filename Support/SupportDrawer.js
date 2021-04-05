@@ -20,6 +20,7 @@ class HeaderOptions extends Component {
     this.props.navigationProps.dispatch(navigateAction);
   };
   render() {
+    // const { theme } = this.props.state;
     return (
       <View
         style={{
@@ -41,8 +42,8 @@ class HeaderOptions extends Component {
           {/*Donute Button Image */}
           <FontAwesomeIcon
             icon={faChevronLeft}
-            size={30}
-            style={{color: '#3F0050'}}
+            size={BasicStyles.headerBackIconSize}
+            // style={{color: theme ? theme.primary : Color.primary }}
           />
         </TouchableOpacity>
       </View>

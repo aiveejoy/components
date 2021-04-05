@@ -5,6 +5,7 @@ import { faSmile } from '@fortawesome/free-solid-svg-icons';
 import { Color, BasicStyles } from 'common';
 import { Dimensions } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
+import IOSPicker from 'react-native-ios-picker';
 import { Picker } from '@react-native-community/picker';
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -29,12 +30,9 @@ class PickerWithLabel extends Component{
 
   dataOnIOS(){
     const { data } = this.props;
-
-    const iOSData = data.map((item) => {
-      return {
-        label: item.title,
-        value: item.value
-      };
+    let iOSData = []
+    data.map((item) => {
+      iOSData.push(item.code)
     });
     this.setState({
       iosData: iOSData
@@ -83,15 +81,18 @@ class PickerWithLabel extends Component{
             borderColor: this.props.borderColor ? this.props.borderColor : Color.lightGray,
             borderRadius: BasicStyles.inputBorderRadius,
             paddingLeft: this.props.paddingLeft ? this.props.paddingLeft : 0,
-            marginBottom: this.props.marginBottom ? this.props.marginBottom : 0
+            marginBottom: this.props.marginBottom ? this.props.marginBottom : 0,
+            ...this.props.style
           }}>
             {
               Platform.OS == 'android' && (
-                <Picker selectedValue={this.state.input}
+                <Picker 
+                  selectedValue={this.state.input}
                   onValueChange={(input) => this.onChange(input)}
                   style={{
                     ...BasicStyles.pickerStyleCreate,
-                    fontSize: BasicStyles.standardFontSize
+                    fontSize: BasicStyles.standardFontSize,
+                    ...this.props.style
                   }}
                   >
                     {
@@ -112,19 +113,28 @@ class PickerWithLabel extends Component{
             }
             {
               (Platform.OS == 'ios' && iosData.length > 0) && (
-                <RNPickerSelect
+                <IOSPicker
                   onValueChange={(input) => this.onChange(input)}
-                  items={iosData}
+                  data={iosData}
+                  mode={'modal'}
                   style={{
                     ...BasicStyles.pickerStyleIOSNoMargin,
-                    fontSize: BasicStyles.standardFontSize
+                    fontSize: BasicStyles.standardFontSize,
+                    ...this.props.style
                   }}
+                  selectedValue={this.state.input}
                   placeholder={{
                     label: placeholder ? placeholder : 'Click to select',
                     value: null,
                     color: Color.primary
                   }}
-                  />
+                  >
+                    { 
+                      data.map((item, index )=>
+                        <Picker.Item key={index} label={item.title} value={item.value} />
+                      )
+                    }
+                  </IOSPicker>
               )
             }
           </View>

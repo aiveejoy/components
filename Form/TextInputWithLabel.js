@@ -13,7 +13,8 @@ class TextInputWithLabel extends Component {
         width: '100%'
       }}>
         <View style={{
-          flexDirection: 'row'
+          flexDirection: 'row',
+          ...this.props.labelStyle
         }}>
           <Text style={{
             fontSize: BasicStyles.standardFontSize,
@@ -42,7 +43,10 @@ class TextInputWithLabel extends Component {
             )
           }
         </View>
-        <View style={BasicStyles.standardTextInput}>
+        <View style={{
+          ...BasicStyles.standardTextInput,
+          ...this.props.style
+        }}>
           <TextInput
             value={this.props.variable}
             maxLength={this.props.maxLength}
@@ -52,7 +56,8 @@ class TextInputWithLabel extends Component {
               this.props.onChange(input);
             }}
             style={{
-              alignItems: 'center'
+              alignItems: 'center',
+              ...this.props.inputStyle
             }}
             placeholder={this.props.placeholder ? this.props.placeholder : 'Type here'}
           />

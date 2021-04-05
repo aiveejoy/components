@@ -56,7 +56,9 @@ class PaddockCard extends Component {
                         marginTop: 6,
                         marginRight: 5
                       }}/>
-                      <Text style={{
+                      <Text
+                        numberOfLines={1}
+                        style={{
                         fontWeight:'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
                         marginBottom: 3

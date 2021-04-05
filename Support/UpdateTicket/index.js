@@ -9,7 +9,7 @@ import ImagePicker from 'react-native-image-picker';
 import TicketButton from 'components/Support/createTicket/TicketButton.js';
 import Dropdown from 'components/InputField/Dropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImages, faPaperPlane, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faImages, faPaperPlane, faClock, faCaretDown, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import Color from 'common/Color';
 import { Spinner } from 'components';
 import Picker from '@react-native-community/picker';
@@ -39,7 +39,8 @@ class UpdateTicket extends Component {
       reply: null,
       date: null,
       modalVisible: false,
-      image: null
+      image: null,
+      closeTicket: false
     };
   }
 
@@ -58,14 +59,14 @@ class UpdateTicket extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.ticketsRetrieve, parameter, response => {
       this.setState({ isLoading: false })
-      console.log(response.data[0].created_at_human, response.data[0].content, response.data[0].title, "===");
       if (response.data.length > 0) {
+        console.log(response.data[0].images);
         this.setState({
           title: response.data[0].title,
           description: response.data[0].content,
           type: response.data[0].type,
           id: response.data[0].id,
-          images: response.data[0].images.split(' '),
+          images: response.data[0].images ? response.data[0].images.split(' ') : [],
           date: response.data[0].created_at_human,
           status: response.data[0].status
         })
@@ -137,7 +138,7 @@ class UpdateTicket extends Component {
       ]
     };
     this.setState({ isLoading: true })
-    console.log(parameter);
+    console.log(parameter, Routes.commentsRetrieve, "parameter");
     Api.request(Routes.commentsRetrieve, parameter, response => {
       this.setState({ isLoading: false, showComments: true })
       if (response.data.length > 0) {
@@ -185,7 +186,8 @@ class UpdateTicket extends Component {
     Api.request(Routes.ticketsUpdate, parameter, tickets => {
       this.setState({ isLoading: false })
       if (tickets.data !== null) {
-        this.props.navigation.push('supportStack');
+        this.retrieve();
+        this.setState({closeTicket: false})
       }
     })
   }
@@ -244,15 +246,12 @@ class UpdateTicket extends Component {
   }
 
   renderComments = () => {
+    const {theme} = this.props.state;
     return (
       <View style={{
         marginBottom: 25,
-        borderWidth: .3,
-        width: width - 45,
-        borderColor: Color.gray,
-        borderRadius: 5,
-        padding: 10,
-        marginTop: 20
+        marginTop: 10,
+        width: '100%'
       }}>
         {this.state.isLoading ? <Spinner mode="overlay" /> : null}
         <View style={{
@@ -267,7 +266,7 @@ class UpdateTicket extends Component {
                   borderColor: Color.gray,
                   borderWidth: .3,
                   borderRadius: 20,
-                  width: '91.5%'
+                  width: '90%'
                 },
                 Style.textInput
               ]
@@ -285,7 +284,7 @@ class UpdateTicket extends Component {
             <FontAwesomeIcon
               icon={faPaperPlane}
               style={{
-                color: Color.primary
+                color: theme ? theme.primary : Color.primary
               }}
               size={20}
             />
@@ -310,8 +309,10 @@ class UpdateTicket extends Component {
   }
 
   render() {
+    const { theme } = this.props.state;
     let data = [{ title: 'Bug', value: 'bug' }, { title: 'Question', value: 'question' }, { title: 'Enhancement', value: 'enhancement' }, { title: 'Invalid', value: 'invalid' }, { title: 'Duplicate', value: 'duplicate' }, { title: 'Help wanted', value: 'help wanted' }]
     let status = [{ title: 'Pending', value: 'pending' }, { title: 'Open', value: 'open' }, { title: 'Closed', value: 'closed' }]
+    console.log(this.state.date && this.state.date);
     return (
       <View style={styles.CreateTicketContainer}>
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -328,26 +329,65 @@ class UpdateTicket extends Component {
               <FontAwesomeIcon
                 icon={faClock}
                 size={25}
-                style={{ marginRight: 5 }}
+                style={{
+                  marginRight: 5,
+                  color: theme ? theme.primary : Color.primary
+                }}
               />
-              <Text>{this.state.date}</Text>
+              <Text>{this.state.date && this.state.date}</Text>
+              {this.state.status !== 'closed' ? <TouchableOpacity style={{
+                position: 'absolute',
+                right: 10
+              }}
+                onPress={() => {this.setState({closeTicket: !this.state.closeTicket})}}
+              >
+                <FontAwesomeIcon
+                  icon={faEllipsisH}
+                  size={25}
+                  style={{
+                    color: theme ? theme.primary : Color.primary
+                  }}
+                />
+              </TouchableOpacity> :
+                <Text style={{
+                  position: 'absolute',
+                  right: 10,
+                  color: 'red'
+                }}>Closed</Text>
+              }
+              {this.state.closeTicket === true && (<TouchableOpacity style={{
+                position: 'absolute',
+                right: 10,
+                backgroundColor: 'white',
+                top: 30,
+                height: 45,
+                width: 105,
+                borderWidth: 1,
+                borderRadius: 10,
+                borderColor: Color.gray,
+                padding: 10,
+                zIndex: 10
+              }}
+                onPress={() => {this.update()}}>
+                <Text>Close Ticket</Text>
+              </TouchableOpacity>)}
             </View>
             <View>
               <Text style={{ fontWeight: 'bold', textDecorationLine: 'underline' }}>{this.state.title?.toUpperCase()}</Text>
             </View>
             <View style={{marginTop: 20}}>
-              <Text>{this.state.description}</Text>
+              <Text>{this.state.description && this.state.description}</Text>
             </View>
             <Text style={{
               fontStyle: 'italic',
-              color: Color.primary,
+              color: theme ? theme.primary : Color.primary,
               marginTop: 30,
               fontWeight: 'bold',
               marginBottom: 10
             }}>Attachment(s)</Text>
             <View style={{ flexDirection: 'row', width: '90%' }}>
               <ScrollView horizontal={true}>
-                {this.state.images.map((u, i) => {
+                {this.state.images.length > 0 && this.state.images.map((u, i) => {
                   return (
                     <View key={i} style={{ flexDirection: 'row' }}>
                       <TouchableOpacity
@@ -377,22 +417,8 @@ class UpdateTicket extends Component {
               }}>{this.state.status}</Text>
             </View>
           </View>
-          {/* <View style={{ marginBottom: 25 }}>
-            {this.state.showComments === false ?
-              <TouchableOpacity onPress={() => {
-                this.retrieveComments(this.props.navigation.state.params.id);
-              }}>
-                <Text style={{ fontWeight: 'bold' }}>Show comments...</Text>
-              </TouchableOpacity> :
-              <TouchableOpacity onPress={() => { this.setState({ showComments: false }) }}>
-                <Text style={{ fontWeight: 'bold' }}>Hide comments...</Text>
-              </TouchableOpacity>
-            }
-          </View> */}
-          {/* {this.state.showComments === true && ( */}
             {this.renderComments()}
-          {/* )} */}
-          <View style={styles.TicketButtonContainer}>
+          {/* <View style={styles.TicketButtonContainer}>
             <TicketButton
               buttonColor={Color.danger}
               buttonWidth="90%"
@@ -402,7 +428,7 @@ class UpdateTicket extends Component {
               buttonText="Close Ticket"
               onPress={this.update.bind(this)}
             />
-          </View>
+          </View> */}
           {this.showImage()}
         </ScrollView>
       </View>

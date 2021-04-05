@@ -69,11 +69,14 @@ class CurrentLocation extends Component{
 
         this.#onRegionChange(this.#region)
       },
-      error => alert(error.message),
+      error => {
+        alert(error.message)
+        // this.#getCurrentLocation();
+      },
       {
         enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 1000,
+        timeout: 360000,
+        // maximumAge: 1000,
       },
     );
   }
@@ -123,7 +126,7 @@ class CurrentLocation extends Component{
         country: country,
         postal: postal,
         latitude: latitude,
-        longtitude: longitude,
+        longitude: longitude,
       };
 
       const{setLocation} = this.props

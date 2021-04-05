@@ -36,7 +36,7 @@ class Options extends Component {
   }
 
   componentDidMount() {
-    this.retrieveRequestId();
+    // this.retrieveRequestId();
   }
 
   sendSketch = (result) => {
@@ -269,7 +269,7 @@ class Options extends Component {
       error: null
     }
     const { user } = this.props.state;
-    ImagePicker.launchImageLibrary(options, response => {
+    ImagePicker.launchCamera(options, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
         this.setState({ photo: null })
@@ -280,10 +280,10 @@ class Options extends Component {
         console.log('User tapped custom button: ', response.customButton);
         this.setState({ photo: null })
       } else {
-        if (response.fileSize >= 1000000) {
-          Alert.alert('Notice', 'File size exceeded to 1MB')
-          return
-        }
+        // if (response.fileSize >= 1000000) {
+        //   Alert.alert('Notice', 'File size exceeded to 1MB')
+        //   return
+        // }
         let parameter = {
           account_id: user.id,
           payload: payload,
@@ -356,6 +356,7 @@ class Options extends Component {
         this.close()
         break
       case 'requirements':
+        this.retrieveRequestId();
         this.setState({
           previous: {
             title: 'Settings',
@@ -533,14 +534,14 @@ class Options extends Component {
   requirements(options) {
     const { data } = this.props;
     const { user } = this.props.state;
+    console.log(data && data.request?.account?.code, user && user.code, "======");
     return (
       <ScrollView
       >
-        {this.state.isLoading ? <Spinner mode="full" /> : null}
         {
-          this.state.isLoading === false && options.map((item, index) => (
-            <View>
-              {data && user && data.account_id == user.id && (
+          options.map((item, index) => (
+            <View>  
+              {data && user && data.request?.account?.code == user.code && (
                 <TouchableOpacity style={{
                   width: '100%',
                   height: 50,
@@ -557,10 +558,10 @@ class Options extends Component {
                   <Text style={{
                     color: item.color,
                     fontSize: BasicStyles.standardFontSize,
-                    width: (data && data.account_id == user.id) ? '70%' : '90%',
+                    width: (data && data.request?.account?.code == user.code) ? '70%' : '90%',
                   }}>{item.title}</Text>
                   {
-                    (item.title != 'Back' && (data && data.account_id == user.id)) && (
+                    (item.title != 'Back' && (data && data.request?.account?.code == user.code)) && (
                       <View style={{
                         width: '30%',
                         justifyContent: 'center',
@@ -593,7 +594,7 @@ class Options extends Component {
                   }
                 </TouchableOpacity>)}
                 {
-                    (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && data && data.account_id != user.id) && (
+                    (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && data && data.request?.account?.code != user.code) && (
                       <TouchableOpacity style={{
                         width: '100%',
                         height: 50,
@@ -608,7 +609,7 @@ class Options extends Component {
                         <Text style={{
                           color: item.color,
                           fontSize: BasicStyles.standardFontSize,
-                          width: (data && data.account_id == user.id) ? '70%' : '90%',
+                          width: (data && data.request?.account?.code == user.code) ? '70%' : '90%',
                         }}>{item.title}</Text>
                         <View style={{
                           width: '10%',
@@ -638,7 +639,6 @@ class Options extends Component {
     console.log(currentValidation, "======current validation");
     return (
       <ScrollView>
-        {this.state.isLoading ? <Spinner mode="full" /> : null}
         <View style={Style.signatureFrameContainer}>
           {
             this.state.pictures.length > 0 && this.state.pictures.map((ndx, el) => {
@@ -646,10 +646,10 @@ class Options extends Component {
                 return (
                   <View style={{
                     height: 100,
-                    width: '49%',
+                    width: '48%',
                     borderWidth: 1,
                     borderColor: Color.gray,
-                    margin: 2
+                    margin: 1
                   }}
                     key={el}>
                     <Image
@@ -664,7 +664,8 @@ class Options extends Component {
               }
             })
           }
-          <View style={{
+        </View>
+        <View style={{
             paddingTop: 50,
             width: '100%',
             flex: 1,
@@ -672,7 +673,7 @@ class Options extends Component {
             alignItems: 'center' 
           }}>
 
-            {data && data.account_id === user.id && currentValidation?.status === 'pending' && (
+            {data && data.request?.account?.code === user.code && currentValidation?.status === 'pending' && (
               <View style={Style.signatureFrameContainer}>
                 <TouchableOpacity style={[
                   Style.signatureAction,
@@ -689,11 +690,17 @@ class Options extends Component {
                 </TouchableOpacity>
               </View>
             )}
-            {data && data.account_id !== user.id && (
-              <View style={Style.signatureFrameContainer}>
+            {data && data.request?.account?.code != user.code && (
+              <View style={{
+                flex: 1,
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
                 <TouchableOpacity style={[
-                  Style.signatureFullSuccess,
-                  Style.signatureActionSuccess]}
+                  Style.signatureAction,
+                  Style.signatureActionSuccess,
+                  { width: '99%' }]}
                   onPress={() => {
                     if (payload_value === 'signature') {
                       this.setState({ visible: true })
@@ -701,11 +708,11 @@ class Options extends Component {
                       this.uploadPhoto(payload_value);
                     }
                   }}>
-                  <Text style={{ color: Color.white }}> Upload </Text>
+                  <Text style={{ color: Color.white }}>{payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}</Text>
                 </TouchableOpacity>
               </View>
             )}
-            {data && data.account_id === user.id && (currentValidation?.status === 'accepted') && (
+            {data && data.request?.account?.code === user.code && (currentValidation?.status === 'accepted') && (
               <View style={Style.signatureFrameContainer}>
                 <View style={[
                   Style.signatureAction,
@@ -715,7 +722,7 @@ class Options extends Component {
                 </View>
               </View>
             )}
-            {data && data.account_id === user.id && currentValidation?.status === 'declined' && (
+            {data && data.request?.account?.code === user.code && currentValidation?.status === 'declined' && (
               <View style={Style.signatureFrameContainer}>
                 <View style={[
                   Style.signatureAction,
@@ -726,7 +733,6 @@ class Options extends Component {
               </View>
             )}
           </View>
-        </View>
       </ScrollView>
     )
   }
@@ -735,7 +741,6 @@ class Options extends Component {
     const { current } = this.state;
     return (
       <View>
-        {this.state.isLoading ? <Spinner mode="full" /> : null}
         <View style={{
           position: 'absolute',
           zIndex: 1000,
@@ -752,6 +757,7 @@ class Options extends Component {
 
           <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
+          {this.state.isLoading ? <Spinner mode="overlay" /> : null}
           {current.title == 'Settings' && this.body(this.state.current.menu)}
           {current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
           {current.title == 'signature' && this.renderImages(this.state.current.title)}

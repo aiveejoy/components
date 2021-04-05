@@ -18,6 +18,7 @@ class UserImage extends Component{
           (user || user?.profile?.url != null) && (
             <Image
               source={{uri: Config.BACKEND_URL  + user.profile.url}}
+              resizeMode={'cover'}
               style={[BasicStyles.profileImageSize, this.props.style]}/>
           )
         }
