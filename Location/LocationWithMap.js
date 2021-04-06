@@ -350,7 +350,7 @@ class LocationWithMap extends Component {
           renderRightButton={() => this.clearLocation()}
           placeholder="Find location"
           minLength={2} // minimum length of text to search
-          autoFocus={true}
+          autoFocus={false}
           returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
           keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
           listViewDisplayed={false} // true/false/undefined
