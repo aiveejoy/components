@@ -48,11 +48,13 @@ class MessagesV3 extends Component{
       settingsMenu: [],
       settingsBreadCrumbs: ['Settings'],
       group: null,
-      request_id: null
+      request_id: null,
+      isViewing: false
     }
   }
 
   componentDidMount(){
+    console.log('[options]', this.props.navigationProps)
     const { user } = this.props.state
     if (user == null) return
     this.retrieve()
@@ -650,10 +652,11 @@ class MessagesV3 extends Component{
       photo,
       keyRefresh,
       isPullingMessages,
-      isLock
+      isLock,
+      isViewing
     } = this.state;
     const { data } = this.props.navigation.state.params;
-    const { messengerGroup, user, isViewing } = this.props.state;
+    const { messengerGroup, user } = this.props.state;
     return (
       <SafeAreaView>
         {

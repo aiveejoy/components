@@ -37,6 +37,7 @@ class Options extends Component {
 
   componentDidMount() {
     // this.retrieveRequestId();
+    console.log('[options]', this.props)
   }
 
   sendSketch = (result) => {
