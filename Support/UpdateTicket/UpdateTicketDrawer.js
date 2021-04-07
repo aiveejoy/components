@@ -70,10 +70,8 @@ const UpdateTicketStack = createStackNavigator({
       title: 'Ticket Details',
       headerLeft: <HeaderOptionsConnect navigationProps={navigation}/>,
       drawerLabel: 'Ticket Details',
-      headerStyle: {
-        backgroundColor: 'white',
-      },
-      headerTintColor: '#4c4c4c',
+      headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
+      ...BasicStyles.headerDrawerStyle
     }),
   },
 });
