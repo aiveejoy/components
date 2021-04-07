@@ -42,7 +42,6 @@ class Options extends Component {
 
   componentDidMount() {
     // this.retrieveRequestId();
-    console.log('[options]', this.props)
   }
 
   sendSketch = (result) => {
@@ -783,7 +782,6 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing)),
     setRequest: (request) => dispatch(actions.setRequest(request))
   };
 };

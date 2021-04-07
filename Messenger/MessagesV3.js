@@ -54,7 +54,7 @@ class MessagesV3 extends Component{
   }
 
   componentDidMount(){
-    console.log('[options]', this.props.navigationProps)
+    console.log('[options]', this.props.navigation)
     const { user } = this.props.state
     if (user == null) return
     this.retrieve()
@@ -769,8 +769,8 @@ const mapDispatchToProps = dispatch => {
     setMessagesOnGroup: (messagesOnGroup) => dispatch(actions.setMessagesOnGroup(messagesOnGroup)),
     setMessengerGroup: (messengerGroup) => dispatch(actions.setMessengerGroup(messengerGroup)),
     updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
-    updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message)),
-    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
+    updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message))
+    // viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
   };
 };
 
