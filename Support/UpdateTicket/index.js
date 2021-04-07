@@ -17,6 +17,7 @@ import { Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import PostCard from 'modules/generic/PostCard.js';
 import ImageModal from 'components/Modal/ImageModal';
+import Skeleton from 'components/Loading/Skeleton';
 
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -30,7 +31,6 @@ class UpdateTicket extends Component {
       description: null,
       type: null,
       id: null,
-      assignees: [],
       assignee: null,
       status: null,
       isLoading: false,
@@ -62,7 +62,6 @@ class UpdateTicket extends Component {
     Api.request(Routes.ticketsRetrieve, parameter, response => {
       this.setState({ isLoading: false })
       if (response.data.length > 0) {
-        console.log(response.data[0].images);
         this.setState({
           title: response.data[0].title,
           description: response.data[0].content,
@@ -72,33 +71,7 @@ class UpdateTicket extends Component {
           date: response.data[0].created_at_human,
           status: response.data[0].status
         })
-        this.retrieveAssignees();
         this.retrieveComments(this.props.navigation.state.params.id);
-      }
-    })
-  }
-
-  retrieveAssignees() {
-    let parameter = {
-      condition: [{
-        value: 'USER',
-        column: 'account_type',
-        clause: '!='
-      }]
-    }
-    this.setState({ isLoading: true })
-    Api.request(Routes.accountRetrieve, parameter, accounts => {
-      this.setState({ isLoading: false })
-      if (accounts.data.length > 0) {
-        let data = []
-        accounts.data.map((item) => {
-          let assignee = {
-            title: item.username,
-            value: item.id
-          }
-          data.push(assignee)
-        })
-        this.setState({ assignees: data })
       }
     })
   }
@@ -189,7 +162,7 @@ class UpdateTicket extends Component {
       this.setState({ isLoading: false })
       if (tickets.data !== null) {
         this.retrieve();
-        this.setState({closeTicket: false})
+        this.setState({ closeTicket: false })
       }
     })
   }
@@ -210,64 +183,67 @@ class UpdateTicket extends Component {
   }
 
   renderComments = () => {
-    const {theme} = this.props.state;
+    const { theme } = this.props.state;
     return (
-      <View style={{
-        marginBottom: 25,
-        marginTop: 10,
-        width: '100%'
-      }}>
-        {this.state.isLoading ? <Spinner mode="overlay" /> : null}
-        <View style={{
-          flexDirection: 'row',
-          padding: 10,
-        }}>
-          <TextInput
-            style={
-              [
-                {
-                  height: 40,
-                  borderColor: Color.gray,
-                  borderWidth: .3,
-                  borderRadius: 20,
-                  width: '90%'
-                },
-                Style.textInput
-              ]
-            }
-            placeholder={'Comment here...'}
-            onChangeText={value => this.commentHandler(value)}
-            value={this.state.comment}
-          />
-          <TouchableOpacity
-            onPress={() => { this.createComment(this.props.navigation.state.params.id) }}
-            style={{
-              padding: 10
-            }}
-          >
-            <FontAwesomeIcon
-              icon={faPaperPlane}
-              style={{
-                color: theme ? theme.primary : Color.primary
-              }}
-              size={20}
-            />
-          </TouchableOpacity>
-        </View>
-        {this.state.comments && this.state.comments.map((item, index) => {
-          return (
-            <PostCard
-              data={{
-                user: item.account,
-                comments: item.comment_replies,
-                message: item.text,
-                date: item.created_at_human
-              }}
-              postReply={() => { this.createReply() }}
-              reply={(value) => { this.replyHandler(value) }}
-            />
-          )
-        })}
+      <View>
+        {this.state.isLoading && (<Skeleton size={2} />)}
+        {this.state.title && (
+          <View style={{
+            marginBottom: 25,
+            marginTop: 10,
+            width: '100%'
+          }}>
+            <View style={{
+              flexDirection: 'row',
+              padding: 10,
+            }}>
+              <TextInput
+                style={
+                  [
+                    {
+                      height: 40,
+                      borderColor: Color.gray,
+                      borderWidth: .3,
+                      borderRadius: 20,
+                      width: '90%'
+                    },
+                    Style.textInput
+                  ]
+                }
+                placeholder={'Comment here...'}
+                onChangeText={value => this.commentHandler(value)}
+                value={this.state.comment}
+              />
+              <TouchableOpacity
+                onPress={() => { this.createComment(this.props.navigation.state.params.id) }}
+                style={{
+                  padding: 10
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faPaperPlane}
+                  style={{
+                    color: theme ? theme.primary : Color.primary
+                  }}
+                  size={20}
+                />
+              </TouchableOpacity>
+            </View>
+            {this.state.comments && this.state.comments.map((item, index) => {
+              return (
+                <PostCard
+                  data={{
+                    user: item.account,
+                    comments: item.comment_replies,
+                    message: item.text,
+                    date: item.created_at_human
+                  }}
+                  postReply={() => { this.createReply() }}
+                  reply={(value) => { this.replyHandler(value) }}
+                />
+              )
+            })}
+          </View>)}
       </View>
     )
   }
@@ -280,7 +256,8 @@ class UpdateTicket extends Component {
     return (
       <View style={styles.CreateTicketContainer}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{
+        {this.state.isLoading && (<Skeleton size={2} />)}
+          {this.state.title && (<View style={{
             borderColor: Color.gray,
             borderBottomWidth: .3,
             paddingBottom: 20
@@ -303,7 +280,7 @@ class UpdateTicket extends Component {
                 position: 'absolute',
                 right: 10
               }}
-                onPress={() => {this.setState({closeTicket: !this.state.closeTicket})}}
+                onPress={() => { this.setState({ closeTicket: !this.state.closeTicket }) }}
               >
                 <FontAwesomeIcon
                   icon={faEllipsisH}
@@ -332,14 +309,14 @@ class UpdateTicket extends Component {
                 padding: 10,
                 zIndex: 10
               }}
-                onPress={() => {this.update()}}>
+                onPress={() => { this.update() }}>
                 <Text>Close Ticket</Text>
               </TouchableOpacity>)}
             </View>
             <View>
               <Text style={{ fontWeight: 'bold', textDecorationLine: 'underline' }}>{this.state.title?.toUpperCase()}</Text>
             </View>
-            <View style={{marginTop: 20}}>
+            <View style={{ marginTop: 20 }}>
               <Text>{this.state.description && this.state.description}</Text>
             </View>
             <Text style={{
@@ -372,7 +349,7 @@ class UpdateTicket extends Component {
                 })}
               </ScrollView>
             </View>
-            <View style={{ flexDirection: 'row', marginTop: 30,}}>
+            <View style={{ flexDirection: 'row', marginTop: 30, }}>
               <Text style={{
                 fontWeight: 'bold',
               }}>STATUS: </Text>
@@ -381,7 +358,8 @@ class UpdateTicket extends Component {
               }}>{this.state.status}</Text>
             </View>
           </View>
-            {this.renderComments()}
+          )}
+          {this.renderComments()}
           {/* <View style={styles.TicketButtonContainer}>
             <TicketButton
               buttonColor={Color.danger}
@@ -393,7 +371,7 @@ class UpdateTicket extends Component {
               onPress={this.update.bind(this)}
             />
           </View> */}
-          <ImageModal visible={this.state.modalVisible} url={this.state.image} action={() => {this.setState({modalVisible: false})}}></ImageModal>
+          <ImageModal visible={this.state.modalVisible} url={this.state.image} action={() => { this.setState({ modalVisible: false }) }}></ImageModal>
         </ScrollView>
       </View>
     );

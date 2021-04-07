@@ -285,7 +285,7 @@ class Options extends Component {
         console.log('User tapped custom button: ', response.customButton);
         this.setState({ photo: null })
       } else {
-        ImageResizer.createResizedImage(response.uri, 240, 240, 'JPEG', 90, 0)
+        ImageResizer.createResizedImage(response.uri, response.width * 0.5, response.height * 0.5, 'JPEG', 72, 0)
         .then(res => {
           let parameter = {
             account_id: user.id,
@@ -661,10 +661,10 @@ class Options extends Component {
                     borderColor: Color.gray,
                     margin: 1
                   }}
-                  onPress={() => {this.setState({imageModal: true, url: ndx.payload_value.includes('content') ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}`})}}
+                  onPress={() => {this.setState({imageModal: true, url: ndx.payload_value})}}
                     key={el}>
                     <Image
-                      source={{ uri: ndx.payload_value.includes('content') === false ? (ndx.payload_value.includes('file') === true ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}`) : ndx.payload_value}}
+                      source={{ uri: ndx.payload_value.includes('file') === true ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}` }}
                       style={{
                         width: 205,
                         height: 98
@@ -763,7 +763,7 @@ class Options extends Component {
           borderTopWidth: 1,
           borderTopColor: Color.lightGray
         }}>
-          <ImageModal visible={this.state.imageModal} url={this.state.url} action={() => {this.setState({imageModal: false})}}></ImageModal>
+          <ImageModal visible={this.state.imageModal} url={this.state.url && this.state.url.includes('file') === true ? this.state.url : `data:image/png;base64,${this.state.url}`} action={() => {this.setState({imageModal: false})}}></ImageModal>
           <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
           {this.state.isLoading ? <Spinner mode="overlay" /> : null}

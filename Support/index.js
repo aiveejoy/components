@@ -8,8 +8,9 @@ import { Spinner, Empty } from 'components';
 import Style from 'components/Support/Style';
 import Api from 'services/api/index.js';
 import Color from 'common/Color';
+import Skeleton from 'components/Loading/Skeleton';
 import Pagination from 'components/Pagination/Dynamic.js';
-import Picker from '@react-native-community/picker';
+// import Picker from '@react-native-community/picker';
 import _ from 'lodash';
 
 class Support extends Component {
@@ -104,6 +105,7 @@ class Support extends Component {
 
   render() {
     let div;
+    const { theme } = this.props.state;
     const types = [{ type: 'verification issue', color: Color.danger }, { type: 'account issue', color: Color.warning }, { type: 'transaction issue', color: Color.info }, { type: 'others', color: Color.secondary }]
     return (
       <View style={Style.View}>
@@ -161,18 +163,15 @@ class Support extends Component {
             </View>
           </ScrollView>
         )}
-        {this.state.data.length == 0 && (
-          <View style={{
-            marginTop: 40,
-            paddingLeft: 10,
-            paddingRight: 10
-          }}>
-            <Empty refresh={true} onRefresh={() => this.retrieve()} />
-          </View>
-        )}
-        {this.state.isLoading ? <Spinner mode="overlay" /> : null}
+        {this.state.isLoading && (<Skeleton size={2}/>)}
         <TouchableOpacity
-          style={[Style.floatingButton, { width: 70, height: 70, borderRadius: 35 }]}
+          style={[Style.floatingButton, {
+            backgroundColor: theme ? theme.secondary : Color.secondary,
+            height: 60,
+            width: 60,
+            borderRadius: 30,
+            bottom: 70
+          }]}
           onPress={() => {
             this.props.navigation.push('createTicketStack', { user: this.state.user });
           }}>
