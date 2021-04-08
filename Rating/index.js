@@ -35,7 +35,7 @@ class Rating extends Component {
           color: Color.normalGray,
           fontSize: 12,
           paddingRight: 5
-        }}>Ratings</Text>
+        }}>{this.props.rating ? this.props.rating : 'Ratings'}</Text>
         
         {
           stars
