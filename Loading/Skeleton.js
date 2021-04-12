@@ -8,60 +8,74 @@ class Skeleton extends Component {
   }
 
   renderSkeleton = () => {
-    return(
-      <SkeletonPlaceholder>
+    const { size } = this.props;
+    let content = []
+
+    for (var i = 0; i < size; i++) {
+      content.push(
         <View style={{
-          paddingLeft: 20,
-          paddingRight: 20,
-          width: '100%',
-          marginTop: 20
+          width: '100%'
         }}>
           <View style={{
-            flexDirection: "row",
-            alignItems: "center",
-            width: '100%',
-          }}>
-            <View style={{
-              width: '10%'
+              flexDirection: "row",
+              alignItems: "center",
+              width: '100%',
             }}>
               <View style={{
-                width: 30,
-                height: 30,
-                borderRadius: 15
-              }} />
+                width: '10%'
+              }}>
+                <View style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15
+                }} />
+              </View>
+              
+              <View style={{
+                width: '90%'
+              }}>
+                <View style={{
+                  width: '100%',
+                  height: 20,
+                  borderRadius: 4
+                }} />
+                <View style={{
+                  width: '100%',
+                  height: 20,
+                  borderRadius: 4,
+                  marginTop: 10
+                }} />
+              </View>
             </View>
-            
             <View style={{
-              width: '90%'
+              alignItems: "center",
+              width: '100%',
             }}>
               <View style={{
-                width: '100%',
-                height: 20,
-                borderRadius: 4
-              }} />
-              <View style={{
-                width: '100%',
-                height: 20,
-                borderRadius: 4,
-                marginTop: 10
-              }} />
+                  width: '100%',
+                  height: 20,
+                  borderRadius: 4,
+                  marginTop: 10
+                }} />
             </View>
-          </View>
-          <View style={{
-            alignItems: "center",
-            width: '100%',
-          }}>
-            <View style={{
-                width: '100%',
-                height: 20,
-                borderRadius: 4,
-                marginTop: 10
-              }} />
-          </View>
         </View>
+      )
+    }
+
+    return(
+      <SkeletonPlaceholder>
+          <View style={{
+            paddingLeft: 20,
+            paddingRight: 20,
+            width: '100%',
+            marginTop: 20
+          }}>
+          {content}
+          </View>
       </SkeletonPlaceholder>
     )
   }
+
   render() {
     const { size } =  this.props;
     let content = []
@@ -72,9 +86,10 @@ class Skeleton extends Component {
         </View>
       )
     }
+
     return (
       <View>
-        {content}
+        {this.renderSkeleton()}
       </View>
     );
   }
