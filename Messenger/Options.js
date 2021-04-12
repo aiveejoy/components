@@ -86,8 +86,12 @@ class Options extends Component {
   }
 
   close() {
-    const { viewMenu } = this.props;
-    viewMenu(false)
+    this.props.navigation.setParams({
+      data: {
+        ...this.props.navigation.state.params.data,
+        menuFlag: !this.props.navigation.state.params.data.menuFlag
+      }
+    })
   }
 
   sendNewMessage = (payload) => {

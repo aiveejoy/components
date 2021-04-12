@@ -654,6 +654,7 @@ class MessagesV3 extends Component{
     } = this.state;
     const { data } = this.props.navigation.state.params;
     const { messengerGroup, user, isViewing } = this.props.state;
+    console.log('data', data)
     return (
       <SafeAreaView>
         {
@@ -743,7 +744,7 @@ class MessagesV3 extends Component{
           </View>
         </KeyboardAvoidingView>
         {
-          isViewing && (
+          (data && data.menuFlag) && (
             <MessageOptions
               requestId={this.state.request_id}
               messengerId={this.props.navigation.state.params.data.id}

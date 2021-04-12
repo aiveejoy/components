@@ -68,7 +68,6 @@ const UpdateTicketStack = createStackNavigator({
     screen: UpdateTicket,
     navigationOptions: ({navigation}) => ({
       title: 'Ticket Details',
-      headerLeft: <HeaderOptionsConnect navigationProps={navigation}/>,
       drawerLabel: 'Ticket Details',
       headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
       ...BasicStyles.headerDrawerStyle
