@@ -18,6 +18,7 @@ import { connect } from 'react-redux';
 import PostCard from 'modules/generic/PostCard.js';
 import ImageModal from 'components/Modal/ImageModal';
 import Skeleton from 'components/Loading/Skeleton';
+import moment from 'moment';
 
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -97,7 +98,13 @@ class UpdateTicket extends Component {
       this.setState({ isLoading: false })
       if (response.data !== null) {
         this.setState({ comment: null })
-        this.retrieveComments(this.props.navigation.state.params.id);
+        parameter['account'] = {
+          username: this.props.state.user.username
+        }
+        parameter['account']['profile'] = this.props.state.user.profile
+        parameter['created_at_human'] = moment(new Date()).format('MMMM DD, YYYY hh:mm a');
+        let temp = [parameter, ...this.state.comments]
+        this.setState({comments: temp});
       }
     })
   }
@@ -110,11 +117,13 @@ class UpdateTicket extends Component {
           column: 'payload_value',
           clause: '='
         }
-      ]
+      ],
+      sort: { created_at: 'desc'}
     };
     this.setState({ isLoading: true })
     console.log(parameter, Routes.commentsRetrieve, "parameter");
     Api.request(Routes.commentsRetrieve, parameter, response => {
+      console.log(response.data, '===');
       this.setState({ isLoading: false, showComments: true })
       if (response.data.length > 0) {
         this.setState({ comments: response.data })
@@ -135,7 +144,6 @@ class UpdateTicket extends Component {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.setState({ reply: null })
-        this.retrieveComments(this.props.navigation.state.params.id);
       }
     })
   }
