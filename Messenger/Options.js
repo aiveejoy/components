@@ -643,27 +643,29 @@ class Options extends Component {
             </View>
           ))
         }
-        <TouchableOpacity style={{
-          width: '100%',
-          height: 50,
-          alignItems: 'center',
-          flexDirection: 'row',
-          borderBottomWidth: 1,
-          paddingLeft: 20,
-          paddingRight: 20,
-          borderBottomColor: Color.lightGray
-        }}
-          onPress={() =>
-            this.setState({current: {
-              title: 'Settings',
-              menu: Helper.MessengerMenu
-            }})
-          }>
-          <Text style={{
-            color: Color.danger,
-            fontSize: BasicStyles.standardFontSize,
-          }}>Back</Text>
-        </TouchableOpacity>
+        {data && data.request?.account?.code != user.code && (
+          <TouchableOpacity style={{
+            width: '100%',
+            height: 50,
+            alignItems: 'center',
+            flexDirection: 'row',
+            borderBottomWidth: 1,
+            paddingLeft: 20,
+            paddingRight: 20,
+            borderBottomColor: Color.lightGray
+          }}
+            onPress={() =>
+              this.setState({current: {
+                title: 'Settings',
+                menu: Helper.MessengerMenu
+              }})
+            }>
+            <Text style={{
+              color: Color.danger,
+              fontSize: BasicStyles.standardFontSize,
+            }}>Back</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     );
   }
