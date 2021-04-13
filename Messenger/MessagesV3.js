@@ -93,6 +93,7 @@ class MessagesV3 extends Component{
       offset: offset * limit,
     }
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
+      console.log('[response]', response)
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
         this.setState({sender_id: response.data[0].account_id});
@@ -656,12 +657,8 @@ class MessagesV3 extends Component{
       isViewing
     } = this.state;
     const { data } = this.props.navigation.state.params;
-<<<<<<< HEAD
     const { messengerGroup, user } = this.props.state;
-=======
-    const { messengerGroup, user, isViewing } = this.props.state;
     console.log('data', data)
->>>>>>> 459d8b1a9316050894d6a447ca3e17918a247441
     return (
       <SafeAreaView>
         {
