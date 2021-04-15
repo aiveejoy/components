@@ -9,7 +9,8 @@ class Range extends Component{
   constructor(props){
     super(props);
     this.state={
-      filter: false
+      filter: false,
+      value: 100
     }
   }
 
@@ -22,9 +23,10 @@ class Range extends Component{
   redirect(route){
     this.props.navigation.navigate(route)
   }
-
+  
   render() {
     const { filter } = this.state;
+    console.log('[amounddt]', this.state.value);
     return (
       <View style={{
         position: 'absolute',
@@ -41,6 +43,7 @@ class Range extends Component{
                   filter: false
                 })
               }}
+              onFinish={(amount) => {this.setState({value})}}
             />
           )}
         <TouchableOpacity
@@ -49,7 +52,7 @@ class Range extends Component{
           <TextInput
             style={[BasicStyles.formControls, {width: '100%'}]}
             editable={false}
-            placeholder={this.props.value}
+            placeholder={'$' + this.state.value?.amount + '-' + '$9000'}
           />
         </TouchableOpacity>
       </View>
