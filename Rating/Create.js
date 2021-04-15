@@ -36,6 +36,7 @@ class CreateRating extends Component {
     console.log('rating', parameter);
     this.setState({isLoading: true});
     Api.request(Routes.ratingsCreate, parameter, response => {
+      console.log('[ratings here in Components]', response);
       this.setState({isLoading: false});
       this.props.action(true)
     });
