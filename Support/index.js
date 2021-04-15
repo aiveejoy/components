@@ -169,7 +169,7 @@ class Support extends Component {
             height: 60,
             width: 60,
             borderRadius: 30,
-            bottom: 70
+            bottom: 5
           }]}
           onPress={() => {
             this.props.navigation.push('createTicketStack', { user: this.state.user });
