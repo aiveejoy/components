@@ -810,7 +810,6 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing)),
     setRequest: (request) => dispatch(actions.setRequest(request))
   };
 };
