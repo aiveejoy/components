@@ -34,13 +34,15 @@ class Message extends Component{
           />
           <Text style={{
             color: Color.danger,
-            paddingBottom: 50,
+            paddingBottom: 30,
             paddingTop: 10,
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            width: '100%',
+            textAlign: 'center'
           }}>{this.props.message}</Text>
           
             <TouchableOpacity
-            onPress={() => this.redirect('createRequestStack')} 
+            onPress={() => this.redirect('createRequestStack')}
             style={{
                 alignItems: 'center',
                 justifyContent: 'center',
