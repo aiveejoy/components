@@ -48,11 +48,13 @@ class MessagesV3 extends Component{
       settingsMenu: [],
       settingsBreadCrumbs: ['Settings'],
       group: null,
-      request_id: null
+      request_id: null,
+      isViewing: false
     }
   }
 
   componentDidMount(){
+    console.log('[options]', this.props.navigation)
     const { user } = this.props.state
     if (user == null) return
     this.retrieve()
@@ -91,6 +93,7 @@ class MessagesV3 extends Component{
       offset: offset * limit,
     }
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
+      console.log('[response]', response)
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
         this.setState({sender_id: response.data[0].account_id});
@@ -650,10 +653,12 @@ class MessagesV3 extends Component{
       photo,
       keyRefresh,
       isPullingMessages,
-      isLock
+      isLock,
+      isViewing
     } = this.state;
     const { data } = this.props.navigation.state.params;
-    const { messengerGroup, user, isViewing } = this.props.state;
+    const { messengerGroup, user } = this.props.state;
+    console.log('data', data)
     return (
       <SafeAreaView>
         {
@@ -743,7 +748,7 @@ class MessagesV3 extends Component{
           </View>
         </KeyboardAvoidingView>
         {
-          isViewing && (
+          (data && data.menuFlag) && (
             <MessageOptions
               requestId={this.state.request_id}
               messengerId={this.props.navigation.state.params.data.id}
@@ -766,8 +771,8 @@ const mapDispatchToProps = dispatch => {
     setMessagesOnGroup: (messagesOnGroup) => dispatch(actions.setMessagesOnGroup(messagesOnGroup)),
     setMessengerGroup: (messengerGroup) => dispatch(actions.setMessengerGroup(messengerGroup)),
     updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
-    updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message)),
-    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
+    updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message))
+    // viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
   };
 };
 

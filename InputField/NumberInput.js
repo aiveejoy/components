@@ -8,8 +8,7 @@ class NumberInput extends Component{
   constructor(props){
     super(props);
     this.state = {
-      input: 0,
-      count: 1,
+      count: 1
     }
   }
 
@@ -18,8 +17,8 @@ class NumberInput extends Component{
       this.setState({
         count: this.state.count + 1
       });
+      this.setSize(this.state.count + 1)
     }
-    console.log('[[herr]', this.state.count);
   }
   
   decrement = () => {
@@ -27,8 +26,15 @@ class NumberInput extends Component{
       this.setState({
         count: this.state.count - 1
       });
+      this.setSize(this.state.count - 1)
     }
-    console.log('[lower]', this.state.count);
+  }
+
+  setSize(size) {
+    this.setState({
+      count: size
+    })
+    this.props.onFinish({count: size})
   }
 
   render() {
@@ -40,7 +46,7 @@ class NumberInput extends Component{
          <Text style={{color: 'black', marginBottom: -10}}>{this.props.title}</Text>
         <TextInput
           style={[BasicStyles.formControls, {width: '100%'}]}
-          onChangeText={(count) => this.setState({ count })}
+          onChangeText={(count) => this.setState({count})}
           value={ this.state.count }
           keyboardType={'numeric'}
           placeholder={this.state.count.toString()}

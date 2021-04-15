@@ -11,6 +11,10 @@ import { faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Style from 'modules/messenger/Style.js';
 import Modal from 'components/Modal/Sketch';
 import ImagePicker from 'react-native-image-picker';
+import Button from 'components/Form/Button';
+import ImageModal from 'components/Modal/ImageModal';
+import ImageResizer from 'react-native-image-resizer';
+import { color } from 'react-native-reanimated';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -31,7 +35,9 @@ class Options extends Component {
       visible: false,
       validations: [],
       currentValidation: null,
-      requestId: null
+      requestId: null,
+      imageModal: false,
+      url: null
     }
   }
 
@@ -70,7 +76,7 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.retrieveImage, parameter, response => {
       this.setState({ isLoading: false })
-      if(response.data.length > 0) {
+      if (response.data.length > 0) {
         this.setState({ pictures: response.data })
       }
     })
@@ -80,15 +86,19 @@ class Options extends Component {
   }
 
   close() {
-    const { viewMenu } = this.props;
-    viewMenu(false)
+    this.props.navigation.setParams({
+      data: {
+        ...this.props.navigation.state.params.data,
+        menuFlag: !this.props.navigation.state.params.data.menuFlag
+      }
+    })
   }
 
   sendNewMessage = (payload) => {
-    const { messengerGroup, user, messagesOnGroup} = this.props.state;
-    const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
+    const { messengerGroup, user, messagesOnGroup } = this.props.state;
+    const { updateMessagesOnGroup, updateMessageByCode } = this.props;
 
-    if(messengerGroup == null || user == null){
+    if (messengerGroup == null || user == null) {
       return
     }
 
@@ -109,11 +119,11 @@ class Options extends Component {
       error: null
     }
     updateMessagesOnGroup(newMessageTemp);
-    this.setState({newMessage: null})
-    this.setState({isLoading: true})
+    this.setState({ newMessage: null })
+    this.setState({ isLoading: true })
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
-      this.setState({isLoading: false})
-      if(response.data != null){
+      this.setState({ isLoading: false })
+      if (response.data != null) {
         updateMessageByCode(response.data);
       }
     });
@@ -280,21 +290,26 @@ class Options extends Component {
         console.log('User tapped custom button: ', response.customButton);
         this.setState({ photo: null })
       } else {
-        // if (response.fileSize >= 1000000) {
-        //   Alert.alert('Notice', 'File size exceeded to 1MB')
-        //   return
-        // }
-        let parameter = {
-          account_id: user.id,
-          payload: payload,
-          payload_value: response.uri,
-          category: currentValidation?.id
-        }
-        this.setState({ isLoading: true })
-        Api.request(Routes.uploadImage, parameter, response => {
-          this.setState({ isLoading: false })
-          this.retrieveReceiverPhoto(currentValidation?.id);
-        })
+        ImageResizer.createResizedImage(response.uri, response.width * 0.5, response.height * 0.5, 'JPEG', 72, 0)
+          .then(res => {
+            let parameter = {
+              account_id: user.id,
+              payload: payload,
+              payload_value: res.uri,
+              category: currentValidation?.id
+            }
+            this.setState({ isLoading: true })
+            Api.request(Routes.uploadImage, parameter, response => {
+              this.setState({ isLoading: false })
+              this.retrieveReceiverPhoto(currentValidation?.id);
+            })
+            console.log(res, "resultttttttt");
+          })
+          .catch(err => {
+            // Oops, something went wrong. Check that the filename is correct and
+            // inspect err to get more details.
+            console.log(err)
+          });
       }
     })
   }
@@ -314,7 +329,7 @@ class Options extends Component {
   updateValidation = (status) => {
     const { messengerGroup, user } = this.props.state;
     const { currentValidation, requestId } = this.state;
-    if(messengerGroup == null){
+    if (messengerGroup == null) {
       return
     }
     let parameter = {
@@ -328,9 +343,9 @@ class Options extends Component {
         account_id: this.props.state.user.id
       }
     }
-    this.setState({isLoading: true})
+    this.setState({ isLoading: true })
     Api.request(Routes.requestValidationUpdate, parameter, response => {
-      this.setState({isLoading: false})
+      this.setState({ isLoading: false })
     })
   }
 
@@ -396,8 +411,8 @@ class Options extends Component {
         break
       case 'signature':
         let result = this.checkValidation('signature');
-        if(result.result === true ) {
-          this.setState({currentValidation: result.item})
+        if (result.result === true) {
+          this.setState({ currentValidation: result.item })
           this.retrieveReceiverPhoto(result.item.id);
           this.setState({
             showPhotos: true,
@@ -409,9 +424,9 @@ class Options extends Component {
         break
       case 'receiver_picture':
         let result1 = this.checkValidation('receiver_picture');
-        if(result1.result === true ) {
+        if (result1.result === true) {
           console.log(result1.item.id, "=========================result");
-          this.setState({currentValidation: result1.item})
+          this.setState({ currentValidation: result1.item })
           this.retrieveReceiverPhoto(result1.item.id);
           this.setState({
             showPhotos: true,
@@ -423,8 +438,8 @@ class Options extends Component {
         break
       case 'valid_id':
         let result2 = this.checkValidation('valid_id');
-        if(result2.result === true ) {
-          this.setState({currentValidation: result2.item})
+        if (result2.result === true) {
+          this.setState({ currentValidation: result2.item })
           this.retrieveReceiverPhoto(result2.item.id);
           this.setState({
             showPhotos: true,
@@ -540,7 +555,7 @@ class Options extends Component {
       >
         {
           options.map((item, index) => (
-            <View>  
+            <View>
               {data && user && data.request?.account?.code == user.code && (
                 <TouchableOpacity style={{
                   width: '100%',
@@ -552,7 +567,7 @@ class Options extends Component {
                   paddingRight: 20,
                   borderBottomColor: Color.lightGray
                 }}
-                  onPress={() => 
+                  onPress={() =>
                     this.onClick(item)
                   }>
                   <Text style={{
@@ -593,41 +608,64 @@ class Options extends Component {
                     )
                   }
                 </TouchableOpacity>)}
-                {
-                    (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && data && data.request?.account?.code != user.code) && (
-                      <TouchableOpacity style={{
-                        width: '100%',
-                        height: 50,
-                        alignItems: 'center',
-                        flexDirection: 'row',
-                        borderBottomWidth: 1,
-                        paddingLeft: 20,
-                        paddingRight: 20,
-                        borderBottomColor: Color.lightGray
-                      }}
-                        onPress={() => this.onClick(item)}>
-                        <Text style={{
-                          color: item.color,
-                          fontSize: BasicStyles.standardFontSize,
-                          width: (data && data.request?.account?.code == user.code) ? '70%' : '90%',
-                        }}>{item.title}</Text>
-                        <View style={{
-                          width: '10%',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          height: 30
-                        }}>
-                          <FontAwesomeIcon
-                            icon={faChevronRight}
-                            size={20}
-                            style={{ color: Color.primary }} />
-                        </View>
-                      </TouchableOpacity>
-                    )
-                  }
+              {
+                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && data && data.request?.account?.code != user.code) && (
+                  <TouchableOpacity style={{
+                    width: '100%',
+                    height: 50,
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    borderBottomWidth: 1,
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    borderBottomColor: Color.lightGray
+                  }}
+                    onPress={() => this.onClick(item)}>
+                    <Text style={{
+                      color: item.color,
+                      fontSize: BasicStyles.standardFontSize,
+                      width: (data && data.request?.account?.code == user.code) ? '70%' : '90%',
+                    }}>{item.title}</Text>
+                    <View style={{
+                      width: '10%',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      height: 30
+                    }}>
+                      <FontAwesomeIcon
+                        icon={faChevronRight}
+                        size={20}
+                        style={{ color: Color.primary }} />
+                    </View>
+                  </TouchableOpacity>
+                )
+              }
             </View>
           ))
         }
+        {data && data.request?.account?.code != user.code && (
+          <TouchableOpacity style={{
+            width: '100%',
+            height: 50,
+            alignItems: 'center',
+            flexDirection: 'row',
+            borderBottomWidth: 1,
+            paddingLeft: 20,
+            paddingRight: 20,
+            borderBottomColor: Color.lightGray
+          }}
+            onPress={() =>
+              this.setState({current: {
+                title: 'Settings',
+                menu: Helper.MessengerMenu
+              }})
+            }>
+            <Text style={{
+              color: Color.danger,
+              fontSize: BasicStyles.standardFontSize,
+            }}>Back</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     );
   }
@@ -644,95 +682,94 @@ class Options extends Component {
             this.state.pictures.length > 0 && this.state.pictures.map((ndx, el) => {
               if (ndx.payload === payload_value) {
                 return (
-                  <View style={{
+                  <TouchableOpacity style={{
                     height: 100,
                     width: '48%',
                     borderWidth: 1,
                     borderColor: Color.gray,
                     margin: 1
                   }}
+                    onPress={() => { this.setState({ imageModal: true, url: ndx.payload_value }) }}
                     key={el}>
                     <Image
-                      source={{ uri: ndx.payload_value.includes('content') ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}` }}
+                      source={{ uri: ndx.payload_value.includes('file') === true ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}` }}
                       style={{
                         width: 205,
                         height: 98
                       }}
                     />
-                  </View>
+                  </TouchableOpacity>
                 )
               }
             })
           }
         </View>
         <View style={{
-            paddingTop: 50,
-            width: '100%',
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center' 
-          }}>
+          paddingTop: 50,
+          width: '100%',
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
 
-            {data && data.request?.account?.code === user.code && currentValidation?.status === 'pending' && (
-              <View style={Style.signatureFrameContainer}>
-                <TouchableOpacity style={[
-                  Style.signatureAction,
-                  Style.signatureActionDanger,
-                  { width: '45%' }]}
-                  onPress={() => { this.sendNewMessage(currentValidation.payload) }}>
-                  <Text style={{ color: Color.white }}> Decline </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[
-                  Style.signatureAction,
-                  Style.signatureActionSuccess,  { width: '45%' }]}
-                  onPress={() => { this.updateValidation('accepted') }}>
-                  <Text style={{ color: Color.white }}> Accept </Text>
-                </TouchableOpacity>
+          {data && data.request?.account?.code === user.code && currentValidation?.status === 'pending' && (
+            <View style={Style.signatureFrameContainer}>
+              <Button
+                title={'Decline'}
+                onClick={() => this.sendNewMessage(currentValidation.payload)}
+                style={{
+                  width: '45%',
+                  marginRight: '1%',
+                  backgroundColor: Color.danger
+                }}
+              />
+              <Button
+                title={'Decline'}
+                onClick={() => this.updateValidation('accepted')}
+                style={{
+                  width: '45%',
+                  backgroundColor: Color.success
+                }}
+              />
+            </View>
+          )}
+          {data && data.request?.account?.code != user.code && (
+            <Button
+              title={payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}
+              onClick={() => {
+                if (payload_value === 'signature') {
+                  this.setState({ visible: true })
+                } else {
+                  this.uploadPhoto(payload_value);
+                }
+              }}
+              style={{
+                width: '50%',
+                backgroundColor: Color.success
+              }}
+            />
+          )}
+          {data && data.request?.account?.code === user.code && (currentValidation?.status === 'accepted') && (
+            <View style={Style.signatureFrameContainer}>
+              <View style={[
+                Style.signatureAction,
+                Style.signatureActionSuccess,
+                { width: '99%' }]}>
+                <Text style={{ color: Color.white }}> Accepted </Text>
               </View>
-            )}
-            {data && data.request?.account?.code != user.code && (
-              <View style={{
-                flex: 1,
-                width: '100%',
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}>
-                <TouchableOpacity style={[
-                  Style.signatureAction,
-                  Style.signatureActionSuccess,
-                  { width: '99%' }]}
-                  onPress={() => {
-                    if (payload_value === 'signature') {
-                      this.setState({ visible: true })
-                    } else {
-                      this.uploadPhoto(payload_value);
-                    }
-                  }}>
-                  <Text style={{ color: Color.white }}>{payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}</Text>
-                </TouchableOpacity>
+            </View>
+          )}
+          {data && data.request?.account?.code === user.code && currentValidation?.status === 'declined' && (
+            <View style={Style.signatureFrameContainer}>
+              <View style={[
+                Style.signatureAction,
+                Style.signatureActionDanger,
+                { width: '99%' }]}>
+                <Text style={{ color: Color.white }}> Declined </Text>
               </View>
-            )}
-            {data && data.request?.account?.code === user.code && (currentValidation?.status === 'accepted') && (
-              <View style={Style.signatureFrameContainer}>
-                <View style={[
-                  Style.signatureAction,
-                  Style.signatureActionSuccess,
-                  { width: '99%' }]}>
-                  <Text style={{ color: Color.white }}> Accepted </Text>
-                </View>
-              </View>
-            )}
-            {data && data.request?.account?.code === user.code && currentValidation?.status === 'declined' && (
-              <View style={Style.signatureFrameContainer}>
-                <View style={[
-                  Style.signatureAction,
-                  Style.signatureActionDanger,
-                  { width: '99%' }]}>
-                  <Text style={{ color: Color.white }}> Declined </Text>
-                </View>
-              </View>
-            )}
-          </View>
+            </View>
+          )}
+        </View>
       </ScrollView>
     )
   }
@@ -754,7 +791,7 @@ class Options extends Component {
           borderTopWidth: 1,
           borderTopColor: Color.lightGray
         }}>
-
+          <ImageModal visible={this.state.imageModal} url={this.state.url && this.state.url.includes('file') === true ? this.state.url : `data:image/png;base64,${this.state.url}`} action={() => { this.setState({ imageModal: false }) }}></ImageModal>
           <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
           {this.state.isLoading ? <Spinner mode="overlay" /> : null}
@@ -773,7 +810,6 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing)),
     setRequest: (request) => dispatch(actions.setRequest(request))
   };
 };
