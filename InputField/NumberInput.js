@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { View, TouchableHighlight, TextInput, Text } from 'react-native'
 import { Color, BasicStyles} from 'common';
+import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
@@ -14,24 +15,29 @@ class NumberInput extends Component{
   }
 
   increment = () => {
+    const { setSize } = this.props
     if(this.state.count >= 1){
       this.setState({
         count: this.state.count + 1
       });
+    setSize(this.state.count);
     }
-    console.log('[[herr]', this.state.count);
   }
   
   decrement = () => {
+    const { setSize } = this.props
     if(this.state.count > 1 ){
       this.setState({
         count: this.state.count - 1
       });
+    setSize(this.state.count);
     }
-    console.log('[lower]', this.state.count);
   }
 
   render() {
+    const { setSize } = this.props
+    const { size } = this.props.state
+    console.log('[sizeinNumberInput]', size )
     return (
       <View style={{
         position: 'absolute',
@@ -73,5 +79,17 @@ class NumberInput extends Component{
   }
 
 }
+const mapStateToProps = state => ({ state: state });
 
-export default NumberInput;
+
+const mapDispatchToProps = dispatch => {
+  const { actions } = require('@redux');
+  return {
+    setSize: (size) => dispatch(actions.setSize(size))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NumberInput);

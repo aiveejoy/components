@@ -7,6 +7,7 @@ import Currency from 'services/Currency.js';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Dimensions } from 'react-native';
+import { combineReducers } from 'redux';
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
 class DateTime extends Component{
@@ -189,6 +190,7 @@ class DateTime extends Component{
             justifyContent: 'center',
             borderRadius: BasicStyles.inputBorderRadius,
             borderColor: this.props.borderColor ? this.props.borderColor : Color.lightGray,
+            borderBottomColor: this.props.borderBottomColor ? this.props.borderBottomColor : Color.lightGray,
             borderWidth: 1,
             marginTop: 20,
             marginBottom: 20
