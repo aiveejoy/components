@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Button, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, Button, TouchableOpacity, ScrollView, TextInput, BackHandler } from 'react-native';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { Routes } from 'common';
@@ -30,9 +30,21 @@ class Support extends Component {
     };
   }
 
+  componentWillUnmount() {
+    this.backHandler.remove();
+  }
+
+  handleBackPress = () => {
+    return true
+  };
+
   componentDidMount() {
     this.setState({ user: this.props.state.user })
     this.retrieve(false);
+    this.backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackPress,
+    );
   }
 
   retrieve(flag) {
