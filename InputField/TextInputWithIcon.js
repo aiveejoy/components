@@ -31,7 +31,8 @@ class TextInputWithIcon extends Component{
         position: 'relative',
         backgroundColor: 'white',
         borderRadius: 50,
-        marginBottom: 20
+        marginBottom: 20,
+        paddingLeft: 10
         }}>
         <FontAwesomeIcon icon={this.props.icon} size={20} color={Color.primary}/>
         <TextInput
