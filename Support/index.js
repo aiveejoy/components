@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Button, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, Button, TouchableOpacity, ScrollView, TextInput, BackHandler } from 'react-native';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { Routes } from 'common';
@@ -30,9 +30,21 @@ class Support extends Component {
     };
   }
 
+  componentWillUnmount() {
+    this.backHandler.remove();
+  }
+
+  handleBackPress = () => {
+    return true
+  };
+
   componentDidMount() {
     this.setState({ user: this.props.state.user })
     this.retrieve(false);
+    this.backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackPress,
+    );
   }
 
   retrieve(flag) {
@@ -45,7 +57,6 @@ class Support extends Component {
       limit: this.state.limit,
       offset: flag == true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset
     };
-    console.log(parameter, "====");
     this.setState({ isLoading: true })
     Api.request(Routes.ticketsRetrieve, parameter, response => {
       this.setState({ isLoading: false })
@@ -170,7 +181,7 @@ class Support extends Component {
             height: 60,
             width: 60,
             borderRadius: 30,
-            bottom: 70
+            bottom: 5
           }]}
           onPress={() => {
             this.props.navigation.push('createTicketStack', { user: this.state.user });

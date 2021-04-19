@@ -6,11 +6,11 @@ class TextInputWithLabel extends Component {
     super(props);
   }
 
-  redirect(route){
+  redirect(route, param){
     if(this.props.closeOnClick){
       this.props.closeOnClick()
     }
-    this.props.navigation.navigate(route)
+    this.props.navigation.navigate(route, {data: param})
   }
 
   render() {
@@ -20,7 +20,7 @@ class TextInputWithLabel extends Component {
         style={{
           width: '100%'
         }}
-        onPress={() => this.redirect(this.props.route)}
+        onPress={() => this.redirect(this.props.route, this.props.from)}
         >
         <View style={{
           flexDirection: 'row'
@@ -76,7 +76,7 @@ class TextInputWithLabel extends Component {
               <TextInput
                 value={this.props.variable}
                 onFocus={() => {
-                  this.redirect(this.props.route);
+                  this.redirect(this.props.route, this.props.from);
                 }}
                 placeholder={this.props.placeholder ? this.props.placeholder : 'Type here'}
               />

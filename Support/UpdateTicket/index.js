@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Image, TouchableNativeFeedbackBase } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Image, TouchableNativeFeedbackBase, TouchableHighlightBase } from 'react-native';
 import styles from './Styles.js';
 import Modal from "react-native-modal";
 import Style from 'components/Support/Style';
@@ -18,6 +18,7 @@ import { connect } from 'react-redux';
 import PostCard from 'modules/generic/PostCard.js';
 import ImageModal from 'components/Modal/ImageModal';
 import Skeleton from 'components/Loading/Skeleton';
+import moment from 'moment';
 
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -97,7 +98,14 @@ class UpdateTicket extends Component {
       this.setState({ isLoading: false })
       if (response.data !== null) {
         this.setState({ comment: null })
-        this.retrieveComments(this.props.navigation.state.params.id);
+        parameter['account'] = {
+          username: this.props.state.user.username
+        }
+        parameter['account']['profile'] = this.props.state.user.profile
+        parameter['created_at_human'] = moment(new Date()).format('MMMM DD, YYYY hh:mm a');
+        let temp = [parameter, ...this.props.state.comments?.commentList]
+        const { setComments } = this.props;
+        setComments({id: id, commentList: temp});
       }
     })
   }
@@ -110,16 +118,17 @@ class UpdateTicket extends Component {
           column: 'payload_value',
           clause: '='
         }
-      ]
+      ],
+      sort: { created_at: 'desc'}
     };
     this.setState({ isLoading: true })
     console.log(parameter, Routes.commentsRetrieve, "parameter");
     Api.request(Routes.commentsRetrieve, parameter, response => {
       this.setState({ isLoading: false, showComments: true })
       if (response.data.length > 0) {
-        this.setState({ comments: response.data })
-      } else {
-        this.setState({ comments: [] })
+        const { setCurrentTicketId, setComments} = this.props;
+        setCurrentTicketId(id);
+        setComments({id: id, commentList: response.data})
       }
     })
   }
@@ -135,7 +144,6 @@ class UpdateTicket extends Component {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.setState({ reply: null })
-        this.retrieveComments(this.props.navigation.state.params.id);
       }
     })
   }
@@ -229,7 +237,7 @@ class UpdateTicket extends Component {
                 />
               </TouchableOpacity>
             </View>
-            {this.state.comments && this.state.comments.map((item, index) => {
+            {this.props.state.comments && this.props.state.comments.commentList && this.props.state.comments.commentList.length > 0 && this.props.state.comments.commentList.map((item, index) => {
               return (
                 <PostCard
                   data={{
@@ -377,7 +385,17 @@ class UpdateTicket extends Component {
     );
   }
 }
-
 const mapStateToProps = state => ({ state: state });
 
-export default connect(mapStateToProps)(UpdateTicket);
+const mapDispatchToProps = dispatch => {
+  const { actions } = require('@redux');
+  return {
+    setComments: (comments) => dispatch(actions.setComments(comments)),
+    setCurrentTicketId: (currentTicketId) => dispatch(actions.setCurrentTicketId(currentTicketId))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(UpdateTicket);
