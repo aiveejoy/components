@@ -26,7 +26,6 @@ class DateTime extends Component{
 
   dateHandler = (date) => {
     if(this.props.type == 'date'){
-      console.log('[date]', date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
       this.setState({
         showDatePicker: false,
         date: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),

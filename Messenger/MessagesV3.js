@@ -54,7 +54,6 @@ class MessagesV3 extends Component{
   }
 
   componentDidMount(){
-    console.log('[options]', this.props.navigation)
     const { user } = this.props.state
     if (user == null) return
     this.retrieve()
@@ -74,7 +73,6 @@ class MessagesV3 extends Component{
   }
 
   retrieve = () => {
-    console.log("[NAVIGATION]",this.props.navigation.state.params.data);
     const { messengerGroup } = this.props.state
     const { setMessengerGroup } = this.props
     const { offset, limit } = this.state
@@ -93,7 +91,6 @@ class MessagesV3 extends Component{
       offset: offset * limit,
     }
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
-      console.log('[response]', response)
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
         this.setState({sender_id: response.data[0].account_id});
@@ -200,7 +197,6 @@ class MessagesV3 extends Component{
     this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
       if(response.data != null){
-        console.log('[responseByUpdatingMessages]', response.data);
         updateMessageByCode(response.data);
       }
     });
@@ -658,7 +654,6 @@ class MessagesV3 extends Component{
     } = this.state;
     const { data } = this.props.navigation.state.params;
     const { messengerGroup, user } = this.props.state;
-    console.log('data', data)
     return (
       <SafeAreaView>
         {
