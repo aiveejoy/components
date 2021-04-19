@@ -16,7 +16,7 @@ class UserImage extends Component{
     return (
       <View>
         {
-          (user || (user?.profile?.url != null && user?.profile?.url != undefined)) && (
+          (user && (user?.profile?.url != null && user?.profile?.url != undefined)) && ( 
             <Image
               source={{uri: Config.BACKEND_URL  + user.profile.url}}
               resizeMode={'cover'}
