@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, TextInput, TouchableHighlight} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faEyeSlash, faEye, faLock } from '@fortawesome/free-solid-svg-icons';
 import { fas } from '@fortawesome/free-brands-svg-icons'
 import { Color, BasicStyles } from 'common';
 class PasswordInputWithIconLeft extends Component{
@@ -31,9 +31,9 @@ class PasswordInputWithIconLeft extends Component{
         position: 'relative',
         backgroundColor: 'white',
         borderRadius: 50,
-        marginBottom: 10
+        marginBottom: 10,
         }}>
-        <TouchableHighlight
+        {/* <TouchableHighlight
           onPress={() => this.setState({
             flag: !this.state.flag
           })}
@@ -41,12 +41,13 @@ class PasswordInputWithIconLeft extends Component{
             position: 'absolute',
             left: 5,
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            paddingLeft: 10
           }}
           underlayColor={Color.white}
-          >
-          <FontAwesomeIcon icon={this.state.flag == false ? faEyeSlash : faEye} size={20} color={Color.primary}/>
-        </TouchableHighlight>
+          > */}
+          <FontAwesomeIcon style={{marginLeft: -10}} icon={faLock} size={20} color={Color.primary}/>
+        {/* </TouchableHighlight> */}
         <TextInput
           style={{
             ...BasicStyles.standardFormControl,
@@ -57,6 +58,22 @@ class PasswordInputWithIconLeft extends Component{
           placeholder={this.props.placeholder ? this.props.placeholder : '*******'}
           secureTextEntry={this.state.flag == false ? true : false}
         />
+        <TouchableHighlight
+          onPress={() => this.setState({
+            flag: !this.state.flag
+          })}
+          style={{
+            position: 'absolute',
+            right: 0,
+            width: 50,
+            height: 50,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          underlayColor={Color.white}
+          >
+          <FontAwesomeIcon icon={this.state.flag == false ? faEyeSlash : faEye} size={20} color={Color.primary}/>
+        </TouchableHighlight>
       </View>
     );
   }
