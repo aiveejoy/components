@@ -10,7 +10,8 @@ class InputSelect extends Component{
     super(props);
     this.state = {
       input: null,
-      filter: false
+      filter: false,
+      cuisine: ''
     }
   }
 
@@ -22,6 +23,15 @@ class InputSelect extends Component{
 
   redirect(route){
     this.props.navigation.navigate(route)
+  }
+
+  closeFilter(){
+    this.setState({
+      filter: false
+    })    
+    this.props.onFinish({
+      cuisine : this.state.cuisine.categories == null ? this.state.cuisine : this.state.cuisine.categories
+    })
   }
 
   render() {
@@ -36,11 +46,8 @@ class InputSelect extends Component{
               visible={filter}
               title={this.props.titles}
               from={'categories'}
-              close={() => {
-                this.setState({
-                  filter: false
-                })
-              }}
+              close={() => this.closeFilter()}
+              onFinish={(categories) => this.setState({cuisine: categories})}
             />
           )}
         <TouchableOpacity
@@ -49,7 +56,7 @@ class InputSelect extends Component{
           <TextInput
             style={[BasicStyles.formControls, {width: '100%'}]}
             editable={false}
-            placeholder={this.props.value}
+            placeholder={this.props.placeholder}
           />
         </TouchableOpacity>
         <TouchableHighlight
