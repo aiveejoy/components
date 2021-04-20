@@ -12,7 +12,6 @@ class UserImage extends Component{
 
   render () {
     const { user } = this.props;
-    console.log('IMAGEA', user?.profile?.url);
     return (
       <View>
         {

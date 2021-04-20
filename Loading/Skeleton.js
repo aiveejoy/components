@@ -15,7 +15,8 @@ class Skeleton extends Component {
       content.push(
         <View style={{
           width: '100%'
-        }}>
+        }}
+        key={i}>
           <View style={{
               flexDirection: "row",
               alignItems: "center",

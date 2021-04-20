@@ -130,7 +130,7 @@ class Options extends Component {
   }
 
   retrieveRequestId() {
-    const { user, request } = this.props.state;
+    const { user } = this.props.state;
     const { data } = this.props;
     if (user == null || data == null) {
       return
@@ -303,7 +303,6 @@ class Options extends Component {
               this.setState({ isLoading: false })
               this.retrieveReceiverPhoto(currentValidation?.id);
             })
-            console.log(res, "resultttttttt");
           })
           .catch(err => {
             // Oops, something went wrong. Check that the filename is correct and
@@ -351,21 +350,27 @@ class Options extends Component {
 
   enableSupport = () => {
     const { user } = this.props.state;
+    const { data } = this.props
     let parameter = {
       account_id: user.id,
       payload: 'request_id',
-      payload_value: this.props.requestId,
+      payload_value: data.id,
       status: 1,
       assigned_to: ''
     }
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportCreate, parameter, response => {
-      console.log(response.error, "======support enabled");
+      if(response.error = 'Request already exist'){
+        Alert.alert('Notice', 'Enable Support is already activated.')
+        this.setState({ isLoading: false })
+        return
+      }
       this.setState({ isLoading: false })
     })
   }
 
   onClick(item) {
+    const { data } = this.props
     switch (item.payload_value) {
       case 'close':
         this.close()
@@ -393,7 +398,12 @@ class Options extends Component {
         break
       case 'reviewsStack': {
         // review stack
-        this.retrieveRequest('reviewsStack')
+        if(data.status < 2){
+          Alert.alert('Notice', 'Please complete the transaction before giving reviews. Thank you!')
+          return
+        }else{
+          this.retrieveRequest('reviewsStack')
+        }
       }
         break
       case 'enableSupport': {
@@ -519,7 +529,8 @@ class Options extends Component {
               borderBottomWidth: 1,
               borderBottomColor: Color.lightGray
             }}
-              onPress={() => this.onClick(item)}>
+              onPress={() => this.onClick(item)}
+              key={index}>
               <Text style={{
                 color: item.color,
                 fontSize: BasicStyles.standardFontSize,
@@ -555,7 +566,8 @@ class Options extends Component {
       >
         {
           options.map((item, index) => (
-            <View>
+            <View
+            key={index}>
               {data && user && data.request?.account?.code == user.code && (
                 <TouchableOpacity style={{
                   width: '100%',
