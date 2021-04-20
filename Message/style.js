@@ -1,19 +1,20 @@
 import {StyleSheet, Dimensions} from 'react-native';
 import {BasicStyles} from 'common';
 const width = Math.round(Dimensions.get('window').width);
+const height = Math.round(Dimensions.get('window').height);
 export default {
   CardContainer: {
-    width: width - 30,
-    borderRadius: BasicStyles.standardBorderRadius,
-    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 5,
+    width: '100%',
+    borderRadius: BasicStyles.standardBorderRadius,
     padding: 10,
-    marginTop: '40%'
+    height: '100%'
   },
   description: {
     alignItems: 'center',
-    alignSelf: 'flex-end',
+    alignSelf: 'flex-end'
   },
   descriptionText: {
     fontSize: BasicStyles.standardFontSize,
