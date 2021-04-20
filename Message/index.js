@@ -6,7 +6,6 @@ import styles from './style.js';
 import { Color, BasicStyles } from 'common';
 import { Dimensions } from 'react-native';
 import {connect} from 'react-redux';
-const height = Math.round(Dimensions.get('window').height);
 class Message extends Component{
   
   constructor(props){
@@ -20,27 +19,17 @@ class Message extends Component{
   render () {
     const { theme } = this.props.state;
     return (
+      <View style={{marginTop: '30%'}}>
       <View style={{
         ...styles.CardContainer,
         backgroundColor: theme ? theme.primary : Color.primary,
         borderWidth: 1,
-        borderColor: theme ? theme.primary : Color.primary,
-        alignItems: 'center',
-        height: height - 500
+        borderColor: theme ? theme.primary : Color.primary
         }}>
-          <View>
-            <Image source={require('assets/Partners.png')} style={{
-              height: 150,
-              width: 150,
-              marginRight: '15%',
-              // marginLeft: '-10%',
-              position: 'absolute',
-              marginTop: '7%'
-            }}/>
-          </View>
           <View style={[styles.description, {
-            paddingTop: '12%',
-            paddingRight: '40%'
+            paddingTop: '5%',
+            paddingRight: '30%',
+            marginLeft: '3%'
           }]}>
             <Text
               style={{
@@ -54,26 +43,35 @@ class Message extends Component{
           <TouchableOpacity
           onPress={() => this.redirect('createRequestStack')}
           style={{
-              top: '11%',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: 40,
-              borderRadius: 20,
-              marginRight: '45%',
-              color: Color.primary,
-              backgroundColor: Color.white,
-              borderColor: theme ? theme.primary : Color.primary,
-              borderWidth: 1,
-              width: '50%'
+            top: '5%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 40,
+            borderRadius: 20,
+            marginRight: '35%',
+            color: Color.primary,
+            backgroundColor: Color.white,
+            borderColor: theme ? theme.primary : Color.primary,
+            borderWidth: 1,
+            width: '50%'
           }}
           >
           <Text style={{
-              color:theme ? theme.primary : Color.primary,
-              fontSize: 11,
-              textAlign: 'center'
+            color:theme ? theme.primary : Color.primary,
+            fontSize: 11,
+            textAlign: 'center'
           }}>Create Request</Text>
           </TouchableOpacity>
+          <Image source={require('assets/Partners.png')} style={{
+            height: 230,
+            width: 230,
+            // marginRight: '20%',
+            marginLeft: '30%',
+            // position: 'absolute',
+            marginTop: '-9%'
+          }}/>
             
+      </View>
       </View>
     );
   }
