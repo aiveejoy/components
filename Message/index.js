@@ -19,7 +19,7 @@ class Message extends Component{
   render () {
     const { theme } = this.props.state;
     return (
-      <View style={{marginTop: '30%'}}>
+      <View style={{marginTop: '27%', justifyContent: 'center', alignContent: 'center'}}>
       <View style={{
         ...styles.CardContainer,
         backgroundColor: theme ? theme.primary : Color.primary,
