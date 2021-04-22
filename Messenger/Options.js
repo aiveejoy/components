@@ -37,12 +37,13 @@ class Options extends Component {
       currentValidation: null,
       requestId: null,
       imageModal: false,
-      url: null
+      url: null,
+      supportEnabled: []
     }
   }
 
   componentDidMount() {
-    // this.retrieveRequestId();
+    this.checkIfSupportEnabled();
   }
 
   sendSketch = (result) => {
@@ -348,6 +349,30 @@ class Options extends Component {
     })
   }
 
+  checkIfSupportEnabled = () => {
+    const { user } = this.props.state;
+    const { data } = this.props
+    let parameter = {
+      condition: [
+        {
+          clause: '=',
+          value: data.id,
+          column: 'payload_value'
+        },
+        {
+          clause: '=',
+          value: user.id,
+          column: 'account_id'
+        }
+      ]
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.enableSupportRetrieve, parameter, response => {
+      this.setState({ isLoading: false })
+      this.setState({supportEnabled: response.data})
+    })
+  }
+
   enableSupport = () => {
     const { user } = this.props.state;
     const { data } = this.props
@@ -358,6 +383,7 @@ class Options extends Component {
       status: 1,
       assigned_to: ''
     }
+    console.log(parameter, data, '====');
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportCreate, parameter, response => {
       if(response.error = 'Request already exist'){
@@ -536,7 +562,7 @@ class Options extends Component {
                 fontSize: BasicStyles.standardFontSize,
                 paddingLeft: 20,
                 width: '90%'
-              }}>{item.title}</Text>
+              }}>{item.title === 'Enable Support' ? (this.state.supportEnabled.length > 0 ? 'Enabled Support' : 'Enable Support') : item.title}</Text>
               {
                 (item.title != 'Close') && (
                   <View style={{
@@ -560,7 +586,6 @@ class Options extends Component {
   requirements(options) {
     const { data } = this.props;
     const { user } = this.props.state;
-    console.log(data && data.request?.account?.code, user && user.code, "======");
     return (
       <ScrollView
       >
