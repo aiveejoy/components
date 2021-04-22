@@ -32,24 +32,24 @@ class CreateTicket extends Component {
         {
           id: 1,
           type: 'VERIFICATION ISSUE',
-          description: 'Send cash and allow our partners to process or deliver the cash to your receiver.'
+          description: 'Having trouble or did encountered issues about verifications? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
         },
         {
           id: 2,
           type: 'ACCOUNT ISSUE',
-          description: 'Withdraw cash from your wallet and let our partners nearby process or deliver the cash to your specified location.'
+          description: 'Having trouble or did encountered issues in managing your account? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
         }
       ],
       ticketTypes2: [
         {
           id: 3,
           type: 'TRANSACTION ISSUE',
-          description: 'Cash In to your wallet and let our nearby partners process or pickup the cash from your specified location.'
+          description: 'Having trouble or did encountered issues in your previous transactions? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
         },
         {
           id: 4,
           type: 'OTHERS',
-          description: "Don't have time and want to pay your bills either online or onsite? Our partners will handle your payments"
+          description: 'Having trouble or did encountered issues in other matters? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
         }
       ],
       selected: null,
