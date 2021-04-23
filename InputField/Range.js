@@ -23,10 +23,18 @@ class Range extends Component{
   redirect(route){
     this.props.navigation.navigate(route)
   }
+
+  closeFilter(){
+    this.setState({
+      filter: false
+    })
+    this.props.onFinish({
+      amount : this.state.value.amount == undefined ? this.state.value : this.state.value.amount
+    })
+  }
   
   render() {
     const { filter } = this.state;
-    console.log('[amounddt]', this.state.value);
     return (
       <View style={{
         position: 'absolute',
@@ -38,12 +46,8 @@ class Range extends Component{
               visible={filter}
               title={'price'}
               from={'restaurant'}
-              close={() => {
-                this.setState({
-                  filter: false
-                })
-              }}
-              onFinish={(amount) => {this.setState({value})}}
+              close={() => this.closeFilter()}
+              onFinish={(amount) => {this.setState({value: amount})}}
             />
           )}
         <TouchableOpacity
@@ -52,7 +56,7 @@ class Range extends Component{
           <TextInput
             style={[BasicStyles.formControls, {width: '100%'}]}
             editable={false}
-            placeholder={'$' + this.state.value?.amount + '-' + '$9000'}
+            placeholder={'$' + (this.state.value.amount == undefined ? this.state.value : this.state.value.amount) + '-' + '$9000'}
           />
         </TouchableOpacity>
       </View>

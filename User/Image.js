@@ -12,11 +12,10 @@ class UserImage extends Component{
 
   render () {
     const { user } = this.props;
-    console.log('IMAGEA', user?.profile?.url);
     return (
       <View>
         {
-          (user || (user?.profile?.url != null && user?.profile?.url != undefined)) && (
+          (user && (user?.profile?.url != null && user?.profile?.url != undefined)) && ( 
             <Image
               source={{uri: Config.BACKEND_URL  + user.profile.url}}
               resizeMode={'cover'}

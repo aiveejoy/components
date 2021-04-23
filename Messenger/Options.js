@@ -37,12 +37,13 @@ class Options extends Component {
       currentValidation: null,
       requestId: null,
       imageModal: false,
-      url: null
+      url: null,
+      supportEnabled: []
     }
   }
 
   componentDidMount() {
-    // this.retrieveRequestId();
+    this.checkIfSupportEnabled();
   }
 
   sendSketch = (result) => {
@@ -130,7 +131,7 @@ class Options extends Component {
   }
 
   retrieveRequestId() {
-    const { user, request } = this.props.state;
+    const { user } = this.props.state;
     const { data } = this.props;
     if (user == null || data == null) {
       return
@@ -303,7 +304,6 @@ class Options extends Component {
               this.setState({ isLoading: false })
               this.retrieveReceiverPhoto(currentValidation?.id);
             })
-            console.log(res, "resultttttttt");
           })
           .catch(err => {
             // Oops, something went wrong. Check that the filename is correct and
@@ -349,23 +349,54 @@ class Options extends Component {
     })
   }
 
+  checkIfSupportEnabled = () => {
+    const { user } = this.props.state;
+    const { data } = this.props
+    let parameter = {
+      condition: [
+        {
+          clause: '=',
+          value: data.id,
+          column: 'payload_value'
+        },
+        {
+          clause: '=',
+          value: user.id,
+          column: 'account_id'
+        }
+      ]
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.enableSupportRetrieve, parameter, response => {
+      this.setState({ isLoading: false })
+      this.setState({supportEnabled: response.data})
+    })
+  }
+
   enableSupport = () => {
     const { user } = this.props.state;
+    const { data } = this.props
     let parameter = {
       account_id: user.id,
       payload: 'request_id',
-      payload_value: this.props.requestId,
+      payload_value: data.id,
       status: 1,
       assigned_to: ''
     }
+    console.log(parameter, data, '====');
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportCreate, parameter, response => {
-      console.log(response.error, "======support enabled");
+      if(response.error = 'Request already exist'){
+        Alert.alert('Notice', 'Enable Support is already activated.')
+        this.setState({ isLoading: false })
+        return
+      }
       this.setState({ isLoading: false })
     })
   }
 
   onClick(item) {
+    const { data } = this.props
     switch (item.payload_value) {
       case 'close':
         this.close()
@@ -393,7 +424,12 @@ class Options extends Component {
         break
       case 'reviewsStack': {
         // review stack
-        this.retrieveRequest('reviewsStack')
+        if(data.status < 2){
+          Alert.alert('Notice', 'Please complete the transaction before giving reviews. Thank you!')
+          return
+        }else{
+          this.retrieveRequest('reviewsStack')
+        }
       }
         break
       case 'enableSupport': {
@@ -519,13 +555,14 @@ class Options extends Component {
               borderBottomWidth: 1,
               borderBottomColor: Color.lightGray
             }}
-              onPress={() => this.onClick(item)}>
+              onPress={() => this.onClick(item)}
+              key={index}>
               <Text style={{
                 color: item.color,
                 fontSize: BasicStyles.standardFontSize,
                 paddingLeft: 20,
                 width: '90%'
-              }}>{item.title}</Text>
+              }}>{item.title === 'Enable Support' ? (this.state.supportEnabled.length > 0 ? 'Enabled Support' : 'Enable Support') : item.title}</Text>
               {
                 (item.title != 'Close') && (
                   <View style={{
@@ -549,13 +586,13 @@ class Options extends Component {
   requirements(options) {
     const { data } = this.props;
     const { user } = this.props.state;
-    console.log(data && data.request?.account?.code, user && user.code, "======");
     return (
       <ScrollView
       >
         {
           options.map((item, index) => (
-            <View>
+            <View
+            key={index}>
               {data && user && data.request?.account?.code == user.code && (
                 <TouchableOpacity style={{
                   width: '100%',
@@ -724,7 +761,7 @@ class Options extends Component {
                 }}
               />
               <Button
-                title={'Decline'}
+                title={'Accept'}
                 onClick={() => this.updateValidation('accepted')}
                 style={{
                   width: '45%',
