@@ -761,7 +761,7 @@ class Options extends Component {
                 }}
               />
               <Button
-                title={'Accepted'}
+                title={'Accept'}
                 onClick={() => this.updateValidation('accepted')}
                 style={{
                   width: '45%',
