@@ -490,7 +490,7 @@ class LocationWithMap extends Component {
             justifyContent: 'center',
             height: 50,
             width: '90%',
-            backgroundColor: this.state.address ? '#22B173' : '#CCCCCC',
+            backgroundColor: this.state.address ? Color.primary : '#CCCCCC',
             borderRadius: BasicStyles.formControl.borderRadius ? BasicStyles.formControl.borderRadius : 15,
             bottom: 20,
           }}>
