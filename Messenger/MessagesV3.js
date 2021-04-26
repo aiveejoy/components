@@ -27,6 +27,8 @@ import CommonRequest from 'services/CommonRequest.js';
 import Style from 'modules/messenger/Style.js'
 import Modal from 'components/Modal/Sketch';
 import MessageOptions from './Options.js'
+import { fcmService } from 'services/broadcasting/FCMService';
+import { localNotificationService } from 'services/broadcasting/LocalNotificationService';
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
 
@@ -56,13 +58,13 @@ class MessagesV3 extends Component{
   componentDidMount(){
     const { user } = this.props.state
     if (user == null) return
-    this.retrieve()
+    this.retrieveGroup()
   }
 
   componentWillUnmount() {
     const { data } = this.props.navigation.state.params;
     const { setMessengerGroup, setMessagesOnGroup } = this.props
-    setMessengerGroup(null)
+    setMessengerGroup(data)
     setMessagesOnGroup({
       groupId: null,
       messages: null
@@ -72,15 +74,66 @@ class MessagesV3 extends Component{
     }
   }
 
-  retrieve = () => {
+  broadcasting(data){
+    fcmService.registerAppWithFCM()
+    fcmService.register(this.onRegister, this.onNotification, this.onOpenNotification)
+    localNotificationService.configure(this.onOpenNotification, Helper.APP_NAME)
+    fcmService.subscribeTopic('MessageGroup-' + data.id)
+    return () => {
+      console.log("[App] unRegister")
+      fcmService.unRegister()
+      localNotificationService.unRegister()
+    }
+  }
+
+  onRegister = (token) => {
+    console.log("[App] onRegister", token)
+  }
+
+  onOpenNotification = (notify) => {
+    // console.log("[App] onOpenNotification", notify)
+  }
+
+  onNotification = (notify) => {
+    const { user } = this.props.state;
+    // console.log("[App] onNotification", notify)
+    let data = null
+    if(user == null || !notify.data){
+      return
+    }
+    data = notify.data
+    let topic = data.topic.split('-')
+    switch(topic[0].toLowerCase()){
+      case 'messagegroup': {
+          const { messengerGroup } = this.props.state;
+          let members = JSON.parse(data.members)
+          console.log('members', members)
+          if(messengerGroup == null && members.indexOf(user.id) > -1){
+            console.log('[messengerGroup] on empty', data)
+            const { setUnReadMessages } = this.props;
+            setUnReadMessages(data)
+            return
+          }
+          if(parseInt(data.messenger_group_id) === messengerGroup.id && members.indexOf(user.id) > -1){
+            if(parseInt(data.account_id) != user.id){
+              const { updateMessagesOnGroup } = this.props;
+              updateMessagesOnGroup(data); 
+            }
+            return
+          }
+        }
+      break
+    }
+  }
+
+  retrieve = (data) => {
     const { messengerGroup } = this.props.state
     const { setMessengerGroup } = this.props
     const { offset, limit } = this.state
     this.setState({ isLoading: true });
-    setMessengerGroup(this.props.navigation.state.params.data)
     const parameter = {
       condition: [{
-        value: this.props.navigation.state.params.data.id,
+        value: data.id,
         column: 'messenger_group_id',
         clause: '='
       }],
@@ -90,6 +143,7 @@ class MessagesV3 extends Component{
       limit,
       offset: offset * limit,
     }
+    console.log('parameter', parameter)
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
@@ -145,28 +199,47 @@ class MessagesV3 extends Component{
   }
 
   retrieveGroup = (flag = null) => {
-    const { user, messengerGroup } = this.props.state;
+    const { user } = this.props.state;
     const { setMessengerGroup } = this.props;
-    if(messengerGroup == null || user == null){
+    const { data } = this.props.navigation.state.params;
+    if(user == null){
       return
     }
     let parameter = {
       condition: [{
-        value: messengerGroup.id,
-        column: 'id',
+        value: data.title,
+        column: 'title',
         clause: '='
       }],
       account_id: user.id
     }
-    CommonRequest.retrieveMessengerGroup(messengerGroup, user, response => {
-      if(response.data != null){
-        setMessengerGroup(response.data);
-        setTimeout(() => {
-          this.retrieve(response.data)
-          this.setState({keyRefresh: this.state.keyRefresh + 1})
-        }, 500)
-      }
-    })
+    this.setState({ isLoading: true });
+    console.log('request', parameter)
+    Api.request(Routes.messengerGroupRetrieve, parameter, response => {
+       if(response.data.length > 0){
+          this.broadcasting(response.data[0])
+          setMessengerGroup({
+            ...data,
+            id: response.data[0].id
+          });
+          setTimeout(() => {
+            this.retrieve(response.data[0])
+          }, 500)
+       }else{
+          this.setState({ isLoading: false });
+       }
+    }, error => {
+      this.setState({ isLoading: false });
+    });
+    // CommonRequest.retrieveMessengerGroup(messengerGroup, parameter, response => {
+    //   if(response.data != null){
+    //     setMessengerGroup(response.data);
+    //     setTimeout(() => {
+    //       this.retrieve(response.data[0])
+    //       this.setState({keyRefresh: this.state.keyRefresh + 1})
+    //     }, 500)
+    //   }
+    // })
   }
 
   sendNewMessage = () => {
@@ -193,6 +266,7 @@ class MessagesV3 extends Component{
       sending_flag: true,
       error: null
     }
+    console.log('parameter', parameter)
     updateMessagesOnGroup(newMessageTemp);
     this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
@@ -766,7 +840,9 @@ const mapDispatchToProps = dispatch => {
     setMessagesOnGroup: (messagesOnGroup) => dispatch(actions.setMessagesOnGroup(messagesOnGroup)),
     setMessengerGroup: (messengerGroup) => dispatch(actions.setMessengerGroup(messengerGroup)),
     updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
-    updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message))
+    updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message)),
+    setUnReadMessages: (messages) => dispatch(actions.setUnReadMessages(messages)),
+    updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
     // viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
   };
 };

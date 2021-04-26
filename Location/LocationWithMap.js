@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   PermissionsAndroid,
+  Keyboard
 } from 'react-native';
 import {Color} from 'common';
 import {GooglePlacesAutoComplete} from 'components';
@@ -21,6 +22,7 @@ import Geocoder from 'react-native-geocoding';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Config from 'src/config.js';
 import BasicStyles from '../../common/BasicStyles';
+
 
 class LocationWithMap extends Component {
   constructor(props) {
@@ -299,6 +301,7 @@ class LocationWithMap extends Component {
     return (
       <TouchableOpacity
         onPress={() => {
+          Keyboard.dismiss()
           this.GooglePlacesRef.setAddressText('');
           this.setState({errorMessage: null});
         }}>

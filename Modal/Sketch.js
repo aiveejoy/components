@@ -65,7 +65,7 @@ class Sketch extends Component {
                 }}>
                 <TouchableOpacity
                   onPress={() => this.props.close()} 
-                  style={[styles.sketchBtn, {
+                  style={[styles.sketchBtn, BasicStyles.standardButton, {
                     width: '25%',
                     backgroundColor: Color.danger,
                     marginRight: 10
@@ -78,7 +78,7 @@ class Sketch extends Component {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => this.sketch.clear()} 
-                  style={[styles.sketchBtn, {
+                  style={[styles.sketchBtn, BasicStyles.standardButton, {
                     width: '25%',
                     backgroundColor: Color.secondary,
                     marginRight: 10
@@ -91,7 +91,7 @@ class Sketch extends Component {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => this.getBase64()} 
-                  style={[styles.sketchBtn, {
+                  style={[styles.sketchBtn, BasicStyles.standardButton, {
                     width: '25%',
                     backgroundColor: Color.primary
                   }]}
