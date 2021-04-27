@@ -32,24 +32,24 @@ class CreateTicket extends Component {
         {
           id: 1,
           type: 'VERIFICATION ISSUE',
-          description: 'Send cash and allow our partners to process or deliver the cash to your receiver.'
+          description: 'Having trouble or did encountered issues about verifications? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
         },
         {
           id: 2,
           type: 'ACCOUNT ISSUE',
-          description: 'Withdraw cash from your wallet and let our partners nearby process or deliver the cash to your specified location.'
+          description: 'Having trouble or did encountered issues in managing your account? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
         }
       ],
       ticketTypes2: [
         {
           id: 3,
           type: 'TRANSACTION ISSUE',
-          description: 'Cash In to your wallet and let our nearby partners process or pickup the cash from your specified location.'
+          description: 'Having trouble or did encountered issues in your previous transactions? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
         },
         {
           id: 4,
           type: 'OTHERS',
-          description: "Don't have time and want to pay your bills either online or onsite? Our partners will handle your payments"
+          description: 'Having trouble or did encountered issues in other matters? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
         }
       ],
       selected: null,
@@ -127,9 +127,7 @@ class CreateTicket extends Component {
   chooseTicketType1 = () => {
     const { theme } = this.props.state;
     return (
-      <View style={{
-        flexDirection: 'row',
-      }}>
+      <View>
         {
           this.state.ticketTypes1 && this.state.ticketTypes1.map((item, index) => (
 
@@ -172,11 +170,7 @@ class CreateTicket extends Component {
   chooseTicketType2 = () => {
     const { theme } = this.props.state;
     return (
-      <View style={{
-        flexDirection: 'row',
-        marginTop: 10,
-        padding: 10
-      }}>
+      <View>
         {
           this.state.ticketTypes2 && this.state.ticketTypes2.map((item, index) => (
 
@@ -196,7 +190,7 @@ class CreateTicket extends Component {
                 </Text>
               </View>
               <View style={[styles.description, {
-                paddingBottom: 10
+                paddingBottom: 15
               }]}>
                 <Text
                   style={[
@@ -221,134 +215,135 @@ class CreateTicket extends Component {
     let data = [{ title: 'Bug', value: 'bug' }, { title: 'Question', value: 'question' }, { title: 'Enhancement', value: 'enhancement' }, { title: 'Invalid', value: 'invalid' }, { title: 'Duplicate', value: 'duplicate' }, { title: 'Help wanted', value: 'help wanted' }]
     return (
       <View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.CreateTicketContainer}>
-        {this.state.proceed === false && (<View style={{
-            height: height,
-            alignItems: 'center'
-          }}>
-            <Text style={{
-              fontWeight: 'bold',
-              paddingTop: 10,
-              paddingBottom: 40
-            }}>Select type of ticket:</Text>
-            {this.chooseTicketType1()}
-            {this.chooseTicketType2()}
-          </View>)}
-          {this.state.proceed == true && (
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={{ height: height}}>
-                <View style={styles.InputContainer}>
-                  <Text style={styles.TicketInputTitleContainer}>Type of Ticket:</Text>
-                  <TextInput
-                    style={[BasicStyles.formControl, { backgroundColor: Color.gray }]}
-                    value={this.state.type}
-                    editable={false}
-                  />
-                </View>
-                <View style={styles.InputContainer}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.TicketInputTitleContainer}>Title </Text>
-                    <Text style={{color: 'red'}}> *</Text>
-                  </View>
-                  <TextInput
-                    style={BasicStyles.formControl}
-                    onChangeText={(title) => this.setState({ title })}
-                    value={this.state.title}
-                    placeholder={'Title'}
-                  />
-                </View>
-                <View style={styles.InputContainer}>
-                <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.TicketInputTitleContainer}>Description </Text>
-                    <Text style={{color: 'red'}}> *</Text>
-                  </View>
-                  <TextInput
-                    style={{
-                      borderColor: Color.lightGray,
-                      borderWidth: 1,
-                      width: width - 40,
-                      paddingLeft: 10,
-                      marginBottom: 20,
-                      borderRadius: 25,
-                      height: 140
-                    }}
-                    onChangeText={(description) => this.setState({ description })}
-                    value={this.state.description}
-                    placeholder={'Description'}
-                    numberOfLines={6}
-                    multiline={true}
-                  />
-                </View>
-                {this.state.isLoading ? <Spinner mode="overlay" /> : null}
-                <Text style={styles.TicketInputTitleContainer}>Attached file(s) </Text>
-                <View style={{ flexDirection: 'row', padding: 15, width: '90%' }}>
-                  <TouchableOpacity
-                    style={{ marginBottom: 25, padding: 15 }}
-                    onPress={() => {
-                      this.choosePhoto();
-                    }}>
-                    <FontAwesomeIcon
-                      icon={faImages}
-                      style={{
-                        color: Color.gray, marginRight: 5
-                      }}
-                      size={50}
-                    />
-                  </TouchableOpacity>
-                  <ScrollView horizontal={true} showsVerticalScrollIndicator={false}>
-                    {this.state.images.map((u, i) => {
-                      return (
-                        <View key={i}>
-                          <Image
-                            source={{ uri: u }}
-                            style={styles.Image}
-                          />
-                        </View>
-                      )
-                    })}
-                  </ScrollView>
-                </View>
+        <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom: 50}}>
+          <View style={styles.CreateTicketContainer}>
+            {this.state.proceed === false && (
               <View style={{
-                width: '100%',
-                alignItems: 'center',
-                position: 'absolute',
-                bottom: 100
+                height: height,
+                alignItems: 'center'
               }}>
-                <TicketButton
-                  buttonColor="#22B173"
-                  buttonWidth={320}
-                  buttonHeight={50}
-                  fontSize={14}
-                  textColor="#FFFFFF"
-                  buttonText="Create Ticket"
-                  onPress={this.create.bind(this)}
-                />
-              </View>
-              </View>
-            </ScrollView>)}
-        </View>
-      </ScrollView>
-      {this.state.proceed === false && (<View style={{
-        width: '100%',
-        alignItems: 'center',
-        position: 'absolute',
-        bottom: 15
-      }}>
-        <TicketButton
-          buttonColor={theme ? theme.primary : Color.primary}
-          buttonWidth={310}
-          buttonHeight={50}
-          fontSize={14}
-          textColor="#FFFFFF"
-          buttonText="Proceed"
-          onPress={() => {
-            if(this.state.type) {
-              this.setState({ proceed: true })
-            }
-          }}
-        />
-      </View>)}
+                <Text style={{
+                  fontWeight: 'bold',
+                  paddingTop: 10,
+                  paddingBottom: 40
+                }}>Select type of ticket:</Text>
+                {this.chooseTicketType1()}
+                {this.chooseTicketType2()}
+              </View>)}
+            {this.state.proceed == true && (
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={{ height: height }}>
+                  <View style={styles.InputContainer}>
+                    <Text style={styles.TicketInputTitleContainer}>Type of Ticket:</Text>
+                    <TextInput
+                      style={[BasicStyles.formControl, { backgroundColor: Color.gray }]}
+                      value={this.state.type}
+                      editable={false}
+                    />
+                  </View>
+                  <View style={styles.InputContainer}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={styles.TicketInputTitleContainer}>Title </Text>
+                      <Text style={{ color: 'red' }}> *</Text>
+                    </View>
+                    <TextInput
+                      style={BasicStyles.formControl}
+                      onChangeText={(title) => this.setState({ title })}
+                      value={this.state.title}
+                      placeholder={'Title'}
+                    />
+                  </View>
+                  <View style={styles.InputContainer}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text style={styles.TicketInputTitleContainer}>Description </Text>
+                      <Text style={{ color: 'red' }}> *</Text>
+                    </View>
+                    <TextInput
+                      style={{
+                        borderColor: Color.lightGray,
+                        borderWidth: 1,
+                        width: width - 40,
+                        paddingLeft: 10,
+                        marginBottom: 20,
+                        borderRadius: 25,
+                        height: 140
+                      }}
+                      onChangeText={(description) => this.setState({ description })}
+                      value={this.state.description}
+                      placeholder={'Description'}
+                      numberOfLines={6}
+                      multiline={true}
+                    />
+                  </View>
+                  {this.state.isLoading ? <Spinner mode="overlay" /> : null}
+                  <Text style={styles.TicketInputTitleContainer}>Attached file(s) </Text>
+                  <View style={{ flexDirection: 'row', padding: 15, width: '90%' }}>
+                    <TouchableOpacity
+                      style={{ marginBottom: 25, padding: 15 }}
+                      onPress={() => {
+                        this.choosePhoto();
+                      }}>
+                      <FontAwesomeIcon
+                        icon={faImages}
+                        style={{
+                          color: Color.gray, marginRight: 5
+                        }}
+                        size={50}
+                      />
+                    </TouchableOpacity>
+                    <ScrollView horizontal={true} showsVerticalScrollIndicator={false}>
+                      {this.state.images.map((u, i) => {
+                        return (
+                          <View key={i}>
+                            <Image
+                              source={{ uri: u }}
+                              style={styles.Image}
+                            />
+                          </View>
+                        )
+                      })}
+                    </ScrollView>
+                  </View>
+                  <View style={{
+                    width: '100%',
+                    alignItems: 'center',
+                    position: 'absolute',
+                    bottom: 100
+                  }}>
+                    <TicketButton
+                      buttonColor="#22B173"
+                      buttonWidth={320}
+                      buttonHeight={50}
+                      fontSize={14}
+                      textColor="#FFFFFF"
+                      buttonText="Create Ticket"
+                      onPress={this.create.bind(this)}
+                    />
+                  </View>
+                </View>
+              </ScrollView>)}
+          </View>
+        </ScrollView>
+        {this.state.proceed === false && (<View style={{
+          width: '100%',
+          alignItems: 'center',
+          position: 'absolute',
+          bottom: 15
+        }}>
+          <TicketButton
+            buttonColor={theme ? theme.primary : Color.primary}
+            buttonWidth={310}
+            buttonHeight={50}
+            fontSize={14}
+            textColor="#FFFFFF"
+            buttonText="Proceed"
+            onPress={() => {
+              if (this.state.type) {
+                this.setState({ proceed: true })
+              }
+            }}
+          />
+        </View>)}
       </View>
     );
   }

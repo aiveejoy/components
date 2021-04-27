@@ -36,6 +36,7 @@ class CreateRating extends Component {
     console.log('rating', parameter);
     this.setState({isLoading: true});
     Api.request(Routes.ratingsCreate, parameter, response => {
+      console.log('[ratings here in Components]', response);
       this.setState({isLoading: false});
       this.props.action(true)
     });
@@ -48,6 +49,7 @@ class CreateRating extends Component {
 
   _ratings = () => {
     const { userLedger, messengerGroup } = this.props.state;
+    console.log('[reating]', messengerGroup)
     let stars = []
     for(let i = 0; i < 5; i++) {
       stars.push(

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   PermissionsAndroid,
+  Keyboard
 } from 'react-native';
 import {Color} from 'common';
 import {GooglePlacesAutoComplete} from 'components';
@@ -21,6 +22,7 @@ import Geocoder from 'react-native-geocoding';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Config from 'src/config.js';
 import BasicStyles from '../../common/BasicStyles';
+
 
 class LocationWithMap extends Component {
   constructor(props) {
@@ -299,6 +301,7 @@ class LocationWithMap extends Component {
     return (
       <TouchableOpacity
         onPress={() => {
+          Keyboard.dismiss()
           this.GooglePlacesRef.setAddressText('');
           this.setState({errorMessage: null});
         }}>
@@ -350,7 +353,7 @@ class LocationWithMap extends Component {
           renderRightButton={() => this.clearLocation()}
           placeholder="Find location"
           minLength={2} // minimum length of text to search
-          autoFocus={true}
+          autoFocus={false}
           returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
           keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
           listViewDisplayed={false} // true/false/undefined
@@ -436,6 +439,7 @@ class LocationWithMap extends Component {
   };
 
   renderMap = () => {
+    const { theme } = this.props.state
     return (
       <View style={Style.container}>
         <View
@@ -490,7 +494,7 @@ class LocationWithMap extends Component {
             justifyContent: 'center',
             height: 50,
             width: '90%',
-            backgroundColor: this.state.address ? '#22B173' : '#CCCCCC',
+            backgroundColor: this.state.address ? (theme ? theme.secondary : Color.secondary) : '#CCCCCC',
             borderRadius: BasicStyles.formControl.borderRadius ? BasicStyles.formControl.borderRadius : 15,
             bottom: 20,
           }}>

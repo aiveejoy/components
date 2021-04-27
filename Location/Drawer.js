@@ -20,6 +20,7 @@ class HeaderOptions extends Component {
     setPreviousRoute(null)
     this.props.navigationProps.navigate(previousRoute);
   };
+
   render() {
     return (
       <View style={{ flexDirection: 'row' }}>

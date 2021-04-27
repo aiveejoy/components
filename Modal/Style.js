@@ -1,4 +1,4 @@
-import { Color } from 'common';
+import { Color, BasicStyles } from 'common';
 import { Dimensions } from 'react-native';
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -59,8 +59,6 @@ export default {
   sketchBtn: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 40,
-    borderRadius: 5,
     marginTop: 10,
     marginBottom: 10
   }
