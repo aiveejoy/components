@@ -1,6 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import {BasicStyles} from 'common';
 const width = Math.round(Dimensions.get('window').width);
+const height = Math.round(Dimensions.get('window').height);
 import Color from 'common/Color';
 const styles = StyleSheet.create({
   CreateTicketContainer: {
@@ -8,8 +9,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     marginTop: '4%',
-    flex: 1,
-    padding: 15
   },
   InputContainer: {
     width: '90%',
@@ -67,15 +66,15 @@ const styles = StyleSheet.create({
     width: 100,
   },
   CardContainer: {
-    width: (width - 100) / 2,
+    width: (width - 100),
     borderRadius: BasicStyles.standardBorderRadius,
-    marginRight: 10,
-    padding: 10
+    padding: 10,
+    marginBottom: 10
   },
   title: {
     alignItems: 'center',
-    paddingTop: '20%',
-    paddingBottom: '20%',
+    paddingTop: '8%',
+    paddingBottom: '8%',
     textAlign: 'center'
   },
   titleText: {
