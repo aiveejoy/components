@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Image} from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSmile } from '@fortawesome/free-solid-svg-icons';
 import styles from './style.js';
@@ -16,8 +16,19 @@ class Message extends Component{
     this.props.navigation.navigate(route);
   };
 
+  validate = () => {
+    Alert.alert(
+      'Message',
+      'In order to Create Request, Please Verify your Account.',
+      [
+        {text: 'Ok', onPress: () => console.log('Ok'), style: 'cancel'}
+      ],
+      { cancelable: false }
+    )
+  }
+
   render () {
-    const { theme } = this.props.state;
+    const { theme, user } = this.props.state;
     return (
       <View style={{marginTop: '27%', justifyContent: 'center', alignContent: 'center'}}>
       <View style={{
@@ -41,7 +52,7 @@ class Message extends Component{
             </Text>
           </View>
           <TouchableOpacity
-          onPress={() => this.redirect('createRequestStack')}
+          onPress={() => {user.status == 'NOT_VERIFIED' ? this.validate() : this.redirect('createRequestStack')}}
           style={{
             top: '5%',
             alignItems: 'center',
