@@ -9,6 +9,7 @@ import Style from 'components/Support/Style';
 import Api from 'services/api/index.js';
 import Color from 'common/Color';
 import Skeleton from 'components/Loading/Skeleton';
+import Footer from 'modules/generic/Footer'
 import Pagination from 'components/Pagination/Dynamic.js';
 // import Picker from '@react-native-community/picker';
 import _ from 'lodash';
@@ -181,7 +182,7 @@ class Support extends Component {
             height: 60,
             width: 60,
             borderRadius: 30,
-            bottom: 5
+            bottom: 70
           }]}
           onPress={() => {
             this.props.navigation.push('createTicketStack', { user: this.state.user });
@@ -194,6 +195,17 @@ class Support extends Component {
             size={16}
           />
         </TouchableOpacity>
+        <Footer
+          {...this.props}
+          selected={null}
+          onSelect={(value) => {
+            this.setState({
+              page: value,
+              activeIndex: value == 'summary' ? 0 : 1
+            })
+          }}
+          from={'settings'}
+        />
       </View>
     )
   }

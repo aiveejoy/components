@@ -3,7 +3,8 @@ import {
   Platform,
   PermissionsAndroid,
 } from 'react-native';
-import Geolocation from '@react-native-community/geolocation';
+// import Geolocation from '@react-native-community/geolocation';
+import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {connect} from 'react-redux';
 
