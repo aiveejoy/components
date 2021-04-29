@@ -494,11 +494,7 @@ class LocationWithMap extends Component {
             justifyContent: 'center',
             height: 50,
             width: '90%',
-<<<<<<< HEAD
-            backgroundColor: this.state.address ? Color.primary : '#CCCCCC',
-=======
             backgroundColor: this.state.address ? (theme ? theme.secondary : Color.secondary) : '#CCCCCC',
->>>>>>> 20e8971ba9eb60f82436cf043f8fa668690ef61f
             borderRadius: BasicStyles.formControl.borderRadius ? BasicStyles.formControl.borderRadius : 15,
             bottom: 20,
           }}>
