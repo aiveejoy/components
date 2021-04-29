@@ -220,7 +220,8 @@ class CreateTicket extends Component {
             {this.state.proceed === false && (
               <View style={{
                 height: height,
-                alignItems: 'center'
+                alignItems: 'center',
+                marginBottom: 100
               }}>
                 <Text style={{
                   fontWeight: 'bold',
