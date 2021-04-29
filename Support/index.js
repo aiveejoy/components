@@ -204,7 +204,7 @@ class Support extends Component {
               activeIndex: value == 'summary' ? 0 : 1
             })
           }}
-          from={'settings'}
+          from={'support'}
         />
       </View>
     )
