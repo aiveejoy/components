@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, Button, TouchableOpacity, ScrollView, TextInput, BackHandler } from 'react-native';
+import { View, Text, Button, TouchableOpacity, ScrollView, TextInput, BackHandler, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { Routes } from 'common';
 import { faEllipsisH, faPlus, faEnvelope, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { Spinner, Empty } from 'components';
+import EmptyMessage from './EmptyMessage/index';
 import Style from 'components/Support/Style';
 import Api from 'services/api/index.js';
 import Color from 'common/Color';
@@ -13,6 +14,8 @@ import Footer from 'modules/generic/Footer'
 import Pagination from 'components/Pagination/Dynamic.js';
 // import Picker from '@react-native-community/picker';
 import _ from 'lodash';
+
+const height = Math.round(Dimensions.get('window').height);
 
 class Support extends Component {
 
@@ -174,6 +177,14 @@ class Support extends Component {
               </View>
             </View>
           </ScrollView>
+        )}
+        {this.state.isLoading == false && this.state.data.length == 0 && (
+          <View style={{
+            height: height / 2,
+            padding: 10
+          }}>
+            <EmptyMessage navigation={this.props.navigation}/>
+          </View>
         )}
         {this.state.isLoading && (<Skeleton size={2}/>)}
         <TouchableOpacity
