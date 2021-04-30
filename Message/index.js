@@ -30,59 +30,66 @@ class Message extends Component{
   render () {
     const { theme, user } = this.props.state;
     return (
-      <View style={{marginTop: '27%', justifyContent: 'center', alignContent: 'center'}}>
-      <View style={{
-        ...styles.CardContainer,
-        backgroundColor: theme ? theme.primary : Color.primary,
-        borderWidth: 1,
-        borderColor: theme ? theme.primary : Color.primary
-        }}>
-          <View style={[styles.description, {
-            paddingTop: '5%',
-            paddingRight: '30%',
-            marginLeft: '3%'
-          }]}>
-            <Text
-              style={{
-                ...styles.descriptionText,
-                fontSize: BasicStyles.titleText.fontSize,
-                color: Color.white
-              }}>
-              {this.props.message}
-            </Text>
-          </View>
-          <TouchableOpacity
-          onPress={() => {user.status == 'NOT_VERIFIED' ? this.validate() : this.redirect('createRequestStack')}}
-          style={{
-            top: '5%',
-            alignItems: 'center',
+      <View>
+        <View style={{
             justifyContent: 'center',
-            height: 40,
-            borderRadius: 20,
-            marginRight: '35%',
-            color: Color.primary,
-            backgroundColor: Color.white,
-            borderColor: theme ? theme.primary : Color.primary,
+            alignItems: 'center',
+            width: '100%',
+            borderRadius: BasicStyles.standardBorderRadius,
+            padding: 10,
+            marginTop: 20,
+            backgroundColor: theme ? theme.primary : Color.primary,
             borderWidth: 1,
-            width: '50%'
-          }}
-          >
-          <Text style={{
-            color:theme ? theme.primary : Color.primary,
-            fontSize: 11,
-            textAlign: 'center'
-          }}>Create Request</Text>
-          </TouchableOpacity>
-          <Image source={require('assets/Partners.png')} style={{
-            height: 230,
-            width: 230,
-            // marginRight: '20%',
-            marginLeft: '30%',
-            // position: 'absolute',
-            marginTop: '-9%'
-          }}/>
+            borderColor: theme ? theme.primary : Color.primary,
+            flexDirection: 'row'
+          }}>
+            <View style={{
+              width: '60%'
+            }}>
+              <Text
+                style={{
+                  fontSize: BasicStyles.standardFontSize,
+                  fontStyle: 'italic',
+                  textAlign: 'justify',
+                  color: Color.white,
+                  fontSize: BasicStyles.titleText.fontSize,
+                  color: Color.white
+                }}>
+                {this.props.message}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {user.status == 'NOT_VERIFIED' ? this.validate() : this.redirect('createRequestStack')}}
+                style={{
+                  top: '5%',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: 40,
+                  borderRadius: 20,
+                  color: Color.primary,
+                  backgroundColor: Color.white,
+                  borderColor: theme ? theme.primary : Color.primary,
+                  borderWidth: 1,
+                  width: '60%'
+                }}
+                >
+                <Text style={{
+                  color:theme ? theme.primary : Color.primary,
+                  fontSize: 11,
+                  textAlign: 'center'
+                }}>Create Request</Text>
+              </TouchableOpacity>
+            </View>
             
-      </View>
+            <View style={{
+              width: '40%'
+            }}>
+              <Image source={require('assets/Partners.png')} style={{
+                height: 150,
+                width: 150
+              }}/>
+            </View>
+              
+        </View>
       </View>
     );
   }

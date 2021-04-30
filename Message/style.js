@@ -10,11 +10,8 @@ export default {
     width: '100%',
     borderRadius: BasicStyles.standardBorderRadius,
     padding: 10,
-    height: '100%'
-  },
-  description: {
-    alignItems: 'center',
-    alignSelf: 'flex-end'
+    height: 350,
+    marginTop: 20
   },
   descriptionText: {
     fontSize: BasicStyles.standardFontSize,
