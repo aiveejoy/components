@@ -183,7 +183,7 @@ class Support extends Component {
             height: height / 2,
             padding: 10
           }}>
-            <EmptyMessage navigation={this.props.navigation} message={'No tickts displayed'}/>
+            <EmptyMessage navigation={this.props.navigation} message={'No tickets found'}/>
           </View>
         )}
         {this.state.isLoading && (<Skeleton size={2}/>)}
