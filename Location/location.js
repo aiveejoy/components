@@ -7,6 +7,7 @@ import {
 import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {connect} from 'react-redux';
+import Config from 'src/config';
 
 class CurrentLocation extends Component{
   #region = {
@@ -51,7 +52,7 @@ class CurrentLocation extends Component{
   };
 
   #getCurrentLocation = () => {
-    Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
+    Geocoder.init(Config.GOOGLE.API_KEY);
     let watchID = Geolocation.getCurrentPosition(
       position => {
         const currentLongitude = JSON.stringify(position.coords.longitude);
@@ -71,7 +72,8 @@ class CurrentLocation extends Component{
         this.#onRegionChange(this.#region)
       },
       error => {
-        alert(error.message)
+        // alert(error.message)
+        this.$getCurrentLocation()
         // this.#getCurrentLocation();
       },
       {
