@@ -11,7 +11,7 @@ class InputSelect extends Component{
     this.state = {
       input: null,
       filter: false,
-      cuisine: ''
+      cuisine: null
     }
   }
 
@@ -25,12 +25,16 @@ class InputSelect extends Component{
     this.props.navigation.navigate(route)
   }
 
+  getDetails = (category) => {
+    this.state.cuisine = category
+  }
+
   closeFilter(){
     this.setState({
       filter: false
     })    
     this.props.onFinish({
-      cuisine : this.state.cuisine.categories == null ? this.state.cuisine : this.state.cuisine.categories
+      categories : this.state.cuisine?.categories != null ? this.state.cuisine.categories : this.state.cuisine
     })
   }
 
@@ -47,7 +51,7 @@ class InputSelect extends Component{
               title={this.props.titles}
               from={'categories'}
               close={() => this.closeFilter()}
-              onFinish={(categories) => this.setState({cuisine: categories})}
+              onFinish={(categories) => this.getDetails(categories)}
             />
           )}
         <TouchableOpacity
