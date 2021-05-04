@@ -62,7 +62,7 @@ class LocationWithMap extends Component {
 
   requestPermission = async () => {
     if (Platform.OS === 'ios') {
-      Geolocation.requestAuthorization();
+      Geolocation.requestAuthorization('always');
       this.returnToOriginal();
       this.getCurrentLocation();
     } else {
