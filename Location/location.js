@@ -32,7 +32,7 @@ class CurrentLocation extends Component{
   #requestPermission = async () => {
 
     if (Platform.OS === 'ios') {
-      Geolocation.requestAuthorization();
+      Geolocation.requestAuthorization('whenInUse');
       await this.#getCurrentLocation();
     } else {
       let granted = await PermissionsAndroid.request(
@@ -73,12 +73,13 @@ class CurrentLocation extends Component{
       },
       error => {
         // alert(error.message)
-        this.$getCurrentLocation()
+        this.#requestPermission()
         // this.#getCurrentLocation();
       },
       {
         enableHighAccuracy: true,
-        timeout: 360000,
+        forceRequestLocation: true
+        // timeout: 360000,
         // maximumAge: 1000,
       },
     );
