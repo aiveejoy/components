@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Picker, Text, ScrollView, TextInput, TouchableOpacity, Image, Button, Alert, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Image, Button, Alert, Dimensions } from 'react-native';
 import TicketButton from 'components/Support/createTicket/TicketButton.js';
 import styles from 'components/Support/createTicket/Styles.js';
 import Api from 'services/api/index.js';
@@ -68,6 +68,18 @@ class CreateTicket extends Component {
       selected: item,
       type: item.type
     })
+  }
+
+  messageAlert(){
+    Alert.alert(
+      'Message',
+      'Please select (1) type of Ticket.',
+      [
+        { text: 'Ok' }
+      ],
+      { cancelable: false }
+    )
+    return
   }
 
   create = () => {
@@ -308,12 +320,14 @@ class CreateTicket extends Component {
                   <View style={{
                     width: '100%',
                     alignItems: 'center',
+                    justifyContent: 'center',
                     position: 'absolute',
-                    bottom: 100
+                    bottom: 100,
+                    marginLeft: '2%'
                   }}>
                     <TicketButton
                       buttonColor="#22B173"
-                      buttonWidth={320}
+                      buttonWidth={'95%'}
                       buttonHeight={50}
                       fontSize={14}
                       textColor="#FFFFFF"
@@ -325,7 +339,8 @@ class CreateTicket extends Component {
               </ScrollView>)}
           </View>
         </ScrollView>
-        {this.state.proceed === false && (<View style={{
+        {this.state.proceed === false && (
+        <View style={{
           width: '100%',
           alignItems: 'center',
           position: 'absolute',
@@ -341,6 +356,8 @@ class CreateTicket extends Component {
             onPress={() => {
               if (this.state.type) {
                 this.setState({ proceed: true })
+              }else{
+                this.messageAlert()
               }
             }}
           />

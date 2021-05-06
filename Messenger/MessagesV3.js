@@ -57,6 +57,7 @@ class MessagesV3 extends Component{
 
   componentDidMount(){
     const { user } = this.props.state
+    console.log('[userrrrrr]', user)
     if (user == null) return
     this.retrieveGroup()
   }
@@ -506,7 +507,7 @@ class MessagesV3 extends Component{
         }}/>
         <Text style={{
           paddingLeft: 10
-        }}>{item.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item.account.username}</Text>
+        }}>{item?.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item.account.username}</Text>
       </View>
     );
   }

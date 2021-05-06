@@ -19,7 +19,7 @@ class EmptyMessage extends Component{
   validate = () => {
     Alert.alert(
       'Message',
-      'In order to Create Request, Please Verify your Account.',
+      'In order to Create Ticket, Please Verify your Account.',
       [
         {text: 'Ok', onPress: () => console.log('Ok'), style: 'cancel'}
       ],
@@ -58,7 +58,7 @@ class EmptyMessage extends Component{
                 {this.props.message}
               </Text>
               <TouchableOpacity
-                onPress={() => {user.status == 'NOT_VERIFIED' ? this.validate() : this.redirect('createTicketStack')}}
+                onPress={() => this.redirect('createTicketStack')}
                 style={{
                   top: '5%',
                   alignItems: 'center',

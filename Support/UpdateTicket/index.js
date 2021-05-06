@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Image, TouchableNativeFeedbackBase, TouchableHighlightBase } from 'react-native';
 import styles from './Styles.js';
-import Modal from "react-native-modal";
 import Style from 'components/Support/Style';
 import Api from 'services/api/index.js';
 import { Routes, BasicStyles } from 'common';
 import ImagePicker from 'react-native-image-picker';
-import TicketButton from 'components/Support/createTicket/TicketButton.js';
-import Dropdown from 'components/InputField/Dropdown';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImages, faPaperPlane, faClock, faCaretDown, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import Color from 'common/Color';
-import { Spinner } from 'components';
-import Picker from '@react-native-community/picker';
 import { Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import PostCard from 'modules/generic/PostCard.js';
@@ -199,7 +194,7 @@ class UpdateTicket extends Component {
     const { theme } = this.props.state;
     return (
       <View>
-        {this.state.isLoading && (<Skeleton size={2} />)}
+        {this.state.isLoading && (<Skeleton size={2} template={'block'} height={50}/>)}
         {this.state.title && (
           <View style={{
             marginBottom: 25,
@@ -269,7 +264,7 @@ class UpdateTicket extends Component {
     return (
       <View style={styles.CreateTicketContainer}>
         <ScrollView showsVerticalScrollIndicator={false}>
-        {this.state.isLoading && (<Skeleton size={2} />)}
+        {this.state.isLoading && (<Skeleton size={0} template={'block'} height={50}/>)}
           {this.state.title && (<View style={{
             borderColor: Color.gray,
             borderBottomWidth: .3,
