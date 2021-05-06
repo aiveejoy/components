@@ -3,8 +3,8 @@ import {
   Platform,
   PermissionsAndroid,
 } from 'react-native';
-// import Geolocation from '@react-native-community/geolocation';
-import Geolocation from 'react-native-geolocation-service';
+import Geolocation from '@react-native-community/geolocation';
+// import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {connect} from 'react-redux';
 
@@ -46,6 +46,7 @@ class CurrentLocation extends Component{
         await this.#getCurrentLocation();
       } else {
         console.log('Location permission not granted!!!!');
+        this.props.logout();
       }
     }
   };
@@ -75,9 +76,9 @@ class CurrentLocation extends Component{
         // this.#getCurrentLocation();
       },
       {
-        enableHighAccuracy: true,
-        timeout: 360000,
-        // maximumAge: 1000,
+        enableHighAccuracy: false,
+        timeout: 30000,
+        maximumAge: 1000
       },
     );
   }
