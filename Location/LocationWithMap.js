@@ -17,7 +17,8 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faTimes, faChevronLeft} from '@fortawesome/free-solid-svg-icons';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 // import Geolocation from 'react-native-geolocation-service';
-import Geolocation from '@react-native-community/geolocation';
+// import Geolocation from '@react-native-community/geolocation';
+import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Config from 'src/config.js';
@@ -61,7 +62,7 @@ class LocationWithMap extends Component {
 
   requestPermission = async () => {
     if (Platform.OS === 'ios') {
-      Geolocation.requestAuthorization();
+      Geolocation.requestAuthorization('always');
       this.returnToOriginal();
       this.getCurrentLocation();
     } else {
