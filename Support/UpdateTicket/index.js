@@ -114,6 +114,11 @@ class UpdateTicket extends Component {
     let parameter = {
       condition: [
         {
+          value: 'ticket_id',
+          column: 'payload',
+          clause: '='
+        },
+        {
           value: id,
           column: 'payload_value',
           clause: '='
