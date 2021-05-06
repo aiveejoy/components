@@ -727,7 +727,8 @@ class MessagesV3 extends Component{
       isViewing
     } = this.state;
     const { data } = this.props.navigation.state.params;
-    const { messengerGroup, user } = this.props.state;
+    const { messengerGroup, user, viewField } = this.props.state;
+    console.log('[MESSEGER GROUP]', this.props.state.viewField);
     return (
       <SafeAreaView>
         {
@@ -806,7 +807,17 @@ class MessagesV3 extends Component{
               borderTopWidth: 1,
               backgroundColor: Color.white
             }}>
-              {messengerGroup != null && messengerGroup.status < 2 && !isViewing && (this._footer())}
+              {
+                messengerGroup != null && messengerGroup.status < 2 && !isViewing ? (
+                  this._footer()
+                ):(
+                  viewField === true ? (
+                    this._footer()
+                  ) : (
+                    <View></View>
+                  )
+                )
+              }
             </View>
             <ImageModal
               visible={isImageModal}
