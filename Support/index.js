@@ -3,16 +3,13 @@ import { View, Text, Button, TouchableOpacity, ScrollView, TextInput, BackHandle
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { Routes } from 'common';
-import { faEllipsisH, faPlus, faEnvelope, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { Spinner, Empty } from 'components';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import EmptyMessage from './EmptyMessage/index';
 import Style from 'components/Support/Style';
 import Api from 'services/api/index.js';
 import Color from 'common/Color';
 import Skeleton from 'components/Loading/Skeleton';
 import Footer from 'modules/generic/Footer'
-import Pagination from 'components/Pagination/Dynamic.js';
-// import Picker from '@react-native-community/picker';
 import _ from 'lodash';
 
 const height = Math.round(Dimensions.get('window').height);
@@ -186,7 +183,7 @@ class Support extends Component {
             <EmptyMessage navigation={this.props.navigation} message={'No tickets found'}/>
           </View>
         )}
-        {this.state.isLoading && (<Skeleton size={2}/>)}
+        {this.state.isLoading && (<Skeleton size={3} template={'block'} height={50}/>)}
         <TouchableOpacity
           style={[Style.floatingButton, {
             backgroundColor: theme ? theme.secondary : Color.secondary,
