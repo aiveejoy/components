@@ -38,7 +38,7 @@ class Options extends Component {
       requestId: null,
       imageModal: false,
       url: null,
-      supportEnabled: []
+      supportEnabled: null
     }
   }
 
@@ -369,7 +369,8 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportRetrieve, parameter, response => {
       this.setState({ isLoading: false })
-      this.setState({supportEnabled: response.data})
+      console.log(response.data, 'lalaine-----------');
+      this.setState({supportEnabled: response.data[0]})
     })
   }
 
@@ -380,10 +381,9 @@ class Options extends Component {
       account_id: user.id,
       payload: 'request_id',
       payload_value: data.id,
-      status: 1,
+      status: 'PENDING',
       assigned_to: ''
     }
-    console.log(parameter, data, '====');
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportCreate, parameter, response => {
       if(response.error = 'Request already exist'){
@@ -562,7 +562,7 @@ class Options extends Component {
                 fontSize: BasicStyles.standardFontSize,
                 paddingLeft: 20,
                 width: '90%'
-              }}>{item.title === 'Enable Support' ? (this.state.supportEnabled.length > 0 ? 'Enabled Support' : 'Enable Support') : item.title}</Text>
+              }}>{item.title === 'Enable Support' ? (this.state.supportEnabled?.status !== 'PENDING' ? 'Enabled Support' : 'Enable Support') : item.title}</Text>
               {
                 (item.title != 'Close') && (
                   <View style={{
