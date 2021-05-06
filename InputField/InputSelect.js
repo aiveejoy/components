@@ -30,11 +30,12 @@ class InputSelect extends Component{
   }
 
   closeFilter(){
+
     this.setState({
       filter: false
     })    
     this.props.onFinish({
-      categories : this.state.cuisine?.categories != null ? this.state.cuisine.categories : this.state.cuisine
+      categories : this.state.cuisine?.categories?.length >= 1 ? this.state.cuisine.categories : this.state.cuisine
     })
   }
 
@@ -43,6 +44,7 @@ class InputSelect extends Component{
     return (
         <View style={{
           marginLeft: 20,
+          marginBottom: '5%',
           width: '90%'}}>
             {filter && (
             <Filter
@@ -63,16 +65,20 @@ class InputSelect extends Component{
             placeholder={this.props.placeholder}
           />
         </TouchableOpacity>
-        <TouchableHighlight
-          style={{
-            position: 'absolute',
-            right: 10,
-            top: 30
-          }}
-          underlayColor={Color.white}
-          >
-          <Text>All</Text>
-        </TouchableHighlight>
+        {
+          (this.state.cuisine?.categories?.length < 1 || this.state.cuisine == null || this.state.cuisine?.categories?.length == 10) && (
+          <TouchableHighlight
+            style={{
+              position: 'absolute',
+              right: 10,
+              top: 30
+            }}
+            underlayColor={Color.white}
+            >
+            <Text>All</Text>
+          </TouchableHighlight>
+          )
+        }
       </View>
     )
   }
