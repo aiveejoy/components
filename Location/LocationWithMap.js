@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   PermissionsAndroid,
+  Keyboard
 } from 'react-native';
 import {Color} from 'common';
 import {GooglePlacesAutoComplete} from 'components';
@@ -16,11 +17,13 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faTimes, faChevronLeft} from '@fortawesome/free-solid-svg-icons';
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 // import Geolocation from 'react-native-geolocation-service';
-import Geolocation from '@react-native-community/geolocation';
+// import Geolocation from '@react-native-community/geolocation';
+import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Config from 'src/config.js';
 import BasicStyles from '../../common/BasicStyles';
+
 
 class LocationWithMap extends Component {
   constructor(props) {
@@ -59,7 +62,7 @@ class LocationWithMap extends Component {
 
   requestPermission = async () => {
     if (Platform.OS === 'ios') {
-      Geolocation.requestAuthorization();
+      Geolocation.requestAuthorization('always');
       this.returnToOriginal();
       this.getCurrentLocation();
     } else {
@@ -299,6 +302,7 @@ class LocationWithMap extends Component {
     return (
       <TouchableOpacity
         onPress={() => {
+          Keyboard.dismiss()
           this.GooglePlacesRef.setAddressText('');
           this.setState({errorMessage: null});
         }}>
@@ -436,6 +440,7 @@ class LocationWithMap extends Component {
   };
 
   renderMap = () => {
+    const { theme } = this.props.state
     return (
       <View style={Style.container}>
         <View
@@ -490,7 +495,7 @@ class LocationWithMap extends Component {
             justifyContent: 'center',
             height: 50,
             width: '90%',
-            backgroundColor: this.state.address ? '#22B173' : '#CCCCCC',
+            backgroundColor: this.state.address ? (theme ? theme.secondary : Color.secondary) : '#CCCCCC',
             borderRadius: BasicStyles.formControl.borderRadius ? BasicStyles.formControl.borderRadius : 15,
             bottom: 20,
           }}>

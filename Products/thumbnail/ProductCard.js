@@ -186,7 +186,7 @@ class ProductCard extends Component {
                         marginLeft:5,
                         color: Color.blue,
                         fontSize: BasicStyles.standardFontSize
-                      }}>({item.variation && item.variation.length > 0 ? item.variation[0].payload_value + item.variation[0].payload : '100L'})</Text>
+                      }}>({item.variation && item.variation.length > 0 ? Conversion.getConvertedUnit(item.variation[0].payload, item.variation[0].payload_value)  : '100L'})</Text>
                     </View>
                   </View>
                 </View>

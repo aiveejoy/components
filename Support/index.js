@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-import { View, Text, Button, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, Button, TouchableOpacity, ScrollView, TextInput, BackHandler, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { Routes } from 'common';
-import { faEllipsisH, faPlus, faEnvelope, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import { Spinner, Empty } from 'components';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import EmptyMessage from './EmptyMessage/index';
 import Style from 'components/Support/Style';
 import Api from 'services/api/index.js';
 import Color from 'common/Color';
 import Skeleton from 'components/Loading/Skeleton';
-import Pagination from 'components/Pagination/Dynamic.js';
-// import Picker from '@react-native-community/picker';
+import Footer from 'modules/generic/Footer'
 import _ from 'lodash';
+
+const height = Math.round(Dimensions.get('window').height);
 
 class Support extends Component {
 
@@ -30,9 +31,21 @@ class Support extends Component {
     };
   }
 
+  componentWillUnmount() {
+    this.backHandler.remove();
+  }
+
+  handleBackPress = () => {
+    return true
+  };
+
   componentDidMount() {
     this.setState({ user: this.props.state.user })
     this.retrieve(false);
+    this.backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleBackPress,
+    );
   }
 
   retrieve(flag) {
@@ -133,7 +146,7 @@ class Support extends Component {
             }}
           >
             <View>
-              <View style={{ padding: 10 }}>
+              <View style={{ padding: 10, marginBottom: 50 }}>
                 <Text style={{ fontWeight: 'bold' }}>TICKETS</Text>
                 {
                   this.state.data.map((u, i) => {
@@ -162,7 +175,15 @@ class Support extends Component {
             </View>
           </ScrollView>
         )}
-        {this.state.isLoading && (<Skeleton size={2}/>)}
+        {this.state.isLoading == false && this.state.data.length == 0 && (
+          <View style={{
+            height: height / 2,
+            padding: 10
+          }}>
+            <EmptyMessage navigation={this.props.navigation} message={'No tickets found'}/>
+          </View>
+        )}
+        {this.state.isLoading && (<Skeleton size={3} template={'block'} height={50}/>)}
         <TouchableOpacity
           style={[Style.floatingButton, {
             backgroundColor: theme ? theme.secondary : Color.secondary,
@@ -182,6 +203,17 @@ class Support extends Component {
             size={16}
           />
         </TouchableOpacity>
+        <Footer
+          {...this.props}
+          selected={null}
+          onSelect={(value) => {
+            this.setState({
+              page: value,
+              activeIndex: value == 'summary' ? 0 : 1
+            })
+          }}
+          from={'support'}
+        />
       </View>
     )
   }

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { View, TouchableHighlight, TextInput, Text } from 'react-native'
 import { Color, BasicStyles} from 'common';
-import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
@@ -9,35 +8,36 @@ class NumberInput extends Component{
   constructor(props){
     super(props);
     this.state = {
-      input: 0,
-      count: 1,
+      count: 1
     }
   }
 
   increment = () => {
-    const { setSize } = this.props
     if(this.state.count >= 1){
       this.setState({
         count: this.state.count + 1
       });
-    setSize(this.state.count);
+      this.setSize(this.state.count + 1)
     }
   }
   
   decrement = () => {
-    const { setSize } = this.props
     if(this.state.count > 1 ){
       this.setState({
         count: this.state.count - 1
       });
-    setSize(this.state.count);
+      this.setSize(this.state.count - 1)
     }
   }
 
+  setSize(size) {
+    this.setState({
+      count: size
+    })
+    this.props.onFinish({count: size})
+  }
+
   render() {
-    const { setSize } = this.props
-    const { size } = this.props.state
-    console.log('[sizeinNumberInput]', size )
     return (
       <View style={{
         position: 'absolute',
@@ -46,7 +46,7 @@ class NumberInput extends Component{
          <Text style={{color: 'black', marginBottom: -10}}>{this.props.title}</Text>
         <TextInput
           style={[BasicStyles.formControls, {width: '100%'}]}
-          onChangeText={(count) => this.setState({ count })}
+          onChangeText={(count) => this.setState({count})}
           value={ this.state.count }
           keyboardType={'numeric'}
           placeholder={this.state.count.toString()}
@@ -79,17 +79,5 @@ class NumberInput extends Component{
   }
 
 }
-const mapStateToProps = state => ({ state: state });
 
-
-const mapDispatchToProps = dispatch => {
-  const { actions } = require('@redux');
-  return {
-    setSize: (size) => dispatch(actions.setSize(size))
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(NumberInput);
+export default NumberInput;

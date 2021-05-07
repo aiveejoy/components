@@ -10,7 +10,8 @@ class InputSelect extends Component{
     super(props);
     this.state = {
       input: null,
-      filter: false
+      filter: false,
+      cuisine: null
     }
   }
 
@@ -24,11 +25,26 @@ class InputSelect extends Component{
     this.props.navigation.navigate(route)
   }
 
+  getDetails = (category) => {
+    this.state.cuisine = category
+  }
+
+  closeFilter(){
+
+    this.setState({
+      filter: false
+    })    
+    this.props.onFinish({
+      categories : this.state.cuisine?.categories?.length >= 1 ? this.state.cuisine.categories : this.state.cuisine
+    })
+  }
+
   render() {
     const { filter } = this.state;
     return (
         <View style={{
           marginLeft: 20,
+          marginBottom: '5%',
           width: '90%'}}>
             {filter && (
             <Filter
@@ -36,11 +52,8 @@ class InputSelect extends Component{
               visible={filter}
               title={this.props.titles}
               from={'categories'}
-              close={() => {
-                this.setState({
-                  filter: false
-                })
-              }}
+              close={() => this.closeFilter()}
+              onFinish={(categories) => this.getDetails(categories)}
             />
           )}
         <TouchableOpacity
@@ -49,19 +62,23 @@ class InputSelect extends Component{
           <TextInput
             style={[BasicStyles.formControls, {width: '100%'}]}
             editable={false}
-            placeholder={this.props.value}
+            placeholder={this.props.placeholder}
           />
         </TouchableOpacity>
-        <TouchableHighlight
-          style={{
-            position: 'absolute',
-            right: 10,
-            top: 30
-          }}
-          underlayColor={Color.white}
-          >
-          <Text>All</Text>
-        </TouchableHighlight>
+        {
+          (this.state.cuisine?.categories?.length < 1 || this.state.cuisine == null || this.state.cuisine?.categories?.length == 10) && (
+          <TouchableHighlight
+            style={{
+              position: 'absolute',
+              right: 10,
+              top: 30
+            }}
+            underlayColor={Color.white}
+            >
+            <Text>All</Text>
+          </TouchableHighlight>
+          )
+        }
       </View>
     )
   }

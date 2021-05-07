@@ -6,7 +6,7 @@ import styles from './style.js';
 import { Color, BasicStyles } from 'common';
 import { Dimensions } from 'react-native';
 import {connect} from 'react-redux';
-class Message extends Component{
+class EmptyMessage extends Component{
   
   constructor(props){
     super(props);
@@ -19,7 +19,7 @@ class Message extends Component{
   validate = () => {
     Alert.alert(
       'Message',
-      'In order to Create Request, Please Verify your Account.',
+      'In order to Create Ticket, Please Verify your Account.',
       [
         {text: 'Ok', onPress: () => console.log('Ok'), style: 'cancel'}
       ],
@@ -58,7 +58,7 @@ class Message extends Component{
                 {this.props.message}
               </Text>
               <TouchableOpacity
-                onPress={() => {user.status == 'NOT_VERIFIED' ? this.validate() : this.redirect('createRequestStack')}}
+                onPress={() => this.redirect('createTicketStack')}
                 style={{
                   top: '5%',
                   alignItems: 'center',
@@ -76,7 +76,7 @@ class Message extends Component{
                   color:theme ? theme.primary : Color.primary,
                   fontSize: 11,
                   textAlign: 'center'
-                }}>Create Request</Text>
+                }}>Create Ticket</Text>
               </TouchableOpacity>
             </View>
             
@@ -103,4 +103,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Message);
+export default connect(mapStateToProps, mapDispatchToProps)(EmptyMessage);
