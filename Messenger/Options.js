@@ -38,7 +38,7 @@ class Options extends Component {
       requestId: null,
       imageModal: false,
       url: null,
-      supportEnabled: null
+      supportEnabled: []
     }
   }
 
@@ -369,8 +369,9 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportRetrieve, parameter, response => {
       this.setState({ isLoading: false })
-      console.log(response.data, 'lalaine-----------');
-      this.setState({supportEnabled: response.data[0]})
+      if(response.data.length > 0) {
+        this.setState({supportEnabled: response.data})
+      }
     })
   }
 
@@ -391,6 +392,7 @@ class Options extends Component {
         this.setState({ isLoading: false })
         return
       }
+      this.checkIfSupportEnabled();
       this.setState({ isLoading: false })
     })
   }
@@ -562,7 +564,7 @@ class Options extends Component {
                 fontSize: BasicStyles.standardFontSize,
                 paddingLeft: 20,
                 width: '90%'
-              }}>{item.title === 'Enable Support' ? (this.state.supportEnabled?.status !== 'PENDING' ? 'Enabled Support' : 'Enable Support') : item.title}</Text>
+              }}>{item.title === 'Enable Support' ? (this.state.supportEnabled?.length > 0 ? 'Enabled Support' : 'Enable Support') : item.title}</Text>
               {
                 (item.title != 'Close') && (
                   <View style={{
@@ -570,6 +572,12 @@ class Options extends Component {
                     justifyContent: 'center'
                   }}>
                     <FontAwesomeIcon
+                      onPress={() => {
+                        if(item.title === 'Enable Support' && this.state.supportEnabled?.length > 0) {
+                          console.log(this.state.supportEnabled.length > 0 && this.state.supportEnabled, 'support');
+                          this.props.navigation.navigate('commentsStack', {payload: 'support_id', payload_value: this.state.supportEnabled.length > 0 && this.state.supportEnabled[0].id})
+                        }
+                      }}
                       icon={faChevronRight}
                       size={20}
                       style={{ color: Color.primary }} />
