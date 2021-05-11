@@ -334,8 +334,8 @@ class LocationWithMap extends Component {
         }}>
         <TouchableOpacity
           onPress={() => {
-            const{setLocation} = this.props;
-            setLocation(null);
+            // const{setLocation} = this.props;
+            // setLocation(null);
             this.props.navigation.pop();
           }}
           style={{
