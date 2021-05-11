@@ -348,7 +348,7 @@ class CreateTicket extends Component {
         }}>
           <TicketButton
             buttonColor={theme ? theme.primary : Color.primary}
-            buttonWidth={310}
+            buttonWidth={'90%'}
             buttonHeight={50}
             fontSize={14}
             textColor="#FFFFFF"
