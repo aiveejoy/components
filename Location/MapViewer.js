@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import {
   Platform,
-  PermissionsAndroid,
-  View,
-  Image
+  Dimensions,
+  View
 } from 'react-native';
 import {Color, BasicStyles} from 'common';
 import Geolocation from '@react-native-community/geolocation';
@@ -12,11 +11,14 @@ import { connect } from 'react-redux';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import Config from 'src/config.js'
 import { Marker } from 'react-native-maps';
+const width = Dimensions.get('window').width
+const height = Dimensions.get('window').height
 
 class MapViewer extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      isMapReady: false,
       region: {
         latitude: 0,
         longitude: 0,
@@ -33,6 +35,10 @@ class MapViewer extends Component {
     })
   };
 
+  onMapLayout = () => {
+    this.setState({ isMapReady: true });
+  };
+
   renderMap = () => {
     return (
       <View style={{
@@ -40,11 +46,13 @@ class MapViewer extends Component {
       }}>
         <MapView
           style={{
-            width: '100%',
-            height: '100%',
+            minWidth: Dimensions.get("window").width - 50,
+            minHeight: Dimensions.get("window").height - 300,
+            flex: 1,
             borderRadius: BasicStyles.standardBorderRadius
           }}
           ref={(ref) => (this.mapView = ref)}
+          onMapReady={this.onMapLayout}
           provider={PROVIDER_GOOGLE}
           region={{
             ...this.props.data,
@@ -55,17 +63,21 @@ class MapViewer extends Component {
           }}
           onRegionChangeComplete={(e) => this.onRegionChange(e)}
         >
-          <Marker
-            key={0}
-            coordinate={{
-              ...this.props.data,
-              latitudeDelta: 0.005,
-              longitudeDelta: 0.005,
-              longitude: parseFloat(this.props.data.longitude),
-              latitude: parseFloat(this.props.data.latitude)
-            }}
-            title={this.props.data.route}
-          />
+          {
+            this.state.isMapReady && (
+              <Marker
+                key={0}
+                coordinate={{
+                  ...this.props.data,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                  longitude: parseFloat(this.props.data.longitude),
+                  latitude: parseFloat(this.props.data.latitude)
+                }}
+                title={this.props.data.route}
+              />
+            )
+          }
         </MapView>
       </View>
     );
