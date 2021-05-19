@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, Alert} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSmile } from '@fortawesome/free-solid-svg-icons';
 import styles from './style.js';
-import { Color, BasicStyles } from 'common';
+import { Color, BasicStyles, Helper } from 'common';
 import { Dimensions } from 'react-native';
 import {connect} from 'react-redux';
 class Message extends Component{
@@ -58,7 +58,7 @@ class Message extends Component{
                 {this.props.message}
               </Text>
               <TouchableOpacity
-                onPress={() => {user.status == 'NOT_VERIFIED' ? this.validate() : this.redirect('createRequestStack')}}
+                onPress={() => {(Helper.checkStatus(user) < Helper.accountVerified) ?  this.validate() : this.redirect('createRequestStack')}}
                 style={{
                   top: '5%',
                   alignItems: 'center',
