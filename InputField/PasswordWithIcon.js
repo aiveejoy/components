@@ -57,6 +57,7 @@ class PasswordInputWithIconLeft extends Component{
           value={this.state.input}
           placeholder={this.props.placeholder ? this.props.placeholder : '*******'}
           secureTextEntry={this.state.flag == false ? true : false}
+          placeholderTextColor={'#d1d1d1'}
         />
         <TouchableHighlight
           onPress={() => this.setState({
