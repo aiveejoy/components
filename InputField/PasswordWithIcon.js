@@ -65,9 +65,7 @@ class PasswordInputWithIconLeft extends Component{
           })}
           style={{
             position: 'absolute',
-            right: 0,
-            width: 50,
-            height: 50,
+            right: 10,
             alignItems: 'center',
             justifyContent: 'center'
           }}
