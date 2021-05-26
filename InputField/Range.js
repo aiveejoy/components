@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, TextInput, Text } from 'react-native'
-import { Color, BasicStyles} from 'common';
+import { BasicStyles} from 'common';
 import Filter from 'modules/filter/Filter.js'
 
 class Range extends Component{
