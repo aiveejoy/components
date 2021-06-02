@@ -35,7 +35,7 @@ class InputSelect extends Component{
       filter: false
     })    
     this.props.onFinish({
-      categories : this.state.cuisine?.categories?.length >= 1 ? this.state.cuisine.categories : this.state.cuisine
+      categories : this.state.cuisine?.categories?.length >= 1 ? this.state.cuisine.categories : this.state.cuisine.categories
     })
   }
 

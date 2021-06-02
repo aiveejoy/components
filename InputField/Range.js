@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, TextInput, Text } from 'react-native'
-import { Color, BasicStyles} from 'common';
+import { BasicStyles} from 'common';
 import Filter from 'modules/filter/Filter.js'
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 
 class Range extends Component{
   constructor(props){
