@@ -8,7 +8,8 @@ class Range extends Component{
     super(props);
     this.state={
       filter: false,
-      value: 100
+      value: 100,
+      valueHigh: 9000
     }
   }
 
@@ -27,7 +28,7 @@ class Range extends Component{
       filter: false
     })
     this.props.onFinish({
-      amount : this.state.value.amount == undefined ? this.state.value : this.state.value.amount
+      amount : this.state.value.amount == undefined ? this.state.value : this.state.value.amount,
     })
   }
   
@@ -54,7 +55,7 @@ class Range extends Component{
           <TextInput
             style={[BasicStyles.formControls, {width: '100%'}]}
             editable={false}
-            placeholder={'$' + (this.state.value.amount == undefined ? this.state.value : this.state.value.amount) + '-' + '$9000'}
+            placeholder={'$' + (this.state.value.amount == undefined ? this.state.value : this.state.value.amount.low) + '-' + '$' + (this.state.value.amount == undefined ? this.state.valueHigh : this.state.value.amount.high)}
           />
         </TouchableOpacity>
       </View>
