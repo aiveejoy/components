@@ -218,6 +218,8 @@ class ProductCard extends Component {
   }
 }
 
+
+
 const mapStateToProps = state => ({state: state});
 
 const mapDispatchToProps = dispatch => {
