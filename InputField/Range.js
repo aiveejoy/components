@@ -27,9 +27,9 @@ class Range extends Component{
     this.setState({
       filter: false
     })
-    this.props.onFinish({
-      amount : this.state.value.amount == undefined ? this.state.value : this.state.value.amount,
-    })
+    // this.props.onFinish({
+    //   amount : this.state.value.amount == undefined ? this.state.value : this.state.value.amount,
+    // })
   }
   
   render() {
@@ -55,7 +55,7 @@ class Range extends Component{
           <TextInput
             style={[BasicStyles.formControls, {width: '100%'}]}
             editable={false}
-            placeholder={'$' + (this.state.value.amount == undefined ? this.state.value : this.state.value.amount.low) + '-' + '$' + (this.state.value.amount == undefined ? this.state.valueHigh : this.state.value.amount.high)}
+            placeholder={'$' + ((this.state.value?.amount?.low === undefined) ? this.state.value : this.state.value?.amount?.low) + '-' + '$' + ((this.state.value?.amount?.high === undefined) ? this.state.valueHigh : this.state.value?.amount?.high)}
           />
         </TouchableOpacity>
       </View>
