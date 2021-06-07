@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import styles from './Style.js';
-import { View, TouchableOpacity, Image, Platform} from 'react-native';
+import { View, TouchableOpacity, Image, Platform, Alert} from 'react-native';
 import Modal from "react-native-modal";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { Color , BasicStyles} from 'common';
+import { faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Color , BasicStyles, Routes} from 'common';
 import { Spinner } from 'components';
 import Api from 'services/api/index.js';
 import { Dimensions } from 'react-native';
@@ -17,8 +17,26 @@ class ImageModal extends Component {
   }
 
   action = () => {
-    console.log('hi')
     this.props.action()
+  }
+
+  del = (id) => {
+    let parameter = {
+      id: id
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.accountCardsDelete, parameter, response => {
+      if(response.data > 0){
+        Alert.alert(
+          'Message',
+          'Image successfully deleted',
+          [
+            { text: 'Ok', onPress: () => (this.props.successDel(), this.props.action()), style: 'cancel' }
+          ],
+          { cancelable: false }
+        )
+      }
+    })
   }
 
   render(){
@@ -61,6 +79,12 @@ class ImageModal extends Component {
                   resizeMode: 'center'
                 }}
               />
+              <TouchableOpacity onPress={() => this.del(this.props.deleteID)} style={[styles.close, { marginTop: '20%', marginLeft: '48%'
+                }]}>
+                <FontAwesomeIcon icon={ faTrash } style={{
+                  color: Color.white
+                }} size={BasicStyles.iconSize} />
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
