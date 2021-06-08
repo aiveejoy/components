@@ -57,27 +57,30 @@ class Message extends Component{
                 }}>
                 {this.props.message}
               </Text>
-              <TouchableOpacity
-                onPress={() => {(Helper.checkStatus(user) < Helper.accountVerified) ?  this.validate() : this.redirect('createRequestStack')}}
-                style={{
-                  top: '5%',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: 40,
-                  borderRadius: 20,
-                  color: Color.primary,
-                  backgroundColor: Color.white,
-                  borderColor: theme ? theme.primary : Color.primary,
-                  borderWidth: 1,
-                  width: '60%'
-                }}
-                >
-                <Text style={{
-                  color:theme ? theme.primary : Color.primary,
-                  fontSize: 11,
-                  textAlign: 'center'
-                }}>Create Request</Text>
-              </TouchableOpacity>
+              {
+                (this.props.page != 'onNegotiation') &&
+                (<TouchableOpacity
+                  onPress={() => {(Helper.checkStatus(user) < Helper.accountVerified) ?  this.validate() : this.redirect('createRequestStack')}}
+                  style={{
+                    top: '5%',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: 40,
+                    borderRadius: 20,
+                    color: Color.primary,
+                    backgroundColor: Color.white,
+                    borderColor: theme ? theme.primary : Color.primary,
+                    borderWidth: 1,
+                    width: '60%'
+                  }}
+                  >
+                  <Text style={{
+                    color:theme ? theme.primary : Color.primary,
+                    fontSize: 11,
+                    textAlign: 'center'
+                  }}>Create Request</Text>
+                </TouchableOpacity>)
+              }
             </View>
             
             <View style={{
