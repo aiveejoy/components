@@ -5,12 +5,10 @@ import Modal from "react-native-modal";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Color , BasicStyles, Routes} from 'common';
-import { Spinner } from 'components';
 import Api from 'services/api/index.js';
 import { Dimensions } from 'react-native';
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
-import Config from 'src/config.js';
 class ImageModal extends Component {
   constructor(props){
     super(props);
