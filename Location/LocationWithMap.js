@@ -1,3 +1,4 @@
+  
 import React, {Component} from 'react';
 import Style from './LocationWithMapStyles';
 import {
@@ -305,7 +306,7 @@ class LocationWithMap extends Component {
     const setLocation = this.props.setLocation;
     if (this.state.address == null) {
       alert('Please Input an Address or Use the Pin');
-    } else {
+    } else
       this.setState({locationPicked: true}, () => {
         const location = {
           route: this.state.route,
@@ -322,7 +323,6 @@ class LocationWithMap extends Component {
         setLocation(location);
         this.props.navigation.pop();
       });
-    }
   };
 
   clearLocation = () => {
