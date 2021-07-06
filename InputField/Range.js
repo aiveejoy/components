@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, TextInput, Text } from 'react-native'
-import { Color, BasicStyles} from 'common';
+import { BasicStyles} from 'common';
 import Filter from 'modules/filter/Filter.js'
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 
 class Range extends Component{
   constructor(props){
     super(props);
     this.state={
       filter: false,
-      value: 100
+      value: 100,
+      valueHigh: 9000
     }
   }
 
@@ -28,9 +27,9 @@ class Range extends Component{
     this.setState({
       filter: false
     })
-    this.props.onFinish({
-      amount : this.state.value.amount == undefined ? this.state.value : this.state.value.amount
-    })
+    // this.props.onFinish({
+    //   amount : this.state.value.amount == undefined ? this.state.value : this.state.value.amount,
+    // })
   }
   
   render() {
@@ -56,7 +55,7 @@ class Range extends Component{
           <TextInput
             style={[BasicStyles.formControls, {width: '100%'}]}
             editable={false}
-            placeholder={'$' + (this.state.value.amount == undefined ? this.state.value : this.state.value.amount) + '-' + '$9000'}
+            placeholder={'$' + ((this.state.value?.amount?.low === undefined) ? this.state.value : this.state.value?.amount?.low) + '-' + '$' + ((this.state.value?.amount?.high === undefined) ? this.state.valueHigh : this.state.value?.amount?.high)}
           />
         </TouchableOpacity>
       </View>

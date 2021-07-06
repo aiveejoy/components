@@ -63,7 +63,7 @@ class LocationWithMap extends Component {
   requestPermission = async () => {
     if (Platform.OS === 'ios') {
       Geolocation.requestAuthorization('always');
-      this.returnToOriginal();
+      // this.returnToOriginal();
       this.getCurrentLocation();
     } else {
       let granted = await PermissionsAndroid.request(
@@ -149,8 +149,8 @@ class LocationWithMap extends Component {
             longitude: position.coords.longitude,
           },
           pinnedLocation: true,
-          address: null,
         });
+        this.getLocationDetails(position.coords.latitude, position.coords.longitude)
         // this.onRegionChange(this.state.region);
         console.log('-------------------------------------------TESTING----------------------------------------------', position)
       },
@@ -176,17 +176,43 @@ class LocationWithMap extends Component {
     }
   };
 
+  getLocationDetails = (latitude, longitude) => {
+    console.log('hello')
+    Geocoder.from(latitude, longitude).then((json) => {
+      var details = json.results[0].formatted_address.split(', ');
+        // latitude: latitude,
+        // longitude: longitude,
+        // route: details[0],
+        // locality: details[2],
+        // region: details[3],
+        // country: details[4],
+        // postal: null
+      this.setState({
+        address: json.results[0].formatted_address,
+        route: details[0],
+        locality: details[2],
+        province: details[3],
+        country: details[4],
+        postal: null
+      })
+      console.log({
+        details
+      })
+    }).catch((error) => console.warn(error));
+  }
+
   returnToOriginal = () => {
     Geolocation.getCurrentPosition((info) => {
+      console.log(info)
       this.setState({
         region: {
           ...this.state.region,
           latitude: info.coords.latitude,
           longitude: info.coords.longitude,
         },
-        pinnedLocation: false,
-        address: null,
+        pinnedLocation: false
       });
+      this.getLocationDetails(info.coords.latitude, info.coords.longitude)
     },
     (error) => {
       console.log(error.message);
@@ -334,8 +360,8 @@ class LocationWithMap extends Component {
         }}>
         <TouchableOpacity
           onPress={() => {
-            const{setLocation} = this.props;
-            setLocation(null);
+            // const{setLocation} = this.props;
+            // setLocation(null);
             this.props.navigation.pop();
           }}
           style={{
@@ -488,27 +514,32 @@ class LocationWithMap extends Component {
             color={'white'}
           />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.onFinish()}
-          disabled={!this.state.address}
-          style={{
-            justifyContent: 'center',
-            height: 50,
-            width: '90%',
-            backgroundColor: this.state.address ? (theme ? theme.secondary : Color.secondary) : '#CCCCCC',
-            borderRadius: BasicStyles.formControl.borderRadius ? BasicStyles.formControl.borderRadius : 15,
-            bottom: 20,
-          }}>
-          <Text
-            style={{
-              color: 'white',
-              fontSize: 15,
-              fontWeight: 'bold',
-              textAlign: 'center'
-            }}>
-            Use Location
-          </Text>
-        </TouchableOpacity>
+        {
+          this.state.address && (
+            <TouchableOpacity
+              onPress={() => this.onFinish()}
+              disabled={!this.state.address}
+              style={{
+                justifyContent: 'center',
+                height: 50,
+                width: '90%',
+                backgroundColor: (theme ? theme.secondary : Color.secondary),
+                borderRadius: BasicStyles.formControl.borderRadius ? BasicStyles.formControl.borderRadius : 15,
+                bottom: 20,
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 15,
+                  fontWeight: 'bold',
+                  textAlign: 'center'
+                }}>
+                Use Location
+              </Text>
+            </TouchableOpacity>
+          )
+        }
+        
       </View>
     );
   };
