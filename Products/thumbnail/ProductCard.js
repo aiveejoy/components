@@ -21,6 +21,7 @@ class ProductCard extends Component {
       return
     }
     setProduct(item)
+    console.log(item, 'item---------------------------------');
     this.props.navigation.navigate('productDetailsStack', {
       data: item
     })
