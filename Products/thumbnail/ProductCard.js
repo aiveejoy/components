@@ -108,7 +108,7 @@ class ProductCard extends Component {
                   <Text style={{
                     fontSize: 11,
                     color: item.batch_number && item.batch_number.length > 0 ? 'white' : '',
-                  }}>Remaining to add: {item.remaining != null ? parseFloat(item.remaining).toFixed(2) + (item.units ? Conversion.getUnitsAbbreviation(item.units) : null) : "N/A"}</Text>
+                  }}>Remaining to add: {item.remaining && parseFloat(item.remaining).toFixed(2)}{(item.units ? Conversion.getUnitsAbbreviation(item.units) : null)}</Text>
                 </View>}
               </View>
             )
