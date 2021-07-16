@@ -183,7 +183,7 @@ class DateTime extends Component{
       }}>
         <TouchableHighlight style={{
             height: this.props.height ? this.props.height : 50,
-            backgroundColor: 'white',
+            backgroundColor: Color.containerBackground,
             width: '100%',
             paddingLeft: this.props.paddingLeft ? this.props.paddingLeft : 10,
             justifyContent: 'center',

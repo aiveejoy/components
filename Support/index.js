@@ -49,12 +49,19 @@ class Support extends Component {
   }
 
   retrieve(flag) {
+    const { user } = this.props.state;
+    if(user == null){
+      return
+    }
     let parameter = {
       condition: [{
-        value: this.props.state.user.id,
+        value: user.id,
         column: 'account_id',
         clause: '='
       }],
+      sort: {
+        created_at: 'desc'
+      },
       limit: this.state.limit,
       offset: flag == true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset
     };
@@ -145,33 +152,60 @@ class Support extends Component {
               }
             }}
           >
-            <View>
-              <View style={{ padding: 10, marginBottom: 50 }}>
-                <Text style={{ fontWeight: 'bold' }}>TICKETS</Text>
-                {
-                  this.state.data.map((u, i) => {
-                    return (
-                      <View
-                        style={Style.Card}
-                        key={i}
-                      >
-                        <TouchableOpacity
-                          onPress={() => {
-                            this.props.navigation.push('updateTicketStack', { id: u.id });
-                          }}>
-                          <View style={{ alignSelf: 'flex-start', padding: 5, borderRadius: 15, backgroundColor: this.findColor(types, u.type.toLowerCase()) }}>
-                            <Text style={{ color: '#ffffff', fontSize: 11 }}>{u.type}</Text>
-                          </View>
-                          <Text style={Style.TextCard} numberOfLines={2}>{u.title}</Text>
-                          <Text style={Style.TextCard, { fontSize: 11 }} >{u.assigned_to ? 'Assigned to ' + u.assigned_to : 'Not assigned'}</Text>
-                          <View style={{ flexDirection: 'row-reverse' }}>
-                          </View>
-                        </TouchableOpacity>
+            <View style={{
+              marginBottom: 50,
+              paddingLeft: 20,
+              paddingRight: 20
+            }}>
+              <Text style={{
+                fontWeight: 'bold',
+                textAlign: 'center',
+                marginBottom: 20
+              }}>My Tickets</Text>
+              {
+                this.state.data.map((u, i) => {
+                  return (
+                    <TouchableOpacity
+                      style={{
+                        marginBottom: 10
+                      }}
+                      onPress={() => {
+                        this.props.navigation.navigate('updateTicketStack', { id: u.id });
+                      }}>
+                      <View style={{
+                        padding: 10,
+                        borderRadius: 10,
+                        borderColor: Color.lightGray,
+                        borderWidth: 1
+                      }}>
+                        <View style={{
+                          alignSelf: 'flex-start',
+                          padding: 5,
+                          borderRadius: 15,
+                          backgroundColor: this.findColor(types, u.type.toLowerCase())
+                        }}>
+                          <Text
+                            style={{
+                              color: 'white',
+                              fontSize: 11
+                            }}
+                          >
+                            {u.type}
+                          </Text>
+                        </View>
+                        
+                        <Text style={{
+                          paddingTop: 10
+                        }} numberOfLines={2}>{u.title}</Text>
+                        <Text style={{
+                          fontSize: 11,
+                          paddingTop: 10
+                        }}>{u.assigned_to ? 'Assigned to ' + u.assigned_to : 'Not assigned'}</Text>
                       </View>
-                    );
-                  })
-                }
-              </View>
+                    </TouchableOpacity>
+                  );
+                })
+              }
             </View>
           </ScrollView>
         )}
