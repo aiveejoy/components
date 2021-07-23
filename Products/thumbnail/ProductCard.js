@@ -99,7 +99,7 @@ class ProductCard extends Component {
                   </View>
                 </View>
               </View>
-                {this.props.remaining && this.props.showRemaining && <View style={{
+                {item.batch_number && item.batch_number.length > 0 && this.props.remaining && this.props.showRemaining && <View style={{
                   width: '100%',
                   flexDirection: 'row-reverse',
                   marginRight: -20,
