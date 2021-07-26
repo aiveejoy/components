@@ -93,7 +93,7 @@ class CreateTicket extends Component {
       )
       return
     }
-    let account_id = this.props.navigation.state.params.user.id
+    let account_id = this.props.state?.user?.id
     let parameter = {
       account_id: account_id,
       title: this.state.title,
@@ -119,6 +119,8 @@ class CreateTicket extends Component {
         });
         this.props.navigation.dispatch(navigateAction);
       }
+    }, error => {
+      this.setState({ isLoading: false })
     })
   }
 
