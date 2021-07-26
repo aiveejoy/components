@@ -120,6 +120,7 @@ class CreateTicket extends Component {
         this.props.navigation.dispatch(navigateAction);
       }
     }, error => {
+      console.log(error);
       this.setState({ isLoading: false })
     })
   }
