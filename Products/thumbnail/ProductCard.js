@@ -95,7 +95,7 @@ class ProductCard extends Component {
                       borderWidth: 0.5
                     }]}>
                     {/* <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate !=null ? item.rate + (item.units ? Conversion.getUnitsAbbreviation(item.units) : null) : "N/A"}</Text> */}
-                    <Text style={{ fontSize: BasicStyles.standardTitle2FontSize }}>{item.rate != null ? parseFloat(item.rate).toFixed(1) + (item.units ? Conversion.getUnitsAbbreviation(item.units) : null) : "N/A"}</Text>
+                    <Text style={{ fontSize: BasicStyles.standardTitle2FontSize }}>{item.rate != null ? parseFloat(item.rate).toFixed(2) + (item.units ? Conversion.getUnitsAbbreviation(item.units) : null) : "N/A"}</Text>
                   </View>
                 </View>
               </View>
