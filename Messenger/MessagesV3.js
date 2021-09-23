@@ -507,7 +507,7 @@ class MessagesV3 extends Component{
         }}/>
         <Text style={{
           paddingLeft: 10
-        }}>{item?.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item.account.username}</Text>
+        }}>{item?.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item?.account?.username}</Text>
       </View>
     );
   }
@@ -522,7 +522,7 @@ class MessagesV3 extends Component{
       }}>
         <Text style={{
           paddingRight: 10
-        }}>{item?.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item.account.username}</Text>
+        }}>{item?.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item?.account?.username}</Text>
         <UserImage user={item.account} style={{
           width: 25,
           height: 25
