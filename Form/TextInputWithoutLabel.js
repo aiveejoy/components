@@ -25,6 +25,7 @@ class TextInputWithoutLabel extends Component {
             maxLength={this.props.maxLength}
             keyboardType={this.props.keyboardType}
             editable={this.props.editable}
+            placeholderTextColor={Color.darkGray}
             onChangeText={(input) => {
               this.props.onChange(input);
             }}
