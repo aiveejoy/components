@@ -17,61 +17,61 @@ class Options extends Component {
 		const { theme, user } = this.props.state;
 		return (
 			<View>
-			<ScrollView>
-				<View style={{
-					flexDirection: 'row',
-					width: '100%'
-				}}>
-					<View style={[styles.Button, {
-						width: '47%',
-						backgroundColor: 'white',
+				<ScrollView>
+					<View style={{
 						flexDirection: 'row',
-						backgroundColor: theme ? theme.primary : Color.primary,
-						marginRight: '6%'
-					}]}>
-						<FontAwesomeIcon
-							icon={faWallet}
-							style={{
-								marginRight: 5,
-								color: 'white'
-							}}
-						/>
-						<Text style={{ color: 'white', fontFamily: 'Poppins-SemiBold' }}>From Wallet</Text>
+						width: '100%'
+					}}>
+						<View style={[styles.Button, {
+							width: '47%',
+							backgroundColor: 'white',
+							flexDirection: 'row',
+							backgroundColor: theme ? theme.primary : Color.primary,
+							marginRight: '6%'
+						}]}>
+							<FontAwesomeIcon
+								icon={faWallet}
+								style={{
+									marginRight: 5,
+									color: 'white'
+								}}
+							/>
+							<Text style={{ color: 'white', fontFamily: 'Poppins-SemiBold' }}>From Wallet</Text>
+						</View>
+						<View style={[styles.Button, {
+							width: '47%',
+							flexDirection: 'row',
+							marginRight: '6%'
+						}]}>
+							<FontAwesomeIcon
+								icon={faCreditCard}
+								style={{
+									marginRight: 5
+								}}
+							/>
+							<Text style={{ fontFamily: 'Poppins-SemiBold' }}>Paypal</Text>
+						</View>
+						<View style={[styles.Button, {
+							width: '47%',
+							backgroundColor: 'white',
+							flexDirection: 'row'
+						}]}>
+							<FontAwesomeIcon
+								icon={faAddressCard}
+								style={{
+									marginRight: 5
+								}}
+							/>
+							<FontAwesomeIcon
+								icon={faCreditCard}
+								style={{
+									marginRight: 5
+								}}
+							/>
+							<Text style={{ fontFamily: 'Poppins-SemiBold' }}>CC/DC</Text>
+						</View>
 					</View>
-					<View style={[styles.Button, {
-						width: '47%',
-						flexDirection: 'row',
-						marginRight: '6%'
-					}]}>
-						<FontAwesomeIcon
-							icon={faCreditCard}
-							style={{
-								marginRight: 5
-							}}
-						/>
-						<Text style={{ fontFamily: 'Poppins-SemiBold' }}>Paypal</Text>
-					</View>
-					<View style={[styles.Button, {
-						width: '47%',
-						backgroundColor: 'white',
-						flexDirection: 'row'
-					}]}>
-						<FontAwesomeIcon
-							icon={faAddressCard}
-							style={{
-								marginRight: 5
-							}}
-						/>
-						<FontAwesomeIcon
-							icon={faCreditCard}
-							style={{
-								marginRight: 5
-							}}
-						/>
-						<Text style={{ fontFamily: 'Poppins-SemiBold' }}>CC/DC</Text>
-					</View>
-				</View>
-			</ScrollView>
+				</ScrollView>
 			</View>
 		);
 	}
