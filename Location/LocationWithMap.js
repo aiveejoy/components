@@ -11,7 +11,6 @@ import {
   Keyboard
 } from 'react-native';
 import {Color} from 'common';
-import {GooglePlacesAutoComplete} from 'components';
 import {connect} from 'react-redux';
 import {faMapMarkerAlt} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -24,6 +23,7 @@ import Geocoder from 'react-native-geocoding';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import Config from 'src/config.js';
 import BasicStyles from '../../common/BasicStyles';
+import CustomGooglePlacesAutocomplete  from './GooglePlacesAutoComplete'
 
 
 class LocationWithMap extends Component {
@@ -65,7 +65,7 @@ class LocationWithMap extends Component {
     if (Platform.OS === 'ios') {
       Geolocation.requestAuthorization('always');
       // this.returnToOriginal();
-      this.getCurrentLocation();
+      this.getCurrentLocationIOS();
     } else {
       let granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -77,38 +77,38 @@ class LocationWithMap extends Component {
 
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         this.returnToOriginal()
-        this.getCurrentLocation();
+        this.getCurrentLocationAndroid();
       } else {
         console.log('Location permission not granted!!!!');
       }
     }
   };
 
-  // getCurrentLocation = async () => {
-  //   const {user} = this.props.state;
-  //   Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
-  //   Geolocation.getCurrentPosition(
-  //     (info) => {
-  //       this.setState({
-  //         region: {
-  //           ...this.state.region,
-  //           latitude: info.coords.latitude,
-  //           longitude: info.coords.longitude,
-  //         },
-  //       });
-  //     },
-  //     (error) => console.log(error),
-  //     {
-  //       enableHighAccuracy: true,
-  //       timeout: 2000,
-  //     },
-  //   ); //Transfer this to if(user!=null) when api available
+  getCurrentLocationIOS = async () => {
+    const {user} = this.props.state;
+    Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
+    Geolocation.getCurrentPosition(
+      (info) => {
+        this.setState({
+          region: {
+            ...this.state.region,
+            latitude: info.coords.latitude,
+            longitude: info.coords.longitude,
+          },
+        });
+      },
+      (error) => console.log(error),
+      {
+        enableHighAccuracy: true,
+        timeout: 2000,
+      },
+    ); //Transfer this to if(user!=null) when api available
 
-  //   if (user != null) {
-  //   }
-  // };
+    if (user != null) {
+    }
+  };
 
-  getCurrentLocation = () => {
+  getCurrentLocationAndroid = () => {
     Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
     // let watchID = Geolocation.watchPosition(position => {
     //   console.log('-------------------------------------------TESTING----------------------------------------------', position)
@@ -175,6 +175,7 @@ class LocationWithMap extends Component {
         isDraggingMap: true,
       });
     }
+
   };
 
   getLocationDetails = (latitude, longitude) => {
@@ -232,6 +233,7 @@ class LocationWithMap extends Component {
     if (!this.state.isDraggingMap) {
       return;
     }
+
     this.setState({region: regionUpdate, pinnedLocation: true});
     Geocoder.from(regionUpdate.latitude, regionUpdate.longitude)
     .then((json) => {
@@ -346,6 +348,38 @@ class LocationWithMap extends Component {
     );
   };
 
+  renderSearchBarIOS = () => {
+    return (
+      <View style={{
+        position: 'absolute',
+        top: 20,
+        left: 0,
+        right: 10,
+        width: '100%',
+        flexDirection: 'row'
+      }}>
+        <View style={{
+          height: 60,
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {this.renderBackButton()}
+        </View>
+        <CustomGooglePlacesAutocomplete
+          onChange={() => {
+            //
+          }}
+          onFinish={(location) => {
+            this.setState({
+              region: location,
+              address: location
+            })
+          }}
+          />
+      </View>
+    )
+  }
+
   renderSearchBar = () => {
     return (
       <View
@@ -357,7 +391,7 @@ class LocationWithMap extends Component {
           width: '100%',
           paddingLeft: '12%',
           paddingRight: '8%',
-          flexDirection: 'row',
+          flexDirection: 'row'
         }}>
         <TouchableOpacity
           onPress={() => {
@@ -484,17 +518,29 @@ class LocationWithMap extends Component {
           ref={(ref) => (this.mapView = ref)}
           provider={PROVIDER_GOOGLE}
           region={this.state.region}
-          onPanDrag={this.setMapDragging}
-          onRegionChangeComplete={(e) => this.onRegionChange(e)}
+          // onPanDrag={this.setMapDragging}
+          // onRegionChangeComplete={(e) => this.onRegionChange(e)}
+          // onDragEnd={(e) => {
+          //   console.log('onDragEnd', e)
+          // }}
           //onPress={()=>this.animate()}
-        />
-
-        <View style={Style.imageContainer}>
-          <Image
-            source={require('../../assets/userPosition.png')}
-            style={Style.image}
+        >
+          <Marker.Animated
+            draggable
+            coordinate={this.state.region}
+            onDragEnd={(e) => {
+              const coords = e.nativeEvent.coordinate;
+              console.log('test', coords)
+              this.setState({
+                region: {
+                  ...this.state.region,
+                  ...coords
+                }
+              })
+            }}
           />
-        </View>
+
+          </MapView>
 
         <TouchableOpacity
           onPress={() => this.returnToOriginal()}
@@ -515,6 +561,17 @@ class LocationWithMap extends Component {
             color={'white'}
           />
         </TouchableOpacity>
+        
+      </View>
+    );
+  };
+  render() {
+    const {theme} = this.props.state;
+    return (
+      <View style={{flex: 1}}>
+        {this.renderMap()}
+        {Platform.OS  == 'android' && this.renderSearchBar()}
+        {Platform.OS  == 'ios' && this.renderSearchBarIOS()}
         {
           this.state.address && (
             <TouchableOpacity
@@ -524,6 +581,8 @@ class LocationWithMap extends Component {
                 justifyContent: 'center',
                 height: 50,
                 width: '90%',
+                marginLeft: '5%',
+                marginRight: '5%',
                 backgroundColor: (theme ? theme.secondary : Color.secondary),
                 borderRadius: BasicStyles.formControl.borderRadius ? BasicStyles.formControl.borderRadius : 15,
                 bottom: 20,
@@ -540,17 +599,6 @@ class LocationWithMap extends Component {
             </TouchableOpacity>
           )
         }
-        
-      </View>
-    );
-  };
-  render() {
-    const {isLoading, data} = this.state;
-    const {user} = this.props.state;
-    return (
-      <View style={{flex: 1}}>
-        {this.renderMap()}
-        {this.renderSearchBar()}
       </View>
     );
   }
