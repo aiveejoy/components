@@ -262,46 +262,67 @@ class LocationWithMap extends Component {
     let longitude = null;
     let postal = null;
 
-    address = location.formatted_address;
-    location.address_components.forEach(el => {
-      if(el.types.includes('route')) {
-        route = el.long_name;
-      }else if(el.types.includes('locality')){
-        locality = el.long_name;
-      }else if(el.types.includes('administrative_area_level_2')){
-        province = el.long_name;
-      }else if(el.types.includes('administrative_area_level_1')){
-        region = el.long_name;
-      }else if(el.types.includes('country')){
-        country = el.long_name;
-      }else if(el.types.includes('postal_code')){
-        postal = el.long_name;
-      }
-    })
-    longitude = location.geometry.location.lng;
-    latitude = location.geometry.location.lat;
-    this.setState(
-      {
-        region: {
-          ...this.state.region,
-          latitude: latitude,
-          longitude: longitude,
-          formatted_address: address,
-        },
-        address: address,
-        area: location.region,
-        locality: locality,
-        address_region: region,
-        country: country,
-        postal: postal,
-        province: province,
-        route: route
-      },
-      () => {
-        console.log('ADDRESS', this.state.region.formatted_address);
-      },
+    if(Platform.OS == 'ios'){
+      console.log('selection location', JSON.stringify(location))
+      this.setState(
+        {
+          region: {
+            ...this.state.region,
+            latitude: location.latitude,
+            longitude: location.longitude,
+            formatted_address: location.route,
+          },
+          address: location.route,
+          area: location.region,
+          locality: location.locality,
+          address_region: location.region,
+          country: location.country,
+          postal: postal,
+          province: location.region,
+          route: location.route
+        }
       );
-    // console.log('TESTING: ', location);
+    }else{
+      address = location.formatted_address;
+      location.address_components.forEach(el => {
+        if(el.types.includes('route')) {
+          route = el.long_name;
+        }else if(el.types.includes('locality')){
+          locality = el.long_name;
+        }else if(el.types.includes('administrative_area_level_2')){
+          province = el.long_name;
+        }else if(el.types.includes('administrative_area_level_1')){
+          region = el.long_name;
+        }else if(el.types.includes('country')){
+          country = el.long_name;
+        }else if(el.types.includes('postal_code')){
+          postal = el.long_name;
+        }
+      })
+      longitude = location.geometry.location.lng;
+      latitude = location.geometry.location.lat;
+      this.setState(
+        {
+          region: {
+            ...this.state.region,
+            latitude: latitude,
+            longitude: longitude,
+            formatted_address: address,
+          },
+          address: address,
+          area: location.region,
+          locality: locality,
+          address_region: region,
+          country: country,
+          postal: postal,
+          province: province,
+          route: route
+        },
+        () => {
+          console.log('ADDRESS', this.state.region.formatted_address);
+        },
+      );
+    }
   };
 
   onFinish = () => {
@@ -317,11 +338,14 @@ class LocationWithMap extends Component {
           locality: this.state.locality,
           region: this.state.address_region,
           country: this.state.country,
-          postal: this.state.postal,
+          postal: this.state.postal ? this.state.postal : null,
           latitude: this.state.region.latitude,
           longitude: this.state.region.longitude,
         };
-        console.log('LOCATION IN COMPONENT', location);
+        console.log({
+          newLocation: location
+        })
+        // console.log('LOCATION IN COMPONENT', location);
         setLocation(location);
         this.props.navigation.pop();
       });
@@ -371,9 +395,9 @@ class LocationWithMap extends Component {
           }}
           onFinish={(location) => {
             this.setState({
-              region: location,
-              address: location
+              region: location
             })
+            this.manageLocation(location)
           }}
           />
       </View>
