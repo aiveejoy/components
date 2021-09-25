@@ -73,7 +73,15 @@ class CurrentLocation extends Component {
               longitude: parseFloat(this.props.navigation.state.params.data.longitude)
             }}
             title={this.props.navigation.state.params.data.route}
-          />
+          >
+              <Image
+                source={require('src/assets/userPosition.png')}
+                style={{
+                  width: 60,
+                  height: 60
+                }}
+                />
+            </Marker>
         </MapView>
       </View>
     );

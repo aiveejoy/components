@@ -562,8 +562,8 @@ class LocationWithMap extends Component {
               <Image
                 source={require('src/assets/userPosition.png')}
                 style={{
-                  width: 100,
-                  height: 100
+                  width: 80,
+                  height: 80
                 }}
                 />
             </Marker.Animated>
