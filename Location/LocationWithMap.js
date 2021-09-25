@@ -556,19 +556,14 @@ class LocationWithMap extends Component {
               onDragEnd={(e) => {
                 const coords = e.nativeEvent.coordinate;
                 console.log('test', coords)
-                this.setState({
-                  region: {
-                    ...this.state.region,
-                    ...coords
-                  }
-                })
+                this.getLocationDetails(coords.latitude, coords.longitude)
               }}
             >
               <Image
                 source={require('src/assets/userPosition.png')}
                 style={{
-                  width: 80,
-                  height: 80
+                  width: 100,
+                  height: 100
                 }}
                 />
             </Marker.Animated>
