@@ -96,6 +96,7 @@ class LocationWithMap extends Component {
             longitude: info.coords.longitude,
           },
         });
+        this.getLocationDetails(info.coords.latitude, info.coords.longitude)
       },
       (error) => console.log(error),
       {
@@ -550,19 +551,27 @@ class LocationWithMap extends Component {
           //onPress={()=>this.animate()}
         >
           <Marker.Animated
-            draggable
-            coordinate={this.state.region}
-            onDragEnd={(e) => {
-              const coords = e.nativeEvent.coordinate;
-              console.log('test', coords)
-              this.setState({
-                region: {
-                  ...this.state.region,
-                  ...coords
-                }
-              })
-            }}
-          />
+              draggable
+              coordinate={this.state.region}
+              onDragEnd={(e) => {
+                const coords = e.nativeEvent.coordinate;
+                console.log('test', coords)
+                this.setState({
+                  region: {
+                    ...this.state.region,
+                    ...coords
+                  }
+                })
+              }}
+            >
+              <Image
+                source={require('src/assets/userPosition.png')}
+                style={{
+                  width: 80,
+                  height: 80
+                }}
+                />
+            </Marker.Animated>
 
           </MapView>
 
