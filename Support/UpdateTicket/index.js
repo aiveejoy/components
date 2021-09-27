@@ -256,7 +256,7 @@ class UpdateTicket extends Component {
               }}>{data.type}</Text>
               <Text style={{
                 fontSize: 11
-              }}>{moment(new Date(data.created_at)).format('MMMM DD, YYYY hh:mm a')}</Text>
+              }}>{moment(data.created_at).format('MMMM DD, YYYY hh:mm a')}</Text>
             </View>
           </View>
           <Text style={{ fontWeight: 'bold' }}>{data.title}</Text>
