@@ -29,6 +29,7 @@ import Modal from 'components/Modal/Sketch';
 import MessageOptions from './Options.js'
 import { fcmService } from 'services/broadcasting/FCMService';
 import { localNotificationService } from 'services/broadcasting/LocalNotificationService';
+import moment from 'moment';
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
 
@@ -262,8 +263,10 @@ class MessagesV3 extends Component{
     }
     let newMessageTemp = {
       ...parameter,
-      account: user,
-      created_at_human: null,
+      account: {
+        profile: user.profile
+      },
+      created_at_human: moment(new Date()).format('MMMM DD, YYYY'),
       sending_flag: true,
       error: null
     }
@@ -272,7 +275,8 @@ class MessagesV3 extends Component{
     this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
       if(response.data != null){
-        updateMessageByCode(response.data);
+        newMessageTemp['sending_flag'] = false
+        updateMessageByCode(newMessageTemp);
       }
     });
   }
