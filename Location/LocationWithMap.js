@@ -189,12 +189,24 @@ class LocationWithMap extends Component {
         // region: details[3],
         // country: details[4],
         // postal: null
+
+        // route: this.state.route,
+        //   address: this.state.address,
+        //   province: this.state.province,
+        //   locality: this.state.locality,
+        //   region: this.state.address_region,
+        //   country: this.state.country,
+        //   postal: this.state.postal ? this.state.postal : null,
+        //   latitude: this.state.region.latitude,
+        //   longitude: this.state.region.longitude,
       this.setState({
         address: json.results[0].formatted_address,
         route: details[0],
         locality: details[2],
         province: details[3],
         country: details[4],
+        latitude: latitude,
+        longitude: longitude,
         postal: null,
         region: {
           ...this.state.region,
@@ -581,12 +593,12 @@ class LocationWithMap extends Component {
             justifyContent: 'center',
             alignSelf: 'flex-end',
             marginRight: 30,
-            height: 35,
-            width: 35,
+            height: 40,
+            width: 40,
             backgroundColor: Color.primary,
-            borderRadius: 35 / 2,
+            borderRadius: 20,
             bottom: 20,
-            marginBottom: 5,
+            position: 'absolute',
           }}>
           <FontAwesomeIcon
             style={{alignSelf: 'center'}}
