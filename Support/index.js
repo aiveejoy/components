@@ -200,7 +200,7 @@ class Support extends Component {
                         <Text style={{
                           fontSize: 11,
                           paddingTop: 10
-                        }}>{u.assigned_to ? 'Assigned to ' + u.assigned_to : 'Not assigned'}</Text>
+                        }}>{u.assigned_to ? 'Assigned to ' + u.assignTo?.information?.first_name + ' ' + u.assignTo?.information?.last_name : 'Not assigned'}</Text>
                       </View>
                     </TouchableOpacity>
                   );
