@@ -180,7 +180,6 @@ class LocationWithMap extends Component {
   };
 
   getLocationDetails = (latitude, longitude) => {
-    console.log('hello')
     Geocoder.from(latitude, longitude).then((json) => {
       var details = json.results[0].formatted_address.split(', ');
         // latitude: latitude,
@@ -196,7 +195,13 @@ class LocationWithMap extends Component {
         locality: details[2],
         province: details[3],
         country: details[4],
-        postal: null
+        postal: null,
+        region: {
+          ...this.state.region,
+          longitude: longitude,
+          latitude: latitude,
+          formatted_address: json.results[0].formatted_address
+        }
       })
       console.log({
         details
