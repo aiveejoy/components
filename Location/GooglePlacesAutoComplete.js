@@ -178,6 +178,7 @@ class LocationAutoComplete extends Component{
             ref={'searchValueField'}
             value={this.state.searchValue}
             placeholder={placeholder ? placeholder : 'Type location'}
+            placeholderTextColor={Color.darkGray}
           />
           {
             (results != null || selectedFlag == true) && (
