@@ -30,7 +30,7 @@ class QRCodeModal extends Component {
 
           <TextInput
             editable={false}
-            style={[BasicStyles.formControlCreate, { borderColor: Color.black , color:Color.black }]}
+            style={[BasicStyles.formControlCreate, { borderColor: Color.black, color: Color.black }]}
             value={"sample link"}
           />
         </View>
@@ -70,7 +70,7 @@ class QRCodeModal extends Component {
   render() {
     return (
       <View>
-        <Modal isVisible={false}>
+        <Modal isVisible={true}>
           <View style={styles.mainContainer}>
             <View style={[styles.container, {
               height: '60%',
@@ -140,48 +140,45 @@ class QRCodeModal extends Component {
                     </TouchableOpacity>
 
                   </View>
-                  {/*  */}
-                  <Tooltip
-                    ref={this.tooltipRef}
-                    backgroundColor='white'
-                    height={80}
-                    width={width - 40}
-                    containerStyle={{
-                      backgroundColor: Color.lightGray,
-                    }}
-                    pointerColor={Color.lightGray}
-                    overlayColor={'transparent'}
-                    popover={
-                      this._popover()
-                    }
-                  >
-                  </Tooltip>
-                  <View style={{
-                    width: '30%',
-                    marginRight: 10,
-                    alignItems: 'flex-end',
-                    height: '100%',
-                    padding: 5
-                  }}>
-
-                    <TouchableOpacity
-                      onPress={() => {
-                        this.tooltipRef.current.toggleTooltip();
-                      }}
-                      style={[BasicStyles.btn, BasicStyles.btnSecondary, { marginTop: 4, width: '100%' }]}
-                    >
-                      <Text style={[{
-                        color: Color.white,
-                        textAlign: 'center',
-                        alignContent: 'center',
-                        alignSelf: 'center',
-                        justifyContent: 'center'
-                      }]}>Create</Text>
-                    </TouchableOpacity>
-                  </View>
-
                 </View>
-
+              </View>
+              <View style={{
+                flexDirection: 'row',
+                width: '100%',
+                // backgroundColor: 'red',
+                position: 'absolute',
+                bottom: 15,
+                padding: 10,
+                marginTop: 10
+              }}>
+                <Text style={{
+                  width: '60%',
+                  fontSize: 10
+                }}>Transfer an amount to other wallet
+                  by clicking the ‘Scan QR Code’ button.</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.props.setQRCodeModal(false)
+                    this.props.navigation.navigate('qrCodeScannerStack');
+                  }}
+                  style={{
+                    width: '40%',
+                    backgroundColor: Color.primary,
+                    padding: 10,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 50
+                  }}
+                >
+                  <Text style={[{
+                    color: Color.white,
+                    textAlign: 'center',
+                    alignContent: 'center',
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                    fontSize: 10
+                  }]}>Scan QR Code</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
