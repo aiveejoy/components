@@ -5,9 +5,11 @@ import { View, Text, ScrollView, Dimensions } from 'react-native';
 import { Color, BasicStyles } from 'common';
 import { connect } from 'react-redux';
 import styles from './Style';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {fab} from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAddressCard, faCreditCard, faWallet } from '@fortawesome/free-solid-svg-icons';
-
+library.add(fab);
 class Options extends Component {
 	constructor(props) {
 		super(props);
@@ -30,13 +32,13 @@ class Options extends Component {
 							marginRight: '6%'
 						}]}>
 							<FontAwesomeIcon
-								icon={faWallet}
+								icon={['fab', 'cc-visa']}
 								style={{
 									marginRight: 5,
 									color: 'white'
 								}}
 							/>
-							<Text style={{ color: 'white', fontFamily: 'Poppins-SemiBold' }}>From Wallet</Text>
+							<Text style={{ color: 'white', fontFamily: 'Poppins-SemiBold' }}>CC/DC</Text>
 						</View>
 						<View style={[styles.Button, {
 							width: '47%',
