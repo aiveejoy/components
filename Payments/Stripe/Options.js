@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAddressCard, faCreditCard, faWallet } from '@fortawesome/free-solid-svg-icons';
 import Api from 'services/api/index.js';
 const height = Math.round(Dimensions.get('window').height)
+library.add(fab)
 
 class Options extends Component {
   constructor(props) {
@@ -119,13 +120,13 @@ class Options extends Component {
               marginRight: '6%'
             }]}>
               <FontAwesomeIcon
-                icon={faWallet}
+                icon={['fab', 'cc-visa']}
                 style={{
                   marginRight: 5,
                   color: 'white'
                 }}
               />
-              <Text style={{ color: 'white', fontFamily: 'Poppins-SemiBold' }}>From Wallet</Text>
+              <Text style={{ color: 'white', fontFamily: 'Poppins-SemiBold' }}>DD/CD</Text>
             </View>
             <TouchableOpacity style={[styles.Button, {
               width: '47%',
