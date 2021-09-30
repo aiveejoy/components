@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
   Platform,
   Dimensions,
-  View
+  View,
+  Image
 } from 'react-native';
 import {Color, BasicStyles} from 'common';
 import Geolocation from '@react-native-community/geolocation';
@@ -75,7 +76,15 @@ class MapViewer extends Component {
                   latitude: parseFloat(this.props.data.latitude)
                 }}
                 title={this.props.data.route}
-              />
+              >
+                <Image
+                  source={require('src/assets/userPosition.png')}
+                  style={{
+                    width: 60,
+                    height: 60
+                  }}
+                  />
+              </Marker>
             )
           }
         </MapView>

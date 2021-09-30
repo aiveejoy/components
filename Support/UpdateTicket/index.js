@@ -14,6 +14,7 @@ import PostCard from 'modules/generic/PostCard.js';
 import ImageModal from 'components/Modal/ImageModal';
 import Skeleton from 'components/Loading/Skeleton';
 import moment from 'moment';
+import _ from 'lodash';
 
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -25,12 +26,17 @@ class UpdateTicket extends Component {
     this.state = {
       isLoading: false,
       modalVisible: false,
-      data: null
+      data: null,
+      isLoadingComment: false,
+      limit: 5,
+      offset: 0
     };
   }
 
   componentDidMount() {
+    const { setComments } = this.props;
     this.retrieve();
+    setComments({ id: this.props.state.user.id, commentList: [] })
   }
 
   retrieve() {
@@ -45,13 +51,11 @@ class UpdateTicket extends Component {
     Api.request(Routes.ticketsRetrieve, parameter, response => {
       this.setState({ isLoading: false })
       if (response.data.length > 0) {
-        console.log({
-          data: response.data[0]
-        })
         this.setState({
           data: response.data[0]
         })
       }
+      this.retrieveComments(false, this.props.navigation.state.params.id);
     }, error => {
       this.setState({
         isLoading: false
@@ -74,10 +78,10 @@ class UpdateTicket extends Component {
       payload: 'ticket_id',
       text: this.state.comment
     };
-    this.setState({ isLoading: true })
+    this.setState({ isLoadingComment: true })
     console.log(parameter);
     Api.request(Routes.commentCreate, parameter, response => {
-      this.setState({ isLoading: false })
+      this.setState({ isLoadingComment: false })
       if (response.data !== null) {
         this.setState({ comment: null })
         parameter['account'] = {
@@ -87,12 +91,12 @@ class UpdateTicket extends Component {
         parameter['created_at_human'] = moment(new Date()).format('MMMM DD, YYYY hh:mm a');
         let temp = [parameter, ...this.props.state.comments?.commentList]
         const { setComments } = this.props;
-        setComments({id: id, commentList: temp});
+        setComments({ id: id, commentList: temp });
       }
     })
   }
 
-  retrieveComments = (id) => {
+  retrieveComments = (flag, id) => {
     let parameter = {
       condition: [
         {
@@ -106,16 +110,25 @@ class UpdateTicket extends Component {
           clause: '='
         }
       ],
-      sort: { created_at: 'desc'}
+      sort: { created_at: 'desc' },
+      limit: this.state.limit,
+      offset: flag == true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset
     };
-    this.setState({ isLoading: true })
-    console.log(parameter, Routes.commentsRetrieve, "parameter");
+    this.setState({ isLoadingComment: true })
     Api.request(Routes.commentsRetrieve, parameter, response => {
-      this.setState({ isLoading: false, showComments: true })
+      this.setState({ isLoadingComment: false, showComments: true })
       if (response.data.length > 0) {
-        const { setCurrentTicketId, setComments} = this.props;
+        const { setCurrentTicketId, setComments } = this.props;
         setCurrentTicketId(id);
-        setComments({id: id, commentList: response.data})
+        setComments({ id: id, commentList: flag == false ? response.data : _.uniqBy([...this.state.data, ...response.data], 'id') })
+        this.setState({
+          offset: flag == false ? 1 : (this.state.offset + 1)
+        })
+      } else {
+        setComments({ id: id, commentList: flag == false ? [] : this.state.data })
+        this.setState({
+          offset: flag == false ? 0 : this.state.offset
+        })
       }
     })
   }
@@ -166,73 +179,91 @@ class UpdateTicket extends Component {
     const { theme } = this.props.state;
     return (
       <View>
-        {this.state.isLoading && (<Skeleton size={2} template={'block'} height={50}/>)}
-        {this.state.title && (
+        <View style={{
+          marginBottom: 25,
+          marginTop: 10,
+          width: '100%'
+        }}>
           <View style={{
-            marginBottom: 25,
-            marginTop: 10,
-            width: '100%'
+            flexDirection: 'row',
+            padding: 10,
           }}>
-            <View style={{
-              flexDirection: 'row',
-              padding: 10,
-            }}>
-              <TextInput
-                style={
-                  [
-                    {
-                      height: 40,
-                      borderColor: Color.gray,
-                      borderWidth: .3,
-                      borderRadius: 20,
-                      width: '90%'
-                    },
-                    Style.textInput
-                  ]
-                }
-                placeholder={'Comment here...'}
-                onChangeText={value => this.commentHandler(value)}
-                value={this.state.comment}
-              />
-              <TouchableOpacity
-                onPress={() => { this.createComment(this.props.navigation.state.params.id) }}
+            <TextInput
+              style={
+                [
+                  {
+                    height: 40,
+                    borderColor: Color.gray,
+                    borderWidth: .3,
+                    borderRadius: 20,
+                    width: '90%'
+                  },
+                  Style.textInput
+                ]
+              }
+              placeholder={'Comment here...'}
+              onChangeText={value => this.commentHandler(value)}
+              value={this.state.comment}
+            />
+            <TouchableOpacity
+              onPress={() => { this.createComment(this.props.navigation.state.params.id) }}
+              style={{
+                padding: 10
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faPaperPlane}
                 style={{
-                  padding: 10
+                  color: theme ? theme.primary : Color.primary
                 }}
-              >
-                <FontAwesomeIcon
-                  icon={faPaperPlane}
-                  style={{
-                    color: theme ? theme.primary : Color.primary
-                  }}
-                  size={20}
-                />
-              </TouchableOpacity>
-            </View>
-            {this.props.state.comments && this.props.state.comments.commentList && this.props.state.comments.commentList.length > 0 && this.props.state.comments.commentList.map((item, index) => {
-              return (
-                <PostCard
-                  data={{
-                    user: item.account,
-                    comments: item.comment_replies,
-                    message: item.text,
-                    date: item.created_at_human
-                  }}
-                  postReply={() => { this.createReply() }}
-                  reply={(value) => { this.replyHandler(value) }}
-                />
-              )
-            })}
-          </View>)}
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
+          {this.state.isLoadingComment && (<Skeleton size={2} template={'block'} height={50} />)}
+          <View style={{
+            padding: 15
+          }}>
+          {this.props.state.comments?.commentList?.length > 0 && this.props.state.comments.commentList.map((item, index) => {
+            return (
+              <PostCard
+                data={{
+                  user: item.account,
+                  comments: item.comment_replies,
+                  message: item.text,
+                  date: item.created_at_human
+                }}
+                postReply={() => { this.createReply() }}
+                reply={(value) => { this.replyHandler(value) }}
+              />
+            )
+          })}
+          </View>
+        </View>
       </View>
     )
   }
 
-  renderTicket(){
+  renderTicket() {
     const { data } = this.state;
     const { theme } = this.props.state;
-    return(
-      <ScrollView showsVerticalScrollIndicator={false}>  
+    return (
+      <ScrollView showsVerticalScrollIndicator={false}
+        onScroll={(event) => {
+          let scrollingHeight = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y
+          let totalHeight = event.nativeEvent.contentSize.height
+          if (event.nativeEvent.contentOffset.y <= 0) {
+            if (this.state.isLoadingComment == false) {
+              // this.retrieve(false)
+            }
+          }
+          if (scrollingHeight >= (totalHeight)) {
+            if (this.state.isLoadingComment == false) {
+              this.retrieveComments(true, this.props.navigation.state.params.id)
+            }
+          }
+        }}
+      >
         <View style={{
           borderColor: Color.gray,
           borderBottomWidth: .3,
@@ -256,7 +287,7 @@ class UpdateTicket extends Component {
               }}>{data.type}</Text>
               <Text style={{
                 fontSize: 11
-              }}>{moment(new Date(data.created_at)).format('MMMM DD, YYYY hh:mm a')}</Text>
+              }}>{moment(data.created_at).format('MMMM DD, YYYY hh:mm a')}</Text>
             </View>
           </View>
           <Text style={{ fontWeight: 'bold' }}>{data.title}</Text>
@@ -265,8 +296,8 @@ class UpdateTicket extends Component {
             paddingBottom: 20,
             fontStyle: 'italic'
           }}>{data.content}</Text>
-          
-          <View style={{ flexDirection: 'row'}}>
+
+          <View style={{ flexDirection: 'row' }}>
             <Text style={{
               fontWeight: 'bold',
             }}>STATUS: </Text>
@@ -275,18 +306,18 @@ class UpdateTicket extends Component {
             }}>{data.status}</Text>
           </View>
         </View>
-        {data.comments && this.renderComments()}
+        {this.renderComments()}
       </ScrollView>
     )
   }
   render() {
     const { theme } = this.props.state;
-    const { data, isLoading} = this.state;
+    const { data, isLoading } = this.state;
     return (
       <View style={{
         flex: 1
       }}>
-        {isLoading && (<Skeleton size={3} template={'block'} height={50}/>)}
+        {isLoading && (<Skeleton size={3} template={'block'} height={50} />)}
         {
           data && (
             this.renderTicket()
