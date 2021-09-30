@@ -20,8 +20,8 @@ class Stripe extends Component {
           fontFamily: 'Poppins-SemiBold',
           marginTop: 10
         }}>Payment Methods</Text>
-        <Options/>
-        <Input
+        <Options amount={this.props.amount}/>
+        {/* <Input
           label={'Card Number'}
           placeholder={'4242-4242-4242-4242'}
           width={'100%'}
@@ -48,7 +48,7 @@ class Stripe extends Component {
               width={'100%'}
             />
           </View>
-        </View>
+        </View> */}
       </View>
     );
   }
