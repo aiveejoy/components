@@ -267,7 +267,7 @@ class MessagesV3 extends Component{
       sending_flag: true,
       error: null
     }
-    console.log('parameter', parameter)
+    console.log('parameter', parameter, '[route]', Routes.messengerMessagesCreate)
     updateMessagesOnGroup(newMessageTemp);
     this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
