@@ -1,10 +1,12 @@
 import { StripeProvider } from '@stripe/stripe-react-native';
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
+import Config from 'src/config.js'
 
 function App() {
   return (
     <StripeProvider
-      publishableKey={publishableKey}
+      publishableKey={Config.stripe.dev_sk}
       merchantIdentifier="merchant.identifier"
     >
       <PaymentScreen />
@@ -15,15 +17,13 @@ function App() {
 // PaymentScreen.ts
 import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { View } from 'react-native';
-export default function PaymentScreen() {
-  const { confirmPayment } = useStripe();
-
+function PaymentScreen(props) {
   return (
     <View style={{
       padding: 20
     }}>
     <CardField
-      // postalCodeEnabled={true}
+      postalCodeEnabled={false}
       placeholder={{
         number: '4242 4242 4242 4242',
       }}
@@ -38,12 +38,15 @@ export default function PaymentScreen() {
         marginVertical: 30,
       }}
       onCardChange={(cardDetails) => {
-        console.log('cardDetails', cardDetails);
-      }}
-      onFocus={(focusedField) => {
-        console.log('focusField', focusedField);
+        props.setCardDetails(cardDetails.complete, cardDetails);
       }}
     />
     </View>
   );
 }
+
+const mapStateToProps = state => ({ state: state });
+
+export default connect(
+  mapStateToProps
+)(PaymentScreen)
