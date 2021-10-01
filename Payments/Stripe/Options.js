@@ -126,7 +126,7 @@ class Options extends Component {
                   color: 'white'
                 }}
               />
-              <Text style={{ color: 'white', fontFamily: 'Poppins-SemiBold' }}>DD/CD</Text>
+              <Text style={{ color: 'white', fontFamily: 'Poppins-SemiBold' }}>DC/CC</Text>
             </View>
             <TouchableOpacity style={[styles.Button, {
               width: '47%',
