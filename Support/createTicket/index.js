@@ -313,6 +313,7 @@ class CreateTicket extends Component {
             onChangeText={(title) => this.setState({ title })}
             value={this.state.title}
             placeholder={'Description'}
+            placeholderTextColor={Color.darkGray}
           />
         </View>
         <View style={styles.InputContainer}>
@@ -337,6 +338,7 @@ class CreateTicket extends Component {
             placeholder={'Additional information'}
             numberOfLines={6}
             multiline={true}
+            placeholderTextColor={Color.darkGray}
           />
         </View>
         
