@@ -373,7 +373,8 @@ class CreateTicket extends Component {
           <View style={{
             paddingLeft: 20,
             paddingRight: 20,
-            flex: 1
+            flex: 1,
+            minHeight: height * 1.5
           }}>
             {this.state.proceed === false && this.renderStep1()}
             {this.state.proceed == true && this.renderCreate()}
