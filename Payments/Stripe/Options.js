@@ -10,6 +10,7 @@ import {fab} from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAddressCard, faCreditCard, faWallet } from '@fortawesome/free-solid-svg-icons';
 import Api from 'services/api/index.js';
+import Paypal from './ApiRequest.js'
 const height = Math.round(Dimensions.get('window').height)
 library.add(fab)
 
@@ -66,9 +67,9 @@ class Options extends Component {
 
   paypalDirect = () => {
     const { setPaypalUrl } = this.props;
-    Api.paypalPostRequest(response => {
+    Paypal.paypalPostRequest(response => {
       if (response && response.access_token != null) {
-        Api.paypalCreateOrderRequest({
+        Paypal.paypalCreateOrderRequest({
           intent: 'CAPTURE',
           purchase_units: [{
             amount: {
