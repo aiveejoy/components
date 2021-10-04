@@ -76,57 +76,59 @@ class MessagesV3 extends Component{
     }
   }
 
-  broadcasting(data){
-    fcmService.registerAppWithFCM()
-    fcmService.register(this.onRegister, this.onNotification, this.onOpenNotification)
-    localNotificationService.configure(this.onOpenNotification, Helper.APP_NAME)
-    fcmService.subscribeTopic('MessageGroup-' + data.id)
-    return () => {
-      console.log("[App] unRegister")
-      fcmService.unRegister()
-      localNotificationService.unRegister()
-    }
-  }
+  // broadcasting(data){
+  //   const { user } = this.props.state
+  //   fcmService.registerAppWithFCM()
+  //   fcmService.register(this.onRegister, this.onNotification, this.onOpenNotification)
+  //   localNotificationService.configure(this.onOpenNotification, Helper.APP_NAME)
+  //   fcmService.subscribeTopic(user.id)
+  //   return () => {
+  //     console.log("[App] unRegister")
+  //     fcmService.unRegister()
+  //     localNotificationService.unRegister()
+  //   }
+  // }
 
-  onRegister = (token) => {
-    console.log("[App] onRegister", token)
-  }
+  // onRegister = (token) => {
+  //   console.log("[App] onRegister", token)
+  // }
 
-  onOpenNotification = (notify) => {
-    // console.log("[App] onOpenNotification", notify)
-  }
+  // onOpenNotification = (notify) => {
+  //   // console.log("[App] onOpenNotification", notify)
+  // }
 
-  onNotification = (notify) => {
-    const { user } = this.props.state;
-    // console.log("[App] onNotification", notify)
-    let data = null
-    if(user == null || !notify.data){
-      return
-    }
-    data = notify.data
-    let topic = data.topic.split('-')
-    switch(topic[0].toLowerCase()){
-      case 'messagegroup': {
-          const { messengerGroup } = this.props.state;
-          let members = JSON.parse(data.members)
-          console.log('members', members)
-          if(messengerGroup == null && members.indexOf(user.id) > -1){
-            console.log('[messengerGroup] on empty', data)
-            const { setUnReadMessages } = this.props;
-            setUnReadMessages(data)
-            return
-          }
-          if(parseInt(data.messenger_group_id) === messengerGroup.id && members.indexOf(user.id) > -1){
-            if(parseInt(data.account_id) != user.id){
-              const { updateMessagesOnGroup } = this.props;
-              updateMessagesOnGroup(data); 
-            }
-            return
-          }
-        }
-      break
-    }
-  }
+  // onNotification = (notify) => {
+  //   const { user } = this.props.state;
+  //   // console.log("[App] onNotification", notify)
+  //   let data = null
+  //   if(user == null || !notify.data){
+  //     return
+  //   }
+  //   data = notify.data
+  //   let topic = data.topic.split('-')
+  //   console.log(data, '--------------');
+  //   switch(topic[0].toLowerCase()){
+  //     case 'messagegroup': {
+  //         const { messengerGroup } = this.props.state;
+  //         let members = JSON.parse(data.members)
+  //         console.log('members', members)
+  //         if(messengerGroup == null && members.indexOf(user.id) > -1){
+  //           console.log('[messengerGroup] on empty', data)
+  //           const { setUnReadMessages } = this.props;
+  //           setUnReadMessages(data)
+  //           return
+  //         }
+  //         if(parseInt(data.messenger_group_id) === messengerGroup.id && members.indexOf(user.id) > -1){
+  //           if(parseInt(data.account_id) != user.id){
+  //             const { updateMessagesOnGroup } = this.props;
+  //             updateMessagesOnGroup(data); 
+  //           }
+  //           return
+  //         }
+  //       }
+  //     break
+  //   }
+  // }
 
   retrieve = (data) => {
     const { messengerGroup } = this.props.state
@@ -219,7 +221,7 @@ class MessagesV3 extends Component{
     console.log('request', parameter)
     Api.request(Routes.messengerGroupRetrieve, parameter, response => {
        if(response.data.length > 0){
-          this.broadcasting(response.data[0])
+          // this.broadcasting(response.data[0])
           setMessengerGroup({
             ...data,
             id: response.data[0].id
@@ -247,11 +249,10 @@ class MessagesV3 extends Component{
   sendNewMessage = () => {
     const { messengerGroup, user, messagesOnGroup} = this.props.state;
     const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
-
+    const { data } = this.props.navigation.state.params;
     if(messengerGroup == null || user == null || this.state.newMessage == null){
       return
     }
-
     let parameter = {
       messenger_group_id: messengerGroup.id,
       message: this.state.newMessage,
@@ -259,18 +260,24 @@ class MessagesV3 extends Component{
       status: 0,
       payload: 'text',
       payload_value: null,
-      code: messagesOnGroup.messages.length + 1
+      code: 1,
+      to: data?.request?.location?.account_id
     }
     let newMessageTemp = {
       ...parameter,
       account: {
-        profile: user.profile
+        profile: user.profile,
+        information: {
+          first_name: user.information?.first_name,
+          last_name: user.information?.last_name,
+        },
+        username: user.username
       },
       created_at_human: moment(new Date()).format('MMMM DD, YYYY'),
       sending_flag: true,
       error: null
     }
-    console.log('parameter', parameter, '[route]', Routes.messengerMessagesCreate)
+    console.log('parameter', parameter, Routes.messengerMessagesCreate)
     updateMessagesOnGroup(newMessageTemp);
     this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
@@ -499,6 +506,7 @@ class MessagesV3 extends Component{
   }
 
   _headerRight = (item) => {
+    console.log(item, 'hiiii---')
     return (
       <View style={{
           flexDirection: 'row',
@@ -511,7 +519,7 @@ class MessagesV3 extends Component{
         }}/>
         <Text style={{
           paddingLeft: 10
-        }}>{item?.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item?.account?.username}</Text>
+        }}>{item.account?.information?.first_name ? item.account?.information?.first_name + ' ' + item.account?.information?.last_name : item?.account?.username}</Text>
       </View>
     );
   }
@@ -526,7 +534,7 @@ class MessagesV3 extends Component{
       }}>
         <Text style={{
           paddingRight: 10
-        }}>{item?.account?.information ? item.account.information.first_name + ' ' + item.account.information.last_name : item?.account?.username}</Text>
+        }}>{item.account?.information?.first_name ? item.account?.information?.first_name + ' ' + item.account?.information?.last_name : item?.account?.username}</Text>
         <UserImage user={item.account} style={{
           width: 25,
           height: 25

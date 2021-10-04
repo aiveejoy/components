@@ -135,27 +135,30 @@ class Support extends Component {
         onChange={index => this.change(this.state.menu[index])}
       />
       </View> */}
-        {this.state.data.length > 0 && (
-          <ScrollView
-            onScroll={(event) => {
-              let scrollingHeight = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y
-              let totalHeight = event.nativeEvent.contentSize.height
-              if (event.nativeEvent.contentOffset.y <= 0) {
-                if (this.state.loading == false) {
-                  // this.retrieve(false)
-                }
+        {this.state.isLoading && (<Skeleton size={3} template={'block'} height={50}/>)}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          onScroll={(event) => {
+            let scrollingHeight = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y
+            let totalHeight = event.nativeEvent.contentSize.height
+            if (event.nativeEvent.contentOffset.y <= 0) {
+              if (this.state.loading == false) {
+                // this.retrieve(false)
               }
-              if (scrollingHeight >= (totalHeight)) {
-                if (this.state.loading == false) {
-                  this.retrieve(true)
-                }
+            }
+            if (scrollingHeight >= (totalHeight)) {
+              if (this.state.loading == false) {
+                this.retrieve(true)
               }
-            }}
-          >
+            }
+          }}
+        >
+          {this.state.data.length > 0 && (
             <View style={{
               marginBottom: 50,
               paddingLeft: 20,
-              paddingRight: 20
+              paddingRight: 20,
+              minHeight: height * 1.5
             }}>
               <Text style={{
                 fontWeight: 'bold',
@@ -206,18 +209,18 @@ class Support extends Component {
                   );
                 })
               }
+            </View>)
+          }
+          {this.state.isLoading == false && this.state.data.length == 0 && (
+            <View style={{
+              minHeight: height * 1.5,
+              padding: 10
+            }}>
+              <EmptyMessage navigation={this.props.navigation} message={'No existing tickets'}/>
             </View>
-          </ScrollView>
-        )}
-        {this.state.isLoading == false && this.state.data.length == 0 && (
-          <View style={{
-            height: height / 2,
-            padding: 10
-          }}>
-            <EmptyMessage navigation={this.props.navigation} message={'No existing tickets'}/>
-          </View>
-        )}
-        {this.state.isLoading && (<Skeleton size={3} template={'block'} height={50}/>)}
+          )}
+        </ScrollView>
+        
         <TouchableOpacity
           style={[Style.floatingButton, {
             backgroundColor: theme ? theme.secondary : Color.secondary,
