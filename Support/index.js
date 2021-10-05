@@ -173,7 +173,7 @@ class Support extends Component {
                         marginBottom: 10
                       }}
                       onPress={() => {
-                        this.props.navigation.navigate('updateTicketStack', { id: u.id });
+                        this.props.navigation.navigate('updateTicketStack', { u });
                       }}>
                       <View style={{
                         padding: 10,

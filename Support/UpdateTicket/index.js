@@ -36,13 +36,14 @@ class UpdateTicket extends Component {
   componentDidMount() {
     const { setComments } = this.props;
     this.retrieve();
-    setComments({ id: this.props.state.user.id, commentList: [] })
+    setComments([])
   }
 
   retrieve() {
+    const { u } = this.props.navigation.state.params;
     let parameter = {
       condition: [{
-        value: this.props.navigation.state.params.id,
+        value: u.id,
         column: 'id',
         clause: '='
       }]
@@ -55,7 +56,7 @@ class UpdateTicket extends Component {
           data: response.data[0]
         })
       }
-      this.retrieveComments(false, this.props.navigation.state.params.id);
+      this.retrieveComments(false, u.id);
     }, error => {
       this.setState({
         isLoading: false
@@ -72,31 +73,35 @@ class UpdateTicket extends Component {
   }
 
   createComment = (id) => {
+    const { u } = this.props.navigation.state.params;
+    const { user } = this.props.state
     let parameter = {
-      account_id: this.props.state.user.id,
+      account_id: user.id,
       payload_value: id,
       payload: 'ticket_id',
-      text: this.state.comment
+      text: this.state.comment,
+      route: 'updateTicketStack',
+      to: u.assigned_to
     };
     this.setState({ isLoadingComment: true })
-    console.log(parameter);
     Api.request(Routes.commentCreate, parameter, response => {
       this.setState({ isLoadingComment: false })
       if (response.data !== null) {
         this.setState({ comment: null })
         parameter['account'] = {
-          username: this.props.state.user.username
+          username: user.username
         }
-        parameter['account']['profile'] = this.props.state.user.profile
+        parameter['account']['profile'] = user.profile
         parameter['created_at_human'] = moment(new Date()).format('MMMM DD, YYYY hh:mm a');
         let temp = [parameter, ...this.props.state.comments?.commentList]
         const { setComments } = this.props;
-        setComments({ id: id, commentList: temp });
+        setComments(temp);
       }
     })
   }
 
   retrieveComments = (flag, id) => {
+    const { u } = this.props.navigation.state.params;
     let parameter = {
       condition: [
         {
@@ -114,18 +119,19 @@ class UpdateTicket extends Component {
       limit: this.state.limit,
       offset: flag == true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset
     };
+    console.log(parameter,Routes.commentsRetrieve, '---------');
     this.setState({ isLoadingComment: true })
     Api.request(Routes.commentsRetrieve, parameter, response => {
       this.setState({ isLoadingComment: false, showComments: true })
       if (response.data.length > 0) {
-        const { setCurrentTicketId, setComments } = this.props;
-        setCurrentTicketId(id);
-        setComments({ id: id, commentList: flag == false ? response.data : _.uniqBy([...this.state.data, ...response.data], 'id') })
+        const { setCurrentTicket, setComments } = this.props;
+        setCurrentTicket(u);
+        setComments(flag == false ? response.data : _.uniqBy([...this.state.data, ...response.data], 'id'))
         this.setState({
           offset: flag == false ? 1 : (this.state.offset + 1)
         })
       } else {
-        setComments({ id: id, commentList: flag == false ? [] : this.state.data })
+        setComments(flag == false ? [] : this.state.data)
         this.setState({
           offset: flag == false ? 0 : this.state.offset
         })
@@ -134,9 +140,10 @@ class UpdateTicket extends Component {
   }
 
   createReply = () => {
+    const { u } = this.props.navigation.state.params;
     let parameter = {
       account_id: this.props.state.user.id,
-      comment_id: this.props.navigation.state.params.id,
+      comment_id: u.id,
       text: this.state.reply
     }
     this.setState({ isLoading: true });
@@ -177,6 +184,7 @@ class UpdateTicket extends Component {
 
   renderComments = () => {
     const { theme } = this.props.state;
+    const { u } = this.props.navigation.state.params;
     return (
       <View>
         <View style={{
@@ -206,7 +214,7 @@ class UpdateTicket extends Component {
               value={this.state.comment}
             />
             <TouchableOpacity
-              onPress={() => { this.createComment(this.props.navigation.state.params.id) }}
+              onPress={() => { this.createComment(u.id) }}
               style={{
                 padding: 10
               }}
@@ -224,7 +232,7 @@ class UpdateTicket extends Component {
           <View style={{
             padding: 15
           }}>
-          {this.props.state.comments?.commentList?.length > 0 && this.props.state.comments.commentList.map((item, index) => {
+          {this.props.state.comments?.length > 0 && this.props.state.comments.map((item, index) => {
             return (
               <PostCard
                 data={{
@@ -247,6 +255,7 @@ class UpdateTicket extends Component {
   renderTicket() {
     const { data } = this.state;
     const { theme } = this.props.state;
+    const { u } = this.props.navigation.state.params;
     return (
       <ScrollView showsVerticalScrollIndicator={false}
         onScroll={(event) => {
@@ -259,7 +268,7 @@ class UpdateTicket extends Component {
           }
           if (scrollingHeight >= (totalHeight)) {
             if (this.state.isLoadingComment == false) {
-              this.retrieveComments(true, this.props.navigation.state.params.id)
+              this.retrieveComments(true, u.id)
             }
           }
         }}
@@ -333,7 +342,7 @@ const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
     setComments: (comments) => dispatch(actions.setComments(comments)),
-    setCurrentTicketId: (currentTicketId) => dispatch(actions.setCurrentTicketId(currentTicketId))
+    setCurrentTicket: (currentTicket) => dispatch(actions.setCurrentTicket(currentTicket))
   };
 };
 
