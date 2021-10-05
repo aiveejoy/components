@@ -74,7 +74,7 @@ class UpdateTicket extends Component {
 
   createComment = (id) => {
     const { u } = this.props.navigation.state.params;
-    const { user } = this.props.state
+    const { user, comments } = this.props.state
     let parameter = {
       account_id: user.id,
       payload_value: id,
@@ -93,10 +93,13 @@ class UpdateTicket extends Component {
         }
         parameter['account']['profile'] = user.profile
         parameter['created_at_human'] = moment(new Date()).format('MMMM DD, YYYY hh:mm a');
-        let temp = [parameter, ...this.props.state.comments?.commentList]
+        let temp = [parameter, ...comments]
         const { setComments } = this.props;
         setComments(temp);
       }
+    }, error => {
+      console.log(error, 'error');
+      this.setState({ isLoadingComment: false })
     })
   }
 
@@ -119,7 +122,6 @@ class UpdateTicket extends Component {
       limit: this.state.limit,
       offset: flag == true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset
     };
-    console.log(parameter,Routes.commentsRetrieve, '---------');
     this.setState({ isLoadingComment: true })
     Api.request(Routes.commentsRetrieve, parameter, response => {
       this.setState({ isLoadingComment: false, showComments: true })
@@ -183,7 +185,7 @@ class UpdateTicket extends Component {
   }
 
   renderComments = () => {
-    const { theme } = this.props.state;
+    const { theme, comments } = this.props.state;
     const { u } = this.props.navigation.state.params;
     return (
       <View>
@@ -232,7 +234,7 @@ class UpdateTicket extends Component {
           <View style={{
             padding: 15
           }}>
-          {this.props.state.comments?.length > 0 && this.props.state.comments.map((item, index) => {
+          {comments?.length > 0 && comments.map((item, index) => {
             return (
               <PostCard
                 data={{
