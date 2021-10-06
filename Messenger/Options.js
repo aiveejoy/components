@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 // import Style from './Style.js';
 import { View, Text, Dimensions, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 import { Routes, Color, BasicStyles, Helper } from 'common';
-import { Spinner, UserImage } from 'components';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
@@ -16,6 +15,7 @@ import ImageModal from 'components/Modal/ImageModal';
 import ImageResizer from 'react-native-image-resizer';
 import { color } from 'react-native-reanimated';
 import moment from 'moment';
+import Skeleton from 'components/Loading/Skeleton';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -38,7 +38,8 @@ class Options extends Component {
       currentValidation: null,
       imageModal: false,
       url: null,
-      supportEnabled: []
+      supportEnabled: [],
+      imageLoading: false
     }
   }
 
@@ -55,9 +56,9 @@ class Options extends Component {
       payload_value: result,
       category: currentValidation?.id
     }
-    this.setState({ isLoading: true })
+    this.setState({ imageLoading: true })
     Api.request(Routes.uploadImage, parameter, response => {
-      this.setState({ isLoading: false })
+      this.setState({ imageLoading: false })
       this.retrieveReceiverPhoto(this.state.currentValidation?.id);
     })
   }
@@ -74,9 +75,9 @@ class Options extends Component {
         value: id
       }]
     }
-    this.setState({ isLoading: true })
+    this.setState({ imageLoading: true })
     Api.request(Routes.retrieveImage, parameter, response => {
-      this.setState({ isLoading: false })
+      this.setState({ imageLoading: false })
       if (response.data.length > 0) {
         this.setState({ pictures: response.data })
       }
@@ -332,9 +333,9 @@ class Options extends Component {
               payload_value: res.uri,
               category: currentValidation?.id
             }
-            this.setState({ isLoading: true })
+            this.setState({ imageLoading: true })
             Api.request(Routes.uploadImage, parameter, response => {
-              this.setState({ isLoading: false })
+              this.setState({ imageLoading: false })
               this.retrieveReceiverPhoto(currentValidation?.id);
             })
           })
@@ -792,6 +793,7 @@ class Options extends Component {
               }
             })
           }
+          {this.state.imageLoading ? (<Skeleton size={2} />) : null}
         </View>
         <View style={{
           paddingTop: 50,
@@ -883,12 +885,12 @@ class Options extends Component {
           <ImageModal visible={this.state.imageModal} url={this.state.url && this.state.url.includes('file') === true ? this.state.url : `data:image/png;base64,${this.state.url}`} action={() => { this.setState({ imageModal: false }) }}></ImageModal>
           <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
-          {this.state.isLoading ? <Spinner mode="overlay" /> : null}
-          {current.title == 'Settings' && this.body(this.state.current.menu)}
-          {current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
-          {current.title == 'signature' && this.renderImages(this.state.current.title)}
-          {current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
-          {current.title == 'valid_id' && this.renderImages(this.state.current.title)}
+          {this.state.isLoading ? (<Skeleton size={2} />) : null}
+          {!this.state.isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
+          {!this.state.isLoading && current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
+          {!this.state.isLoading && current.title == 'signature' && this.renderImages(this.state.current.title)}
+          {!this.state.isLoading && current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
+          {!this.state.isLoading && current.title == 'valid_id' && this.renderImages(this.state.current.title)}
         </View>
       </View>
     );
