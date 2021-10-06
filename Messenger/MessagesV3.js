@@ -57,9 +57,6 @@ class MessagesV3 extends Component{
   }
 
   componentDidMount(){
-    const { setMessengerGroup } = this.props
-    const { data } = this.props.navigation.state.params;
-    setMessengerGroup(data)
     const { user } = this.props.state
     if (user == null) return
     this.retrieveGroup()
@@ -68,7 +65,7 @@ class MessagesV3 extends Component{
   componentWillUnmount() {
     const { data } = this.props.navigation.state.params;
     const { setMessengerGroup, setMessagesOnGroup } = this.props
-    setMessengerGroup(data)
+    setMessengerGroup(null)
     setMessagesOnGroup({
       groupId: null,
       messages: null
@@ -149,7 +146,7 @@ class MessagesV3 extends Component{
       limit,
       offset: offset * limit,
     }
-    console.log('parameter', parameter)
+    console.log('parameter', parameter, Routes.messengerMessagesRetrieve)
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
@@ -220,7 +217,6 @@ class MessagesV3 extends Component{
       account_id: user.id
     }
     this.setState({ isLoading: true });
-    console.log('request', parameter)
     Api.request(Routes.messengerGroupRetrieve, parameter, response => {
        if(response.data.length > 0){
           // this.broadcasting(response.data[0])
@@ -279,7 +275,7 @@ class MessagesV3 extends Component{
       sending_flag: true,
       error: null
     }
-    console.log('parameter', parameter, Routes.messengerMessagesCreate)
+    console.log('parameter--------------', parameter, Routes.messengerMessagesCreate)
     updateMessagesOnGroup(newMessageTemp);
     this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
