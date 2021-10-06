@@ -15,6 +15,7 @@ import Button from 'components/Form/Button';
 import ImageModal from 'components/Modal/ImageModal';
 import ImageResizer from 'react-native-image-resizer';
 import { color } from 'react-native-reanimated';
+import moment from 'moment';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -94,14 +95,48 @@ class Options extends Component {
     })
   }
 
-  sendNewMessage = (payload) => {
-    const { messengerGroup, user, messagesOnGroup } = this.props.state;
-    const { updateMessagesOnGroup, updateMessageByCode } = this.props;
+  // sendNewMessage = (payload) => {
+  //   const { messengerGroup, user, messagesOnGroup } = this.props.state;
+  //   const { updateMessagesOnGroup, updateMessageByCode } = this.props;
 
-    if (messengerGroup == null || user == null) {
+  //   if (messengerGroup == null || user == null) {
+  //     return
+  //   }
+
+  //   let parameter = {
+  //     messenger_group_id: messengerGroup.id,
+  //     message: `Your ${payload} request has been declined. Please send more photos.`,
+  //     account_id: user.id,
+  //     status: 0,
+  //     payload: 'text',
+  //     payload_value: null,
+  //     code: messagesOnGroup.messages.length + 1
+  //   }
+  //   let newMessageTemp = {
+  //     ...parameter,
+  //     account: user,
+  //     created_at_human: null,
+  //     sending_flag: true,
+  //     error: null
+  //   }
+  //   updateMessagesOnGroup(newMessageTemp);
+  //   this.setState({ newMessage: null })
+  //   this.setState({ isLoading: true })
+  //   Api.request(Routes.messengerMessagesCreate, parameter, response => {
+  //     this.setState({ isLoading: false })
+  //     if (response.data != null) {
+  //       updateMessageByCode(response.data);
+  //     }
+  //   });
+  // }
+
+  sendNewMessage = (payload) => {
+    const { messengerGroup, user, messagesOnGroup} = this.props.state;
+    const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
+    const { data } = this.props.navigation.state.params;
+    if(messengerGroup == null || user == null){
       return
     }
-
     let parameter = {
       messenger_group_id: messengerGroup.id,
       message: `Your ${payload} request has been declined. Please send more photos.`,
@@ -109,22 +144,38 @@ class Options extends Component {
       status: 0,
       payload: 'text',
       payload_value: null,
-      code: messagesOnGroup.messages.length + 1
+      code: 1,
+      to: data?.request?.location?.account_id
     }
     let newMessageTemp = {
       ...parameter,
-      account: user,
-      created_at_human: null,
+      account: {
+        profile: user.profile,
+        information: {
+          first_name: user.information?.first_name,
+          last_name: user.information?.last_name,
+        },
+        username: user.username
+      },
+      created_at_human: moment(new Date()).format('MMMM DD, YYYY'),
       sending_flag: true,
       error: null
     }
+    console.log('parameter', parameter, Routes.messengerMessagesCreate)
     updateMessagesOnGroup(newMessageTemp);
-    this.setState({ newMessage: null })
-    this.setState({ isLoading: true })
+    this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
-      this.setState({ isLoading: false })
       if (response.data != null) {
-        updateMessageByCode(response.data);
+        const { messagesOnGroup } = this.props.state;
+        const { setMessagesOnGroup} = this.props;
+        if (messagesOnGroup && messagesOnGroup.messages.length > 0) {
+          let temp = messagesOnGroup.messages;
+          temp[messagesOnGroup.messages.length - 1].sending_flag = false
+          setMessagesOnGroup({
+            groupId: this.props.navigation.state.params.data.id,
+            messages: temp
+          })
+        }
       }
     });
   }
@@ -329,6 +380,9 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.requestValidationUpdate, parameter, response => {
       this.setState({ isLoading: false })
+      let temp = currentValidation
+      temp.status = status;
+      this.setState({currentValidation: temp});
     })
   }
 
@@ -371,7 +425,7 @@ class Options extends Component {
       account_id: user.id,
       payload: 'request_id',
       payload_value: data?.request?.id,
-      status: 'PENDING',
+      status: 0,
       assigned_to: ''
     }
     this.setState({ isLoading: true })
