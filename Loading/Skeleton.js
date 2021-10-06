@@ -111,7 +111,6 @@ class Skeleton extends Component {
               </View>
             )
             break
-            break
         }
       }else{
         content.push(
