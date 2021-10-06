@@ -35,7 +35,6 @@ class Options extends Component {
       visible: false,
       validations: [],
       currentValidation: null,
-      // requestId: null,
       imageModal: false,
       url: null,
       supportEnabled: []
@@ -129,30 +128,6 @@ class Options extends Component {
       }
     });
   }
-
-  // retrieveRequestId() {
-  //   const { user } = this.props.state;
-  //   const { data } = this.props;
-  //   if (user == null || data == null) {
-  //     return
-  //   }
-  //   let parameter = {
-  //     condition: [{
-  //       value: data.title,
-  //       clause: '=',
-  //       column: 'code'
-  //     }],
-  //     account_id: user.id
-  //   };
-  //   this.setState({ isLoading: true });
-  //   Api.request(Routes.requestRetrieveItem, parameter, (response) => {
-  //     this.setState({ isLoading: false });
-  //     if (response.data.length > 0) {
-  //       this.setState({ requestId: response.data[0].id });
-        
-  //     }
-  //   })
-  // }
 
   retrieveRequest(route) {
     const { user, request } = this.props.state;
@@ -335,7 +310,8 @@ class Options extends Component {
 
   updateValidation = (status) => {
     const { messengerGroup, user } = this.props.state;
-    const { currentValidation, requestId } = this.state;
+    const { currentValidation } = this.state;
+    const { data } = this.props;
     if (messengerGroup == null) {
       return
     }
@@ -344,7 +320,7 @@ class Options extends Component {
       id: currentValidation?.id,
       payload: currentValidation?.payload,
       account_id: this.props.state.user.id,
-      request_id: requestId,
+      request_id: data?.request?.id,
       messages: {
         messenger_group_id: this.props.messengerId,
         account_id: this.props.state.user.id
