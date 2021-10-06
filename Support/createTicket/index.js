@@ -33,22 +33,22 @@ class CreateTicket extends Component {
         {
           id: 1,
           type: 'VERIFICATION ISSUE',
-          description: 'Having trouble or did encountered issues about verifications? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
+          description: 'Having trouble or encountered issues during the verification process? Create a ticket to raise an issue and communicate with PayHiram Support for it to be addressed.'
         },
         {
           id: 2,
           type: 'ACCOUNT ISSUE',
-          description: 'Having trouble or did encountered issues in managing your account? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
+          description: 'Having trouble or encountered issues in managing your account? Create a ticket to raise an issue and communicate with PayHiram Support for it to be addressed.'
         },
         {
           id: 3,
           type: 'TRANSACTION ISSUE',
-          description: 'Having trouble or did encountered issues in your previous transactions? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
+          description: 'Having trouble or encountered issues in your previous transaction?? Create a ticket to raise an issue and communicate with PayHiram Support for it to be addressed.'
         },
         {
           id: 4,
           type: 'OTHERS',
-          description: 'Having trouble or did encountered issues in other matters? Create issues here and communicate with Payhiram Administrator for the said issue to be addressed.'
+          description: 'Got other issues that are not mentioned above? Create a ticket to raise the issue and communicate with PayHiram Support for it to be addressed.'
         }
       ],
       selected: null,
