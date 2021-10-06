@@ -57,6 +57,9 @@ class MessagesV3 extends Component{
   }
 
   componentDidMount(){
+    const { setMessengerGroup } = this.props
+    const { data } = this.props.navigation.state.params;
+    setMessengerGroup(data)
     const { user } = this.props.state
     console.log('[userrrrrr]', user)
     if (user == null) return
@@ -281,9 +284,17 @@ class MessagesV3 extends Component{
     updateMessagesOnGroup(newMessageTemp);
     this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
-      if(response.data != null){
-        newMessageTemp['sending_flag'] = false
-        updateMessageByCode(newMessageTemp);
+      if (response.data != null) {
+        const { messagesOnGroup } = this.props.state;
+        const { setMessagesOnGroup} = this.props;
+        if (messagesOnGroup && messagesOnGroup.messages.length > 0) {
+          let temp = messagesOnGroup.messages;
+          temp[messagesOnGroup.messages.length - 1].sending_flag = false
+          setMessagesOnGroup({
+            groupId: this.props.navigation.state.params.data.id,
+            messages: temp
+          })
+        }
       }
     });
   }
