@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-// import Style from './Style.js';
 import {
   TextInput,
   View,
@@ -20,15 +19,12 @@ import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane, faLock, faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock} from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
-import CommonRequest from 'services/CommonRequest.js';
 import Style from 'modules/messenger/Style.js'
 import Modal from 'components/Modal/Sketch';
 import MessageOptions from './Options.js'
-import { fcmService } from 'services/broadcasting/FCMService';
-import { localNotificationService } from 'services/broadcasting/LocalNotificationService';
 import moment from 'moment';
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -52,7 +48,8 @@ class MessagesV3 extends Component{
       settingsBreadCrumbs: ['Settings'],
       group: null,
       request_id: null,
-      isViewing: false
+      isViewing: false,
+      members: []
     }
   }
 
@@ -75,63 +72,7 @@ class MessagesV3 extends Component{
     }
   }
 
-  // broadcasting(data){
-  //   const { user } = this.props.state
-  //   fcmService.registerAppWithFCM()
-  //   fcmService.register(this.onRegister, this.onNotification, this.onOpenNotification)
-  //   localNotificationService.configure(this.onOpenNotification, Helper.APP_NAME)
-  //   fcmService.subscribeTopic(user.id)
-  //   return () => {
-  //     console.log("[App] unRegister")
-  //     fcmService.unRegister()
-  //     localNotificationService.unRegister()
-  //   }
-  // }
-
-  // onRegister = (token) => {
-  //   console.log("[App] onRegister", token)
-  // }
-
-  // onOpenNotification = (notify) => {
-  //   // console.log("[App] onOpenNotification", notify)
-  // }
-
-  // onNotification = (notify) => {
-  //   const { user } = this.props.state;
-  //   // console.log("[App] onNotification", notify)
-  //   let data = null
-  //   if(user == null || !notify.data){
-  //     return
-  //   }
-  //   data = notify.data
-  //   let topic = data.topic.split('-')
-  //   console.log(data, '--------------');
-  //   switch(topic[0].toLowerCase()){
-  //     case 'messagegroup': {
-  //         const { messengerGroup } = this.props.state;
-  //         let members = JSON.parse(data.members)
-  //         console.log('members', members)
-  //         if(messengerGroup == null && members.indexOf(user.id) > -1){
-  //           console.log('[messengerGroup] on empty', data)
-  //           const { setUnReadMessages } = this.props;
-  //           setUnReadMessages(data)
-  //           return
-  //         }
-  //         if(parseInt(data.messenger_group_id) === messengerGroup.id && members.indexOf(user.id) > -1){
-  //           if(parseInt(data.account_id) != user.id){
-  //             const { updateMessagesOnGroup } = this.props;
-  //             updateMessagesOnGroup(data); 
-  //           }
-  //           return
-  //         }
-  //       }
-  //     break
-  //   }
-  // }
-
   retrieve = (data) => {
-    const { messengerGroup } = this.props.state
-    const { setMessengerGroup } = this.props
     const { offset, limit } = this.state
     this.setState({ isLoading: true });
     const parameter = {
@@ -146,7 +87,6 @@ class MessagesV3 extends Component{
       limit,
       offset: offset * limit,
     }
-    console.log('parameter', parameter, Routes.messengerMessagesRetrieve)
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
       this.setState({ isLoading: false, offset: offset + limit });
       if(response.data.length > 0) {
@@ -158,6 +98,31 @@ class MessagesV3 extends Component{
         messages: response.data.reverse(),
         groupId: this.props.navigation.state.params.data.id
       })
+    }, error => {
+      this.setState({ isLoading: false });
+      console.log({ retrieveMessagesError: error })
+    });
+  }
+
+  retrieveMembers = (data) => {
+    this.setState({ isLoading: true });
+    const parameter = {
+      condition: [{
+        value: data.id,
+        column: 'messenger_group_id',
+        clause: '='
+      }],
+      sort: {
+        'created_at': 'DESC'
+      },
+      limit: 2,
+      offset: 0,
+    }
+    Api.request(Routes.messengerMembersRetrieve, parameter, response => {
+      this.setState({ isLoading: false});
+      if(response.data.length > 0) {
+        this.setState({members: response.data});
+      }
     }, error => {
       this.setState({ isLoading: false });
       console.log({ retrieveMessagesError: error })
@@ -219,13 +184,13 @@ class MessagesV3 extends Component{
     this.setState({ isLoading: true });
     Api.request(Routes.messengerGroupRetrieve, parameter, response => {
        if(response.data.length > 0){
-          // this.broadcasting(response.data[0])
           setMessengerGroup({
             ...data,
             id: response.data[0].id
           });
           setTimeout(() => {
             this.retrieve(response.data[0])
+            this.retrieveMembers(response.data[0])
           }, 500)
        }else{
           this.setState({ isLoading: false });
@@ -233,21 +198,13 @@ class MessagesV3 extends Component{
     }, error => {
       this.setState({ isLoading: false });
     });
-    // CommonRequest.retrieveMessengerGroup(messengerGroup, parameter, response => {
-    //   if(response.data != null){
-    //     setMessengerGroup(response.data);
-    //     setTimeout(() => {
-    //       this.retrieve(response.data[0])
-    //       this.setState({keyRefresh: this.state.keyRefresh + 1})
-    //     }, 500)
-    //   }
-    // })
   }
 
   sendNewMessage = () => {
     const { messengerGroup, user, messagesOnGroup} = this.props.state;
     const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
     const { data } = this.props.navigation.state.params;
+    const { members } = this.state;
     if(messengerGroup == null || user == null || this.state.newMessage == null){
       return
     }
@@ -259,7 +216,7 @@ class MessagesV3 extends Component{
       payload: 'text',
       payload_value: null,
       code: 1,
-      to: data?.request?.location?.account_id
+      to: members[0]?.account_id === user.id ? members[1]?.account_id : members[0]?.account_id
     }
     let newMessageTemp = {
       ...parameter,
@@ -275,9 +232,9 @@ class MessagesV3 extends Component{
       sending_flag: true,
       error: null
     }
-    console.log('parameter--------------', parameter, Routes.messengerMessagesCreate)
     updateMessagesOnGroup(newMessageTemp);
     this.setState({newMessage: null})
+    console.log(Routes.messengerMessagesCreate, parameter, '---------------')
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
       if (response.data != null) {
         const { messagesOnGroup } = this.props.state;
@@ -295,7 +252,6 @@ class MessagesV3 extends Component{
   }
 
   sendImageWithoutPayload = (parameter) => {
-    const { messengerGroup, user, messagesOnGroup } = this.props.state;
     const { updateMessageByCode } = this.props;
 
     Api.request(Routes.mmCreateWithImageWithoutPayload, parameter, response => {
@@ -512,7 +468,6 @@ class MessagesV3 extends Component{
   }
 
   _headerRight = (item) => {
-    console.log(item, 'hiiii---')
     return (
       <View style={{
           flexDirection: 'row',
@@ -698,8 +653,7 @@ class MessagesV3 extends Component{
   }
 
   _flatList = () => {
-    const { selected } = this.state;
-    const { user, messagesOnGroup, messengerGroup } = this.props.state;
+    const { user, messagesOnGroup } = this.props.state;
     return (
       <View style={{
         width: '100%',
@@ -872,8 +826,7 @@ const mapDispatchToProps = dispatch => {
     updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
     updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message)),
     setUnReadMessages: (messages) => dispatch(actions.setUnReadMessages(messages)),
-    updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
-    // viewMenu: (isViewing) => dispatch(actions.viewMenu(isViewing))
+    updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message))
   };
 };
 
