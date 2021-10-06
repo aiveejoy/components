@@ -35,7 +35,7 @@ class Options extends Component {
       visible: false,
       validations: [],
       currentValidation: null,
-      requestId: null,
+      // requestId: null,
       imageModal: false,
       url: null,
       supportEnabled: []
@@ -130,29 +130,29 @@ class Options extends Component {
     });
   }
 
-  retrieveRequestId() {
-    const { user } = this.props.state;
-    const { data } = this.props;
-    if (user == null || data == null) {
-      return
-    }
-    let parameter = {
-      condition: [{
-        value: data.title,
-        clause: '=',
-        column: 'code'
-      }],
-      account_id: user.id
-    };
-    this.setState({ isLoading: true });
-    Api.request(Routes.requestRetrieveItem, parameter, (response) => {
-      this.setState({ isLoading: false });
-      if (response.data.length > 0) {
-        this.setState({ requestId: response.data[0].id });
-        this.retrieveValidation();
-      }
-    })
-  }
+  // retrieveRequestId() {
+  //   const { user } = this.props.state;
+  //   const { data } = this.props;
+  //   if (user == null || data == null) {
+  //     return
+  //   }
+  //   let parameter = {
+  //     condition: [{
+  //       value: data.title,
+  //       clause: '=',
+  //       column: 'code'
+  //     }],
+  //     account_id: user.id
+  //   };
+  //   this.setState({ isLoading: true });
+  //   Api.request(Routes.requestRetrieveItem, parameter, (response) => {
+  //     this.setState({ isLoading: false });
+  //     if (response.data.length > 0) {
+  //       this.setState({ requestId: response.data[0].id });
+        
+  //     }
+  //   })
+  // }
 
   retrieveRequest(route) {
     const { user, request } = this.props.state;
@@ -194,18 +194,19 @@ class Options extends Component {
   }
 
   addToValidation = (payload) => {
-    const { requestId } = this.state;
+    const { data } = this.props;
     let parameter = {
       status: 'pending',
       payload: payload,
       account_id: this.props.state.user.id,
-      request_id: requestId,
+      request_id: data?.request?.id,
       messages: {
         messenger_group_id: this.props.messengerId,
         account_id: this.props.state.user.id
       }
     }
     this.setState({ isLoading: true });
+    console.log(parameter, Routes.requestValidationCreate, '---');
     Api.request(Routes.requestValidationCreate, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
@@ -239,15 +240,21 @@ class Options extends Component {
 
   retrieveValidation = () => {
     const { user } = this.props.state;
-    const { requestId } = this.state;
+    const { data } = this.props;
     let parameter = {
       condition: [{
-        value: requestId,
+        value: data?.request?.id,
         clause: '=',
         column: 'request_id'
-      }]
+      }],
+      sort: {
+        created_at: 'asc'
+      },
+      offset: 0,
+      limit: 3
     }
     this.setState({ isLoading: true });
+    console.log(Routes.requestValidationRetreive, parameter);
     Api.request(Routes.requestValidationRetreive, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
@@ -356,7 +363,7 @@ class Options extends Component {
       condition: [
         {
           clause: '=',
-          value: data.id,
+          value: data?.request?.id,
           column: 'payload_value'
         },
         {
@@ -364,8 +371,14 @@ class Options extends Component {
           value: user.id,
           column: 'account_id'
         }
-      ]
+      ],
+      sort: {
+        created_at: 'asc'
+      },
+      offset: 0,
+      limit: 3
     }
+    console.log(Routes.enableSupportRetrieve, parameter);
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportRetrieve, parameter, response => {
       this.setState({ isLoading: false })
@@ -381,7 +394,7 @@ class Options extends Component {
     let parameter = {
       account_id: user.id,
       payload: 'request_id',
-      payload_value: data.id,
+      payload_value: data?.request?.id,
       status: 'PENDING',
       assigned_to: ''
     }
@@ -404,7 +417,7 @@ class Options extends Component {
         this.close()
         break
       case 'requirements':
-        this.retrieveRequestId();
+        this.retrieveValidation();
         this.setState({
           previous: {
             title: 'Settings',
@@ -601,7 +614,7 @@ class Options extends Component {
           options.map((item, index) => (
             <View
             key={index}>
-              {data && user && data.request?.account?.code == user.code && (
+              {data?.request?.location?.account_id == user.id && (
                 <TouchableOpacity style={{
                   width: '100%',
                   height: 50,
@@ -654,7 +667,7 @@ class Options extends Component {
                   }
                 </TouchableOpacity>)}
               {
-                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && data && data.request?.account?.code != user.code) && (
+                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.request?.location?.account_id != user.id)) && (
                   <TouchableOpacity style={{
                     width: '100%',
                     height: 50,
@@ -669,12 +682,13 @@ class Options extends Component {
                     <Text style={{
                       color: item.color,
                       fontSize: BasicStyles.standardFontSize,
-                      width: (data && data.request?.account?.code == user.code) ? '70%' : '90%',
+                      width: '90%',
                     }}>{item.title}</Text>
                     <View style={{
                       width: '10%',
                       justifyContent: 'center',
                       alignItems: 'center',
+                      flexDirection: 'row-reverse',
                       height: 30
                     }}>
                       <FontAwesomeIcon
@@ -757,7 +771,7 @@ class Options extends Component {
           alignItems: 'center'
         }}>
 
-          {data && data.request?.account?.code === user.code && currentValidation?.status === 'pending' && (
+          {data?.request?.location?.account_id == user.id && currentValidation?.status === 'pending' && (
             <View style={Style.signatureFrameContainer}>
               <Button
                 title={'Decline'}
@@ -778,7 +792,7 @@ class Options extends Component {
               />
             </View>
           )}
-          {data && data.request?.account?.code != user.code && (
+          {data?.request?.location?.account_id != user.id && (
             <Button
               title={payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}
               onClick={() => {
@@ -794,7 +808,7 @@ class Options extends Component {
               }}
             />
           )}
-          {data && data.request?.account?.code === user.code && (currentValidation?.status === 'accepted') && (
+          {(currentValidation?.status === 'accepted') && (
             <View style={Style.signatureFrameContainer}>
               <View style={[
                 Style.signatureAction,
@@ -804,7 +818,7 @@ class Options extends Component {
               </View>
             </View>
           )}
-          {data && data.request?.account?.code === user.code && currentValidation?.status === 'declined' && (
+          {currentValidation?.status === 'declined' && (
             <View style={Style.signatureFrameContainer}>
               <View style={[
                 Style.signatureAction,

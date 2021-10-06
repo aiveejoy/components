@@ -49,6 +49,7 @@ class UpdateTicket extends Component {
       }]
     };
     this.setState({ isLoading: true })
+    console.log(Routes.ticketsRetrieve, parameter, '-----');
     Api.request(Routes.ticketsRetrieve, parameter, response => {
       this.setState({ isLoading: false })
       if (response.data.length > 0) {
