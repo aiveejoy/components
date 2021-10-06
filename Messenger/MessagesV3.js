@@ -61,7 +61,6 @@ class MessagesV3 extends Component{
     const { data } = this.props.navigation.state.params;
     setMessengerGroup(data)
     const { user } = this.props.state
-    console.log('[userrrrrr]', user)
     if (user == null) return
     this.retrieveGroup()
   }
