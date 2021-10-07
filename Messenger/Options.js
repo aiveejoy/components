@@ -498,7 +498,7 @@ class Options extends Component {
       case 'signature':
         let result = this.checkValidation('signature');
         if (result.result === true) {
-          this.firebaseNotification(result.item.id)
+          // this.firebaseNotification(result.item.id)
           setCurrentValidation(result.item)
           this.retrieveReceiverPhoto(result.item.id);
           this.setState({
@@ -512,7 +512,7 @@ class Options extends Component {
       case 'receiver_picture':
         let result1 = this.checkValidation('receiver_picture');
         if (result1.result === true) {
-          this.firebaseNotification(result1.item.id)
+          // this.firebaseNotification(result1.item.id)
           setCurrentValidation(result1.item)
           this.retrieveReceiverPhoto(result1.item.id);
           this.setState({
@@ -526,7 +526,7 @@ class Options extends Component {
       case 'valid_id':
         let result2 = this.checkValidation('valid_id');
         if (result2.result === true) {
-          this.firebaseNotification(result2.item.id)
+          // this.firebaseNotification(result2.item.id)
           setCurrentValidation(result2.item)
           this.retrieveReceiverPhoto(result2.item.id);
           this.setState({
