@@ -827,8 +827,7 @@ class MessagesV3 extends Component {
                 backgroundColor: Color.white
               }}>
                 <Text style={{
-                  marginBottom: 10,
-                  color: Color.danger
+                  marginBottom: 10
                 }}>This transaction is already completed.</Text>
                 <Button
                   title={'Go to Dashboard'}
