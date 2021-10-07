@@ -653,7 +653,7 @@ class Options extends Component {
           options.map((item, index) => (
             <View
             key={index}>
-              {data?.request?.location?.account_id == user.id && (
+              { (data?.request?.account?.code == user.code) && (
                 <TouchableOpacity style={{
                   width: '100%',
                   height: 50,
@@ -670,10 +670,10 @@ class Options extends Component {
                   <Text style={{
                     color: item.color,
                     fontSize: BasicStyles.standardFontSize,
-                    width: (data && data.request?.account?.code == user.code) ? '70%' : '90%',
+                    width: (data?.request?.account?.code == user.code) ? '70%' : '90%',
                   }}>{item.title}</Text>
                   {
-                    (item.title != 'Back' && (data && data.request?.account?.code == user.code)) && (
+                    (item.title != 'Back' && (data?.request?.account?.code == user.code)) && (
                       <View style={{
                         width: '30%',
                         justifyContent: 'center',
@@ -706,7 +706,7 @@ class Options extends Component {
                   }
                 </TouchableOpacity>)}
               {
-                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.request?.location?.account_id != user.id)) && (
+                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.request?.account?.code != user.code)) && (
                   <TouchableOpacity style={{
                     width: '100%',
                     height: 50,
