@@ -19,18 +19,21 @@ import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane, faLock} from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import Style from 'modules/messenger/Style.js'
 import Modal from 'components/Modal/Sketch';
 import MessageOptions from './Options.js'
 import moment from 'moment';
+import Button from 'components/Form/Button';
+import { NavigationActions, StackActions } from 'react-navigation';
+
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
 
-class MessagesV3 extends Component{
-  constructor(props){
+class MessagesV3 extends Component {
+  constructor(props) {
     super(props);
     this.state = {
       isLoading: false,
@@ -53,7 +56,7 @@ class MessagesV3 extends Component{
     }
   }
 
-  componentDidMount(){
+  componentDidMount() {
     const { user } = this.props.state
     if (user == null) return
     this.retrieveGroup()
@@ -67,9 +70,28 @@ class MessagesV3 extends Component{
       groupId: null,
       messages: null
     })
-    if(data == null){
+    if (data == null) {
       return
     }
+  }
+
+  navigateToScreen = () => {
+    const navigateAction = NavigationActions.navigate({
+      routeName: 'drawerStack',
+      action: StackActions.reset({
+        index: 0,
+        key: null,
+        actions: [
+          NavigationActions.navigate({
+            routeName: 'Dashboard', params: {
+              initialRouteName: 'Dashboard',
+              index: 0
+            }
+          }),
+        ]
+      })
+    });
+    this.props.navigation.dispatch(navigateAction);
   }
 
   retrieve = (data) => {
@@ -89,11 +111,11 @@ class MessagesV3 extends Component{
     }
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
       this.setState({ isLoading: false, offset: offset + limit });
-      if(response.data.length > 0) {
-        this.setState({sender_id: response.data[0].account_id});
-        this.setState({request_id: response.data[0].id});
+      if (response.data.length > 0) {
+        this.setState({ sender_id: response.data[0].account_id });
+        this.setState({ request_id: response.data[0].id });
       }
-      const {setMessagesOnGroup} = this.props;
+      const { setMessagesOnGroup } = this.props;
       setMessagesOnGroup({
         messages: response.data.reverse(),
         groupId: this.props.navigation.state.params.data.id
@@ -119,9 +141,9 @@ class MessagesV3 extends Component{
       offset: 0,
     }
     Api.request(Routes.messengerMembersRetrieve, parameter, response => {
-      this.setState({ isLoading: false});
-      if(response.data.length > 0) {
-        this.setState({members: response.data});
+      this.setState({ isLoading: false });
+      if (response.data.length > 0) {
+        this.setState({ members: response.data });
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -134,7 +156,7 @@ class MessagesV3 extends Component{
     const { messengerGroup, messagesOnGroup } = this.props.state;
     const { setMessagesOnGroup } = this.props;
 
-    if(messengerGroup == null){
+    if (messengerGroup == null) {
       return
     }
 
@@ -170,7 +192,7 @@ class MessagesV3 extends Component{
     const { user } = this.props.state;
     const { setMessengerGroup } = this.props;
     const { data } = this.props.navigation.state.params;
-    if(user == null){
+    if (user == null) {
       return
     }
     let parameter = {
@@ -183,29 +205,29 @@ class MessagesV3 extends Component{
     }
     this.setState({ isLoading: true });
     Api.request(Routes.messengerGroupRetrieve, parameter, response => {
-       if(response.data.length > 0){
-          setMessengerGroup({
-            ...data,
-            id: response.data[0].id
-          });
-          setTimeout(() => {
-            this.retrieve(response.data[0])
-            this.retrieveMembers(response.data[0])
-          }, 500)
-       }else{
-          this.setState({ isLoading: false });
-       }
+      if (response.data.length > 0) {
+        setMessengerGroup({
+          ...data,
+          id: response.data[0].id
+        });
+        setTimeout(() => {
+          this.retrieve(response.data[0])
+          this.retrieveMembers(response.data[0])
+        }, 500)
+      } else {
+        this.setState({ isLoading: false });
+      }
     }, error => {
       this.setState({ isLoading: false });
     });
   }
 
   sendNewMessage = () => {
-    const { messengerGroup, user, messagesOnGroup} = this.props.state;
-    const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
+    const { messengerGroup, user, messagesOnGroup } = this.props.state;
+    const { updateMessagesOnGroup, updateMessageByCode } = this.props;
     const { data } = this.props.navigation.state.params;
     const { members } = this.state;
-    if(messengerGroup == null || user == null || this.state.newMessage == null){
+    if (messengerGroup == null || user == null || this.state.newMessage == null) {
       return
     }
     let parameter = {
@@ -233,12 +255,12 @@ class MessagesV3 extends Component{
       error: null
     }
     updateMessagesOnGroup(newMessageTemp);
-    this.setState({newMessage: null})
+    this.setState({ newMessage: null })
     console.log(Routes.messengerMessagesCreate, parameter, '---------------')
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
       if (response.data != null) {
         const { messagesOnGroup } = this.props.state;
-        const { setMessagesOnGroup} = this.props;
+        const { setMessagesOnGroup } = this.props;
         if (messagesOnGroup && messagesOnGroup.messages.length > 0) {
           let temp = messagesOnGroup.messages;
           temp[messagesOnGroup.messages.length - 1].sending_flag = false
@@ -255,7 +277,7 @@ class MessagesV3 extends Component{
     const { updateMessageByCode } = this.props;
 
     Api.request(Routes.mmCreateWithImageWithoutPayload, parameter, response => {
-      if(response.data != null){
+      if (response.data != null) {
         updateMessageByCode(response.data);
       }
     }, error => {
@@ -269,7 +291,7 @@ class MessagesV3 extends Component{
       noData: true,
       error: null
     }
-    if(messengerGroup == null){
+    if (messengerGroup == null) {
       return
     }
     ImagePicker.launchImageLibrary(options, response => {
@@ -282,8 +304,8 @@ class MessagesV3 extends Component{
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
         this.setState({ photo: null })
-      }else {
-        if(response.fileSize >= 1000000){
+      } else {
+        if (response.fileSize >= 1000000) {
           Alert.alert('Notice', 'File size exceeded to 1MB')
           return
         }
@@ -324,7 +346,7 @@ class MessagesV3 extends Component{
 
         Api.uploadByFetch(Routes.imageUploadUnLink, formData, imageResponse => {
           // add message
-          if(imageResponse.data != null){
+          if (imageResponse.data != null) {
             parameter = {
               ...parameter,
               url: imageResponse.data
@@ -339,9 +361,9 @@ class MessagesV3 extends Component{
   }
 
   setImage = (url) => {
-    this.setState({imageModalUrl: url})
+    this.setState({ imageModalUrl: url })
     setTimeout(() => {
-      this.setState({isImageModal: true})
+      this.setState({ isImageModal: true })
     }, 500)
   }
 
@@ -350,24 +372,24 @@ class MessagesV3 extends Component{
     const { messengerGroup, user, theme } = this.props.state;
     return (
       <View>
-      {
-        item.payload_value != null && Platform.OS == 'android' && (
-          <Text style={[Style.messageTextRight, {
-            backgroundColor: item.validations.status == 'approved' ? Color.primary : Color.danger
-          }]}>{item.validations.payload} - {item.validations.status}</Text>
-        )
-      }
-      {
-        item.payload_value != null && Platform.OS == 'ios' && (
-          <View style={[Style.messageTextRight, {
-            backgroundColor: item.validations.status == 'approved' ? Color.primary : Color.danger
-          }]}>
-            <Text style={Style.messageTextRightIOS}>
-              {item.validations.payload} - {item.validations.status}
-            </Text>
-          </View>
-        )
-      }
+        {
+          item.payload_value != null && Platform.OS == 'android' && (
+            <Text style={[Style.messageTextRight, {
+              backgroundColor: item.validations.status == 'approved' ? Color.primary : Color.danger
+            }]}>{item.validations.payload} - {item.validations.status}</Text>
+          )
+        }
+        {
+          item.payload_value != null && Platform.OS == 'ios' && (
+            <View style={[Style.messageTextRight, {
+              backgroundColor: item.validations.status == 'approved' ? Color.primary : Color.danger
+            }]}>
+              <Text style={Style.messageTextRightIOS}>
+                {item.validations.payload} - {item.validations.status}
+              </Text>
+            </View>
+          )
+        }
         <View style={{
           flexDirection: 'row',
           marginTop: 10
@@ -376,21 +398,21 @@ class MessagesV3 extends Component{
             item.files.map((imageItem, imageIndex) => {
               return (
                 <TouchableOpacity
-                  onPress={() => this.setImage(Config.BACKEND_URL  + imageItem.url)} 
+                  onPress={() => this.setImage(Config.BACKEND_URL + imageItem.url)}
                   style={Style.messageImage}
                   key={imageIndex}
-                  >
+                >
                   {
                     item.sending_flag == true && (
-                      <Image source={{uri: imageItem.url}} style={Style.messageImage} key={imageIndex}/>
+                      <Image source={{ uri: imageItem.url }} style={Style.messageImage} key={imageIndex} />
                     )
                   }
                   {
                     item.sending_flag != true && (
-                      <Image source={{uri: Config.BACKEND_URL  + imageItem.url}} style={Style.messageImage} key={imageIndex}/>
+                      <Image source={{ uri: Config.BACKEND_URL + imageItem.url }} style={Style.messageImage} key={imageIndex} />
                     )
                   }
-                  
+
                 </TouchableOpacity>
               );
             })
@@ -406,40 +428,40 @@ class MessagesV3 extends Component{
               marginTop: 10
             }}>
               <View style={{
-                  width: '45%',
-                  height: 50,
-                  marginRight: '5%'
-                }}>
+                width: '45%',
+                height: 50,
+                marginRight: '5%'
+              }}>
                 <TouchableOpacity
                   onPress={() => {
                     this.updateValidation(item.validations, 'declined')
-                  }} 
+                  }}
                   style={[Style.templateBtn, {
                     width: '100%',
                     height: 40,
                     borderColor: Color.danger
                   }]}
-                  >
+                >
                   <Text style={[Style.templateText, {
                     color: Color.danger
                   }]}>Decline</Text>
                 </TouchableOpacity>
               </View>
               <View style={{
-                  width: '45%',
-                  height: 50,
-                  marginRight: '5%'
-                }}>
+                width: '45%',
+                height: 50,
+                marginRight: '5%'
+              }}>
                 <TouchableOpacity
                   onPress={() => {
                     this.updateValidation(item.validations, 'approved')
-                  }} 
+                  }}
                   style={[Style.templateBtn, {
                     width: '100%',
                     height: 40,
                     borderColor: theme ? theme.primary : Color.primary
                   }]}
-                  >
+                >
                   <Text style={[Style.templateText, {
                     color: theme ? theme.primary : Color.primary
                   }]}>Approve</Text>
@@ -455,13 +477,13 @@ class MessagesV3 extends Component{
   _imageTest = (item) => {
     return (
       <View style={{
-        flexDirection: 'row' 
+        flexDirection: 'row'
       }}>
         <TouchableOpacity
-          onPress={() => this.setImage(item.uri)} 
+          onPress={() => this.setImage(item.uri)}
           style={Style.messageImage}
-          >
-          <Image source={{uri: item.uri}} style={Style.messageImage}/>
+        >
+          <Image source={{ uri: item.uri }} style={Style.messageImage} />
         </TouchableOpacity>
       </View>
     );
@@ -470,14 +492,14 @@ class MessagesV3 extends Component{
   _headerRight = (item) => {
     return (
       <View style={{
-          flexDirection: 'row',
-          height: 30,
-          alignItems: 'center'
-        }}>
+        flexDirection: 'row',
+        height: 30,
+        alignItems: 'center'
+      }}>
         <UserImage user={item.account} style={{
           width: 25,
           height: 25
-        }}/>
+        }} />
         <Text style={{
           paddingLeft: 10
         }}>{item.account?.information?.first_name ? item.account?.information?.first_name + ' ' + item.account?.information?.last_name : item?.account?.username}</Text>
@@ -499,7 +521,7 @@ class MessagesV3 extends Component{
         <UserImage user={item.account} style={{
           width: 25,
           height: 25
-        }}/>
+        }} />
       </View>
     );
   }
@@ -527,7 +549,7 @@ class MessagesV3 extends Component{
             <View style={[Style.messageTextRight, {
               backgroundColor: theme ? theme.primary : Color.primary
             }]}>
-                <Text style={Style.messageTextRightIOS}>{item.message}</Text>
+              <Text style={Style.messageTextRightIOS}>{item.message}</Text>
             </View>
           )
         }
@@ -561,7 +583,7 @@ class MessagesV3 extends Component{
             <View style={[Style.messageTextLeft, {
               backgroundColor: theme ? theme.primary : Color.primary
             }]}>
-                <Text style={Style.messageTextLeftIOS}>{item.message}</Text>
+              <Text style={Style.messageTextLeftIOS}>{item.message}</Text>
             </View>
           )
         }
@@ -573,7 +595,7 @@ class MessagesV3 extends Component{
             <Text style={{
               fontSize: 10,
               color: Color.gray,
-              textAlign: 'right' 
+              textAlign: 'right'
             }}>Sending...</Text>
           )
         }
@@ -586,7 +608,7 @@ class MessagesV3 extends Component{
     return (
       <View style={{
         width: '100%',
-        marginBottom: index == (messagesOnGroup.messages.length - 1) ? 50: 0
+        marginBottom: index == (messagesOnGroup.messages.length - 1) ? 50 : 0
       }}>
         <View style={{
           alignItems: 'flex-end'
@@ -594,7 +616,7 @@ class MessagesV3 extends Component{
           {item.account_id == user.id && (this._leftTemplate(item, index))}
         </View>
         <View style={{
-          alignItems: 'flex-start' 
+          alignItems: 'flex-start'
         }}>
           {item.account_id != user.id && (this._rightTemplate(item, index))}
         </View>
@@ -606,47 +628,48 @@ class MessagesV3 extends Component{
     const { theme } = this.props.state;
     return (
       <View style={{
-        flexDirection: 'row' 
+        flexDirection: 'row'
       }}>
         <TouchableOpacity
-          onPress={() => this.handleChoosePhoto()} 
+          onPress={() => this.handleChoosePhoto()}
           style={{
             height: 50,
             justifyContent: 'center',
             alignItems: 'center',
             width: '10%'
           }}
-          >
+        >
           <FontAwesomeIcon
-            icon={ faImage }
+            icon={faImage}
             size={BasicStyles.iconSize}
             style={{
               color: theme ? theme.primary : Color.primary
             }}
-            />
+          />
         </TouchableOpacity>
         <TextInput
           style={Style.formControl}
-          onChangeText={(newMessage) => this.setState({newMessage})}
+          onChangeText={(newMessage) => this.setState({ newMessage })}
           value={this.state.newMessage}
           placeholder={'Type your message here ...'}
+          placeholderTextColor={Color.darkGray}
         />
         <TouchableOpacity
-          onPress={() => this.sendNewMessage()} 
+          onPress={() => this.sendNewMessage()}
           style={{
             height: 50,
             justifyContent: 'center',
             alignItems: 'center',
             width: '10%'
           }}
-          >
+        >
           <FontAwesomeIcon
-            icon={ faPaperPlane }
+            icon={faPaperPlane}
             size={BasicStyles.iconSize}
             style={{
               color: theme ? theme.primary : Color.primary
             }}
-            />
+          />
         </TouchableOpacity>
       </View>
     );
@@ -668,7 +691,7 @@ class MessagesV3 extends Component{
               style={{
                 marginBottom: 50,
                 flex: 1,
-                
+
               }}
               renderItem={({ item, index }) => (
                 <View>
@@ -689,7 +712,7 @@ class MessagesV3 extends Component{
   }
 
   render() {
-    const { 
+    const {
       isLoading,
       isImageModal,
       imageModalUrl,
@@ -697,10 +720,11 @@ class MessagesV3 extends Component{
       keyRefresh,
       isPullingMessages,
       isLock,
-      isViewing
+      isViewing,
+      members
     } = this.state;
     const { data } = this.props.navigation.state.params;
-    const { messengerGroup, user, viewField } = this.props.state;
+    const { messengerGroup, user, viewField, theme } = this.props.state;
     console.log('[MESSEGER GROUP]', this.props.state.viewField);
     return (
       <SafeAreaView>
@@ -724,20 +748,20 @@ class MessagesV3 extends Component{
           )
         }
         <KeyboardAvoidingView
-          behavior={'padding'} 
+          behavior={'padding'}
           keyboardVerticalOffset={
             Platform.select({
               ios: () => 65,
               android: () => -200
-          })()}
+            })()}
         >
           <View key={keyRefresh}>
-            {isLoading ? <Spinner mode="full"/> : null }
+            {isLoading ? <Spinner mode="full" /> : null}
             <ScrollView
               ref={ref => this.scrollView = ref}
-              onContentSizeChange={(contentWidth, contentHeight)=>{        
+              onContentSizeChange={(contentWidth, contentHeight) => {
                 if (!isPullingMessages) {
-                  this.scrollView.scrollToEnd({animated: true});
+                  this.scrollView.scrollToEnd({ animated: true });
                 }
               }}
               showsVerticalScrollIndicator={false}
@@ -750,7 +774,7 @@ class MessagesV3 extends Component{
                 const isOnTop = contentOffset.y <= 0
 
                 if (isOnTop) {
-                  if(this.state.isLoading == false){
+                  if (this.state.isLoading == false) {
                     if (!isPullingMessages) {
                       this.setState({ isPullingMessages: true })
                     }
@@ -763,7 +787,7 @@ class MessagesV3 extends Component{
                   }
                 }
               }}
-              >
+            >
               <View style={{
                 flexDirection: 'row',
                 width: '100%'
@@ -783,7 +807,7 @@ class MessagesV3 extends Component{
               {
                 messengerGroup != null && messengerGroup.status < 2 && !isViewing ? (
                   this._footer()
-                ):(
+                ) : (
                   viewField === true ? (
                     this._footer()
                   ) : (
@@ -792,12 +816,37 @@ class MessagesV3 extends Component{
                 )
               }
             </View>
+            {data?.status >= 2 && <View style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+            }}>
+              <View style={{
+                position: 'absolute',
+                bottom: 30,
+                backgroundColor: Color.white
+              }}>
+                <Text style={{
+                  marginBottom: 10
+                }}>This transaction is already completed.</Text>
+                <Button
+                  title={'Go to Dashboard'}
+                  onClick={() => this.navigateToScreen()}
+                  style={{
+                    width: '100%',
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    backgroundColor: theme ? theme.secondary : Color.secondary
+                  }}
+                />
+              </View>
+            </View>}
             <ImageModal
               visible={isImageModal}
               url={imageModalUrl}
-              action={() => this.setState({isImageModal: false})}
+              action={() => this.setState({ isImageModal: false })}
             ></ImageModal>
-            <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible}/>
+            <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           </View>
         </KeyboardAvoidingView>
         {
@@ -806,6 +855,7 @@ class MessagesV3 extends Component{
               requestId={this.state.request_id}
               messengerId={this.props.navigation.state.params.data.id}
               data={data}
+              members={members}
               navigation={this.props.navigation}
               updateMessagesOnGroup={this.props.updateMessagesOnGroup}
               updateMessageByCode={this.props.updateMessageByCode}
