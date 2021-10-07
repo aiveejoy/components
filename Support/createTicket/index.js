@@ -43,7 +43,7 @@ class CreateTicket extends Component {
         {
           id: 3,
           type: 'TRANSACTION ISSUE',
-          description: 'Having trouble or encountered issues in your previous transaction?? Create a ticket to raise an issue and communicate with PayHiram Support for it to be addressed.'
+          description: 'Having trouble or encountered issues in your previous transaction? Create a ticket to raise an issue and communicate with PayHiram Support for it to be addressed.'
         },
         {
           id: 4,
