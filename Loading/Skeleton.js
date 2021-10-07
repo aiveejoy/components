@@ -3,86 +3,169 @@ import { Text, View, Image, TouchableOpacity } from 'react-native';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 class Skeleton extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
   }
 
-  blockTemplate(i){
+  blockTemplate(i) {
     const { size } = this.props;
-    return(
+    return (
       <View style={{
-          width: '100%'
-        }}
+        width: '100%'
+      }}
         key={i}>
 
         <View style={{
-            width: '100%',
-            alignItems: "center",
-            flexDirection: "row",
+          width: '100%',
+          alignItems: "center",
+          flexDirection: "row",
+        }}>
+          <View style={{
+            width: '100%'
           }}>
             <View style={{
-              width: '100%'
-            }}>
-              <View style={{
-                width: '100%',
-                height: this.props.height ? this.props.height : 75,
-                borderRadius: 15,
-                marginBottom: size > 1 ? 20 : 0
-              }} />
-            </View>
+              width: '100%',
+              height: this.props.height ? this.props.height : 75,
+              borderRadius: 15,
+              marginBottom: size > 1 ? 20 : 0
+            }} />
           </View>
+        </View>
       </View>
     )
   }
 
-  standard(i){
-    return(
+  requestTemplate(i) {
+    return (
       <View style={{
-          width: '100%'
-        }}
+        width: '100%'
+      }}
         key={i}>
         <View style={{
-            flexDirection: "row",
-            alignItems: "center",
-            width: '100%',
-          }}>
-            <View style={{
-              width: '10%'
-            }}>
-              <View style={{
-                width: 30,
-                height: 30,
-                borderRadius: 15
-              }} />
-            </View>
-            
-            <View style={{
-              width: '90%'
-            }}>
-              <View style={{
-                width: '100%',
-                height: 20,
-                borderRadius: 4
-              }} />
-              <View style={{
-                width: '100%',
-                height: 20,
-                borderRadius: 4,
-                marginTop: 10
-              }} />
-            </View>
-          </View>
+          flexDirection: "row",
+          alignItems: "center",
+          width: '100%',
+        }}>
           <View style={{
-            alignItems: "center",
-            width: '100%',
+            width: '10%',
+            marginRight: '10%'
           }}>
             <View style={{
-                width: '100%',
-                height: 20,
-                borderRadius: 4,
-                marginTop: 10
-              }} />
+              width: 50,
+              height: 50,
+              borderRadius: 25
+            }} />
           </View>
+
+          <View style={{
+            width: '80%'
+          }}>
+            <View style={{
+              width: '100%',
+              height: 20,
+              borderRadius: 4
+            }} />
+          </View>
+        </View>
+
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: '100%',
+          marginTop: 10
+        }}>
+
+          <View style={{
+            width: '100%'
+          }}>
+            <View style={{
+              width: '100%',
+              height: 20,
+              borderRadius: 4
+            }} />
+          </View>
+        </View>
+
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: '100%',
+          marginTop: 10,
+          borderBottomColor: 'black',
+          borderBottomWidth: 1
+        }}>
+
+        </View>
+
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: '100%',
+          marginTop: 10
+        }}>
+          <View style={{
+            width: '100%'
+          }}>
+            <View style={{
+              width: '100%',
+              height: 40,
+              borderRadius: 4
+            }} />
+          </View>
+        </View>
+
+      </View>
+    )
+  }
+
+  standard(i) {
+    return (
+      <View style={{
+        width: '100%'
+      }}
+        key={i}>
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: '100%',
+        }}>
+          <View style={{
+            width: '10%'
+          }}>
+            <View style={{
+              width: 30,
+              height: 30,
+              borderRadius: 15
+            }} />
+          </View>
+
+          <View style={{
+            width: '90%'
+          }}>
+            <View style={{
+              width: '100%',
+              height: 20,
+              borderRadius: 4
+            }} />
+            <View style={{
+              width: '100%',
+              height: 20,
+              borderRadius: 4,
+              marginTop: 10
+            }} />
+          </View>
+        </View>
+        <View style={{
+          alignItems: "center",
+          width: '100%',
+        }}>
+          <View style={{
+            width: '100%',
+            height: 20,
+            borderRadius: 4,
+            marginTop: 10
+          }} />
+        </View>
       </View>
     )
   }
@@ -91,13 +174,22 @@ class Skeleton extends Component {
     let content = []
 
     for (var i = 0; i < size; i++) {
-      if(this.props.template){
-        switch(this.props.template){
+      if (this.props.template) {
+        switch (this.props.template) {
           case 'block':
             content.push(
               <View>
                 {
                   this.blockTemplate(i)
+                }
+              </View>
+            )
+            break
+          case 'request':
+            content.push(
+              <View>
+                {
+                  this.requestTemplate(i)
                 }
               </View>
             )
@@ -112,7 +204,7 @@ class Skeleton extends Component {
             )
             break
         }
-      }else{
+      } else {
         content.push(
           <View>
             {
@@ -123,22 +215,22 @@ class Skeleton extends Component {
       }
     }
 
-    return(
+    return (
       <SkeletonPlaceholder>
-          <View style={{
-            paddingLeft: 20,
-            paddingRight: 20,
-            width: '100%',
-            marginTop: 20
-          }}>
+        <View style={{
+          paddingLeft: 20,
+          paddingRight: 20,
+          width: '100%',
+          marginTop: 20
+        }}>
           {content}
-          </View>
+        </View>
       </SkeletonPlaceholder>
     )
   }
 
   render() {
-    const { size } =  this.props;
+    const { size } = this.props;
     let content = []
     for (var i = 0; i < size; i++) {
       content.push(
