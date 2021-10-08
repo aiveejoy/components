@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Text, View, Image, TouchableOpacity } from 'react-native';
+import { Text, View, Image, TouchableOpacity, ColorPropType } from 'react-native';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import { Color } from 'common';
 
 class Skeleton extends Component {
   constructor(props) {
@@ -91,7 +92,7 @@ class Skeleton extends Component {
           alignItems: "center",
           width: '100%',
           marginTop: 10,
-          borderBottomColor: 'black',
+          borderBottomColor: Color.gray,
           borderBottomWidth: 1
         }}>
 
