@@ -65,6 +65,7 @@ class TextInputWithLabel extends Component {
                 placeholder={this.props.placeholder ? this.props.placeholder : 'Type here'}
                 multiline={true}
                 numberOfLines={this.props.numberOfLines}
+                placeholderTextColor={Color.darkGray}
               />
             </View>
           )
@@ -78,6 +79,7 @@ class TextInputWithLabel extends Component {
                 onFocus={() => {
                   this.redirect(this.props.route, this.props.from);
                 }}
+                placeholderTextColor={this.props.placeholderTextColor}
                 placeholder={this.props.placeholder ? this.props.placeholder : 'Type here'}
               />
             </View>

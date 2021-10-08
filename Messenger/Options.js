@@ -175,7 +175,7 @@ class Options extends Component {
 
   retrieveRequest(route) {
     const { user, request } = this.props.state;
-    const { data } = this.props;
+    const { data, members } = this.props;
     if (user == null || data == null) {
       return
     }
@@ -190,6 +190,7 @@ class Options extends Component {
     if (request != null && request.code == data.title) {
       this.props.navigation.navigate(route, {
         data: request,
+        members: members,
         from: 'messenger'
       })
       return
@@ -204,7 +205,8 @@ class Options extends Component {
         this.setState({ sender_id: response.data[0].account_id });
         this.props.navigation.navigate(route, {
           data: response.data[0],
-          from: 'messenger'
+          members: members,
+          from: 'messenger',
         })
       }
     }, error => {
@@ -465,7 +467,7 @@ class Options extends Component {
           if(status) {
             this.retrieveRequest('transferFundStack')
           } else {
-            Alert.alert('Notice', 'Please accept all enabled requirements first.')
+            Alert.alert('Notice', `Enabled requirements aren't accepted yet.`)
           }
         } else {
           Alert.alert('Notice', 'You have not enabled any requirement/s yet.')
@@ -651,7 +653,7 @@ class Options extends Component {
           options.map((item, index) => (
             <View
             key={index}>
-              {data?.request?.location?.account_id == user.id && (
+              { (data?.request?.account?.code == user.code) && (
                 <TouchableOpacity style={{
                   width: '100%',
                   height: 50,
@@ -668,10 +670,10 @@ class Options extends Component {
                   <Text style={{
                     color: item.color,
                     fontSize: BasicStyles.standardFontSize,
-                    width: (data && data.request?.account?.code == user.code) ? '70%' : '90%',
+                    width: (data?.request?.account?.code == user.code) ? '70%' : '90%',
                   }}>{item.title}</Text>
                   {
-                    (item.title != 'Back' && (data && data.request?.account?.code == user.code)) && (
+                    (item.title != 'Back' && (data?.request?.account?.code == user.code)) && (
                       <View style={{
                         width: '30%',
                         justifyContent: 'center',
@@ -704,7 +706,7 @@ class Options extends Component {
                   }
                 </TouchableOpacity>)}
               {
-                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.request?.location?.account_id != user.id)) && (
+                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.request?.account?.code != user.code)) && (
                   <TouchableOpacity style={{
                     width: '100%',
                     height: 50,
@@ -807,7 +809,7 @@ class Options extends Component {
           alignItems: 'center'
         }}>
 
-          {!this.state.imageLoading && data?.request?.location?.account_id == user.id && currentValidation?.status === 'pending' && (
+          {!this.state.imageLoading && data?.request?.location?.account_id == user.id && currentValidation?.status === 'pending' && data.status < 2 && (
             <View style={Style.signatureFrameContainer}>
               <Button
                 title={'Decline'}
@@ -828,7 +830,7 @@ class Options extends Component {
               />
             </View>
           )}
-          {data?.request?.location?.account_id != user.id && (
+          {data?.request?.location?.account_id != user.id && data.status < 2 && (
             <Button
               title={payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}
               onClick={() => {
