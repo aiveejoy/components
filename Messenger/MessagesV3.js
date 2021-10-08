@@ -28,6 +28,7 @@ import MessageOptions from './Options.js'
 import moment from 'moment';
 import Button from 'components/Form/Button';
 import { NavigationActions, StackActions } from 'react-navigation';
+import Skeleton from 'components/Loading/Skeleton';
 
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -756,7 +757,7 @@ class MessagesV3 extends Component {
             })()}
         >
           <View key={keyRefresh}>
-            {isLoading ? <Spinner mode="full" /> : null}
+            {isLoading ? <Skeleton size={1} template={'messages'} /> : null}
             <ScrollView
               ref={ref => this.scrollView = ref}
               onContentSizeChange={(contentWidth, contentHeight) => {

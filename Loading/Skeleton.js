@@ -36,6 +36,109 @@ class Skeleton extends Component {
     )
   }
 
+  messagesTemplate(i) {
+    return (
+      <View style={{
+        width: '100%'
+      }}
+        key={i}>
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: '100%',
+        }}>
+          <View style={{
+            width: '10%',
+            marginRight: 20
+          }}>
+            <View style={{
+              width: 30,
+              height: 30,
+              borderRadius: 15
+            }} />
+          </View>
+
+          <View style={{
+            width: '40%'
+          }}>
+            <View style={{
+              width: '100%',
+              height: 20,
+              borderRadius: 4
+            }} />
+          </View>
+        </View>
+
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: '100%',
+          marginTop: 10
+        }}>
+
+          <View style={{
+            width: '100%'
+          }}>
+            <View style={{
+              width: '100%',
+              height: 150,
+              borderRadius: 4
+            }} />
+          </View>
+        </View>
+
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: '100%',
+          marginTop: 20
+        }}>
+          
+          <View style={{
+            width: '40%',
+            marginLeft: '40%'
+          }}>
+            <View style={{
+              width: '100%',
+              height: 20,
+              borderRadius: 4
+            }} />
+          </View>
+
+          <View style={{
+            width: '10%',
+            marginLeft: 20
+          }}>
+            <View style={{
+              width: 30,
+              height: 30,
+              borderRadius: 15
+            }} />
+          </View>
+        </View>
+
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          width: '100%',
+          marginTop: 10
+        }}>
+          <View style={{
+            width: '100%'
+          }}>
+            <View style={{
+              width: '100%',
+              height: 150,
+              borderRadius: 4
+            }} />
+          </View>
+        </View>
+
+      </View>
+    )
+  }
+
+
   requestTemplate(i) {
     return (
       <View style={{
@@ -191,6 +294,15 @@ class Skeleton extends Component {
               <View>
                 {
                   this.requestTemplate(i)
+                }
+              </View>
+            )
+            break
+          case 'messages':
+            content.push(
+              <View>
+                {
+                  this.messagesTemplate(i)
                 }
               </View>
             )
