@@ -53,14 +53,49 @@ class MessagesV3 extends Component {
       group: null,
       request_id: null,
       isViewing: false,
-      members: []
+      members: [],
+      data: null
     }
   }
 
   componentDidMount() {
+    const { setMessageTitle } = this.props;
+    setMessageTitle(null)
     const { user } = this.props.state
     if (user == null) return
+    this.retrieveRequest()
     this.retrieveGroup()
+  }
+
+  retrieveRequest() {
+    const { user } = this.props.state;
+    const { data } = this.props.navigation.state.params;
+    const { setMessageTitle } = this.props;
+    let parameter = {
+      condition: [{
+        value: data.title,
+        clause: '=',
+        column: 'code'
+      }],
+      account_id: user.id
+    };
+    this.setState({ isLoading: true });
+    console.log(parameter, Routes.requestRetrieveItem)
+    Api.request(Routes.requestRetrieveItem, parameter, (response) => {
+      this.setState({ isLoading: false });
+      if (response.data.length > 0) {
+        this.setState({
+          data: response.data[0]
+        });
+        setMessageTitle({
+          amount: response.data[0].amount,
+          currency: response.data[0].currency
+        })
+      }
+    }, error => {
+      console.log('error', error)
+      this.setState({ isLoading: false });
+    });
   }
 
   componentWillUnmount() {
@@ -110,6 +145,7 @@ class MessagesV3 extends Component {
       limit,
       offset: offset * limit,
     }
+    console.log(parameter, '--')
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
       this.setState({ isLoading: false, offset: offset + limit });
       if (response.data.length > 0) {
@@ -224,9 +260,8 @@ class MessagesV3 extends Component {
   }
 
   sendNewMessage = () => {
-    const { messengerGroup, user, messagesOnGroup } = this.props.state;
-    const { updateMessagesOnGroup, updateMessageByCode } = this.props;
-    const { data } = this.props.navigation.state.params;
+    const { messengerGroup, user } = this.props.state;
+    const { updateMessagesOnGroup } = this.props;
     const { members } = this.state;
     if (messengerGroup == null || user == null || this.state.newMessage == null) {
       return
@@ -257,7 +292,7 @@ class MessagesV3 extends Component {
     }
     updateMessagesOnGroup(newMessageTemp);
     this.setState({ newMessage: null })
-    console.log(Routes.messengerMessagesCreate, parameter, '---------------')
+    console.log(Routes.messengerMessagesCreate, parameter)
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
       if (response.data != null) {
         const { messagesOnGroup } = this.props.state;
@@ -266,7 +301,7 @@ class MessagesV3 extends Component {
           let temp = messagesOnGroup.messages;
           temp[messagesOnGroup.messages.length - 1].sending_flag = false
           setMessagesOnGroup({
-            groupId: this.props.navigation.state.params.data.id,
+            groupId: messengerGroup.id,
             messages: temp
           })
         }
@@ -722,9 +757,9 @@ class MessagesV3 extends Component {
       isPullingMessages,
       isLock,
       isViewing,
-      members
+      members,
+      data
     } = this.state;
-    const { data } = this.props.navigation.state.params;
     const { messengerGroup, user, viewField, theme } = this.props.state;
     console.log('[MESSEGER GROUP]', this.props.state.viewField);
     return (
@@ -851,10 +886,10 @@ class MessagesV3 extends Component {
           </View>
         </KeyboardAvoidingView>
         {
-          (data && data.menuFlag) && (
+          (data && this.props.navigation.state?.params?.data?.menuFlag) && (
             <MessageOptions
               requestId={this.state.request_id}
-              messengerId={this.props.navigation.state.params.data.id}
+              messengerId={this.props.navigation.state.params.data?.id}
               data={data}
               members={members}
               navigation={this.props.navigation}
@@ -877,7 +912,8 @@ const mapDispatchToProps = dispatch => {
     updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
     updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message)),
     setUnReadMessages: (messages) => dispatch(actions.setUnReadMessages(messages)),
-    updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message))
+    updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
+    setMessageTitle: (messageTitle) => dispatch(actions.setMessageTitle(messageTitle))
   };
 };
 
