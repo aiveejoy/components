@@ -114,11 +114,12 @@ class Options extends Component {
   componentWillUnmount() {
   }
 
-  close() {
+  close = () => {
     this.props.navigation.setParams({
       data: {
-        ...this.props.navigation.state.params.data,
-        menuFlag: !this.props.navigation.state.params.data.menuFlag
+        ...this.props.data,
+        title: this.props.navigation.state?.params?.data?.title,
+        menuFlag: !this.props.navigation.state?.params?.data?.menuFlag
       }
     })
   }
@@ -126,7 +127,7 @@ class Options extends Component {
   sendNewMessage = (payload) => {
     const { messengerGroup, user, messagesOnGroup} = this.props.state;
     const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
-    const { data } = this.props.navigation.state.params;
+    const { data } = this.props;
     if(messengerGroup == null || user == null){
       return
     }
@@ -138,7 +139,7 @@ class Options extends Component {
       payload: 'text',
       payload_value: null,
       code: 1,
-      to: data?.request?.location?.account_id
+      to: data?.location?.account_id
     }
     let newMessageTemp = {
       ...parameter,
@@ -165,7 +166,7 @@ class Options extends Component {
           let temp = messagesOnGroup.messages;
           temp[messagesOnGroup.messages.length - 1].sending_flag = false
           setMessagesOnGroup({
-            groupId: this.props.navigation.state.params.data.id,
+            groupId: data?.id,
             messages: temp
           })
         }
@@ -181,13 +182,13 @@ class Options extends Component {
     }
     let parameter = {
       condition: [{
-        value: data.title,
+        value: data.id,
         clause: '=',
-        column: 'code'
+        column: 'id'
       }],
       account_id: user.id
     };
-    if (request != null && request.code == data.title) {
+    if (request != null && request.code == data.code) {
       this.props.navigation.navigate(route, {
         data: request,
         members: members,
@@ -197,7 +198,6 @@ class Options extends Component {
     }
     this.setState({ isLoading: true });
     Api.request(Routes.requestRetrieveItem, parameter, (response) => {
-      console.log(response, '--------');
       this.setState({ isLoading: false });
       if (response.data.length > 0) {
         const { setRequest } = this.props;
@@ -216,14 +216,15 @@ class Options extends Component {
   }
 
   addToValidation = (payload) => {
+    const { messengerGroup } = this.props.state;
     const { data } = this.props;
     let parameter = {
       status: 'pending',
       payload: payload,
       account_id: this.props.state.user.id,
-      request_id: data?.request?.id,
+      request_id: data?.id,
       messages: {
-        messenger_group_id: this.props.messengerId,
+        messenger_group_id: messengerGroup.id,
         account_id: this.props.state.user.id
       }
     }
@@ -265,7 +266,7 @@ class Options extends Component {
     const { data } = this.props;
     let parameter = {
       condition: [{
-        value: data?.request?.id,
+        value: data?.id,
         clause: '=',
         column: 'request_id'
       }],
@@ -276,7 +277,7 @@ class Options extends Component {
       limit: 3
     }
     this.setState({ isLoading: true });
-    console.log(Routes.requestValidationRetreive, parameter);
+    console.log(Routes.requestValidationRetreive, parameter, '----');
     Api.request(Routes.requestValidationRetreive, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
@@ -366,18 +367,21 @@ class Options extends Component {
       id: currentValidation?.id,
       payload: currentValidation?.payload,
       account_id: user.id,
-      request_id: data?.request?.id,
+      request_id: data?.id,
       messages: {
-        messenger_group_id: this.props.messengerId,
+        messenger_group_id: messengerGroup.id,
         account_id: user.id
       }
     }
     this.setState({ isLoading: true })
+    console.log(Routes.requestValidationUpdate, parameter)
     Api.request(Routes.requestValidationUpdate, parameter, response => {
       this.setState({ isLoading: false })
       let temp = currentValidation
       temp.status = status;
       setCurrentValidation(temp);
+    }, error => {
+      console.log(error)
     })
   }
 
@@ -388,7 +392,7 @@ class Options extends Component {
       condition: [
         {
           clause: '=',
-          value: data?.request?.id,
+          value: data?.id,
           column: 'payload_value'
         },
         {
@@ -419,7 +423,7 @@ class Options extends Component {
     let parameter = {
       account_id: user.id,
       payload: 'request_id',
-      payload_value: data?.request?.id,
+      payload_value: data?.id,
       status: 0,
       assigned_to: ''
     }
@@ -476,7 +480,7 @@ class Options extends Component {
         break
       case 'reviewsStack': {
         // review stack
-        if(data.status < 2){
+        if(data?.status < 2){
           Alert.alert('Notice', 'Please complete the transaction before giving reviews.')
           return
         }else{
@@ -653,7 +657,7 @@ class Options extends Component {
           options.map((item, index) => (
             <View
             key={index}>
-              { (data?.request?.account?.code == user.code) && (
+              { (data?.account?.code == user.code) && (
                 <TouchableOpacity style={{
                   width: '100%',
                   height: 50,
@@ -670,10 +674,10 @@ class Options extends Component {
                   <Text style={{
                     color: item.color,
                     fontSize: BasicStyles.standardFontSize,
-                    width: (data?.request?.account?.code == user.code) ? '70%' : '90%',
+                    width: (data?.account?.code == user.code) ? '70%' : '90%',
                   }}>{item.title}</Text>
                   {
-                    (item.title != 'Back' && (data?.request?.account?.code == user.code)) && (
+                    (item.title != 'Back' && (data?.account?.code == user.code)) && (
                       <View style={{
                         width: '30%',
                         justifyContent: 'center',
@@ -706,7 +710,7 @@ class Options extends Component {
                   }
                 </TouchableOpacity>)}
               {
-                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.request?.account?.code != user.code)) && (
+                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.account?.code != user.code)) && (
                   <TouchableOpacity style={{
                     width: '100%',
                     height: 50,
@@ -741,7 +745,7 @@ class Options extends Component {
             </View>
           ))
         }
-        {data && data.request?.account?.code != user.code && (
+        {data?.account?.code != user.code && (
           <TouchableOpacity style={{
             width: '100%',
             height: 50,
@@ -771,6 +775,7 @@ class Options extends Component {
   renderImages(payload_value) {
     const { data } = this.props;
     const { user, currentValidation } = this.props.state;
+    const{ imageLoading } = this.state;
     return (
       <ScrollView>
         <View style={Style.signatureFrameContainer}>
@@ -809,7 +814,7 @@ class Options extends Component {
           alignItems: 'center'
         }}>
 
-          {!this.state.imageLoading && data?.request?.location?.account_id == user.id && currentValidation?.status === 'pending' && data.status < 2 && (
+          {!this.state.imageLoading && data?.account?.code == user.code && currentValidation?.status === 'pending' && data?.status < 2 && (
             <View style={Style.signatureFrameContainer}>
               <Button
                 title={'Decline'}
@@ -830,7 +835,7 @@ class Options extends Component {
               />
             </View>
           )}
-          {data?.request?.location?.account_id != user.id && data.status < 2 && (
+          {data?.account?.code != user.code && data?.status < 2 && currentValidation?.status !== 'accepted' && imageLoading === false && (
             <Button
               title={payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}
               onClick={() => {
@@ -846,7 +851,7 @@ class Options extends Component {
               }}
             />
           )}
-          {(currentValidation?.status === 'accepted') && (
+          {(currentValidation?.status === 'accepted') && imageLoading === false && (
             <View style={Style.signatureFrameContainer}>
               <View style={[
                 Style.signatureAction,
@@ -856,7 +861,7 @@ class Options extends Component {
               </View>
             </View>
           )}
-          {currentValidation?.status === 'declined' && (
+          {currentValidation?.status === 'declined' && imageLoading === false && (
             <View style={Style.signatureFrameContainer}>
               <View style={[
                 Style.signatureAction,
