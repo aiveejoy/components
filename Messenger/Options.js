@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
-// import Style from './Style.js';
 import { View, Text, Dimensions, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
 import { Routes, Color, BasicStyles, Helper } from 'common';
-import { Spinner, UserImage } from 'components';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
-import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Style from 'modules/messenger/Style.js';
@@ -14,7 +11,11 @@ import ImagePicker from 'react-native-image-picker';
 import Button from 'components/Form/Button';
 import ImageModal from 'components/Modal/ImageModal';
 import ImageResizer from 'react-native-image-resizer';
-import { color } from 'react-native-reanimated';
+import moment from 'moment';
+import Skeleton from 'components/Loading/Skeleton';
+import { fcmService } from 'services/broadcasting/FCMService';
+import { localNotificationService } from 'services/broadcasting/LocalNotificationService';
+import NotificationsHandler from 'services/NotificationHandler';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -34,31 +35,58 @@ class Options extends Component {
       sender_id: null,
       visible: false,
       validations: [],
-      currentValidation: null,
-      requestId: null,
       imageModal: false,
       url: null,
-      supportEnabled: []
+      supportEnabled: [],
+      imageLoading: false
     }
   }
 
   componentDidMount() {
     this.checkIfSupportEnabled();
+    this.retrieveValidation();
+  }
+
+  onRegister = () => {
+    this.notificationHandler.onRegister();
+  };
+
+  onOpenNotification = (notify) => {
+    this.notificationHandler.onOpenNotification(notify);
+  };
+
+  onNotification = (notify) => {
+    this.notificationHandler.onNotification(notify);
+  };
+
+  firebaseNotification(){
+    const { user } = this.props.state;
+    if(user == null){
+      return
+    }
+    fcmService.registerAppWithFCM()
+    fcmService.register(this.onRegister, this.onNotification, this.onOpenNotification)
+    localNotificationService.configure(this.onOpenNotification, Helper.APP_NAME)
+    this.notificationHandler.setTopics()
+    return () => {
+      console.log("[App] unRegister")
+      fcmService.unRegister()
+      localNotificationService.unRegister()
+    }
   }
 
   sendSketch = (result) => {
-    const { user } = this.props.state;
-    const { currentValidation } = this.state;
+    const { user, currentValidation } = this.props.state;
     let parameter = {
       account_id: user.id,
       payload: 'signature',
       payload_value: result,
       category: currentValidation?.id
     }
-    this.setState({ isLoading: true })
+    this.setState({ imageLoading: true })
     Api.request(Routes.uploadImage, parameter, response => {
-      this.setState({ isLoading: false })
-      this.retrieveReceiverPhoto(this.state.currentValidation?.id);
+      this.setState({ imageLoading: false })
+      this.retrieveReceiverPhoto(currentValidation?.id);
     })
   }
 
@@ -74,9 +102,9 @@ class Options extends Component {
         value: id
       }]
     }
-    this.setState({ isLoading: true })
+    this.setState({ imageLoading: true })
     Api.request(Routes.retrieveImage, parameter, response => {
-      this.setState({ isLoading: false })
+      this.setState({ imageLoading: false })
       if (response.data.length > 0) {
         this.setState({ pictures: response.data })
       }
@@ -96,13 +124,12 @@ class Options extends Component {
   }
 
   sendNewMessage = (payload) => {
-    const { messengerGroup, user, messagesOnGroup } = this.props.state;
-    const { updateMessagesOnGroup, updateMessageByCode } = this.props;
-
-    if (messengerGroup == null || user == null) {
+    const { messengerGroup, user, messagesOnGroup} = this.props.state;
+    const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
+    const { data } = this.props.navigation.state.params;
+    if(messengerGroup == null || user == null){
       return
     }
-
     let parameter = {
       messenger_group_id: messengerGroup.id,
       message: `Your ${payload} request has been declined. Please send more photos.`,
@@ -110,53 +137,45 @@ class Options extends Component {
       status: 0,
       payload: 'text',
       payload_value: null,
-      code: messagesOnGroup.messages.length + 1
+      code: 1,
+      to: data?.request?.location?.account_id
     }
     let newMessageTemp = {
       ...parameter,
-      account: user,
-      created_at_human: null,
+      account: {
+        profile: user.profile,
+        information: {
+          first_name: user.information?.first_name,
+          last_name: user.information?.last_name,
+        },
+        username: user.username
+      },
+      created_at_human: moment(new Date()).format('MMMM DD, YYYY'),
       sending_flag: true,
       error: null
     }
+    console.log('parameter', parameter, Routes.messengerMessagesCreate)
     updateMessagesOnGroup(newMessageTemp);
-    this.setState({ newMessage: null })
-    this.setState({ isLoading: true })
+    this.setState({newMessage: null})
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
-      this.setState({ isLoading: false })
       if (response.data != null) {
-        updateMessageByCode(response.data);
+        const { messagesOnGroup } = this.props.state;
+        const { setMessagesOnGroup} = this.props;
+        if (messagesOnGroup && messagesOnGroup.messages.length > 0) {
+          let temp = messagesOnGroup.messages;
+          temp[messagesOnGroup.messages.length - 1].sending_flag = false
+          setMessagesOnGroup({
+            groupId: this.props.navigation.state.params.data.id,
+            messages: temp
+          })
+        }
       }
     });
   }
 
-  retrieveRequestId() {
-    const { user } = this.props.state;
-    const { data } = this.props;
-    if (user == null || data == null) {
-      return
-    }
-    let parameter = {
-      condition: [{
-        value: data.title,
-        clause: '=',
-        column: 'code'
-      }],
-      account_id: user.id
-    };
-    this.setState({ isLoading: true });
-    Api.request(Routes.requestRetrieveItem, parameter, (response) => {
-      this.setState({ isLoading: false });
-      if (response.data.length > 0) {
-        this.setState({ requestId: response.data[0].id });
-        this.retrieveValidation();
-      }
-    })
-  }
-
   retrieveRequest(route) {
     const { user, request } = this.props.state;
-    const { data } = this.props;
+    const { data, members } = this.props;
     if (user == null || data == null) {
       return
     }
@@ -171,12 +190,14 @@ class Options extends Component {
     if (request != null && request.code == data.title) {
       this.props.navigation.navigate(route, {
         data: request,
+        members: members,
         from: 'messenger'
       })
       return
     }
     this.setState({ isLoading: true });
     Api.request(Routes.requestRetrieveItem, parameter, (response) => {
+      console.log(response, '--------');
       this.setState({ isLoading: false });
       if (response.data.length > 0) {
         const { setRequest } = this.props;
@@ -184,7 +205,8 @@ class Options extends Component {
         this.setState({ sender_id: response.data[0].account_id });
         this.props.navigation.navigate(route, {
           data: response.data[0],
-          from: 'messenger'
+          members: members,
+          from: 'messenger',
         })
       }
     }, error => {
@@ -194,18 +216,19 @@ class Options extends Component {
   }
 
   addToValidation = (payload) => {
-    const { requestId } = this.state;
+    const { data } = this.props;
     let parameter = {
       status: 'pending',
       payload: payload,
       account_id: this.props.state.user.id,
-      request_id: requestId,
+      request_id: data?.request?.id,
       messages: {
         messenger_group_id: this.props.messengerId,
         account_id: this.props.state.user.id
       }
     }
     this.setState({ isLoading: true });
+    console.log(parameter, Routes.requestValidationCreate, '---');
     Api.request(Routes.requestValidationCreate, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
@@ -239,15 +262,21 @@ class Options extends Component {
 
   retrieveValidation = () => {
     const { user } = this.props.state;
-    const { requestId } = this.state;
+    const { data } = this.props;
     let parameter = {
       condition: [{
-        value: requestId,
+        value: data?.request?.id,
         clause: '=',
         column: 'request_id'
-      }]
+      }],
+      sort: {
+        created_at: 'asc'
+      },
+      offset: 0,
+      limit: 3
     }
     this.setState({ isLoading: true });
+    console.log(Routes.requestValidationRetreive, parameter);
     Api.request(Routes.requestValidationRetreive, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
@@ -274,7 +303,7 @@ class Options extends Component {
   }
 
   uploadPhoto = (payload) => {
-    const { currentValidation } = this.state;
+    const { currentValidation } = this.props.state;
     const options = {
       noData: true,
       error: null
@@ -299,9 +328,9 @@ class Options extends Component {
               payload_value: res.uri,
               category: currentValidation?.id
             }
-            this.setState({ isLoading: true })
+            this.setState({ imageLoading: true })
             Api.request(Routes.uploadImage, parameter, response => {
-              this.setState({ isLoading: false })
+              this.setState({ imageLoading: false })
               this.retrieveReceiverPhoto(currentValidation?.id);
             })
           })
@@ -327,8 +356,8 @@ class Options extends Component {
   }
 
   updateValidation = (status) => {
-    const { messengerGroup, user } = this.props.state;
-    const { currentValidation, requestId } = this.state;
+    const { messengerGroup, user, currentValidation } = this.props.state;
+    const { data, setCurrentValidation } = this.props;
     if (messengerGroup == null) {
       return
     }
@@ -336,16 +365,19 @@ class Options extends Component {
       status: status,
       id: currentValidation?.id,
       payload: currentValidation?.payload,
-      account_id: this.props.state.user.id,
-      request_id: requestId,
+      account_id: user.id,
+      request_id: data?.request?.id,
       messages: {
         messenger_group_id: this.props.messengerId,
-        account_id: this.props.state.user.id
+        account_id: user.id
       }
     }
     this.setState({ isLoading: true })
     Api.request(Routes.requestValidationUpdate, parameter, response => {
       this.setState({ isLoading: false })
+      let temp = currentValidation
+      temp.status = status;
+      setCurrentValidation(temp);
     })
   }
 
@@ -356,7 +388,7 @@ class Options extends Component {
       condition: [
         {
           clause: '=',
-          value: data.id,
+          value: data?.request?.id,
           column: 'payload_value'
         },
         {
@@ -364,8 +396,14 @@ class Options extends Component {
           value: user.id,
           column: 'account_id'
         }
-      ]
+      ],
+      sort: {
+        created_at: 'asc'
+      },
+      offset: 0,
+      limit: 3
     }
+    console.log(Routes.enableSupportRetrieve, parameter);
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportRetrieve, parameter, response => {
       this.setState({ isLoading: false })
@@ -381,8 +419,8 @@ class Options extends Component {
     let parameter = {
       account_id: user.id,
       payload: 'request_id',
-      payload_value: data.id,
-      status: 'PENDING',
+      payload_value: data?.request?.id,
+      status: 0,
       assigned_to: ''
     }
     this.setState({ isLoading: true })
@@ -398,13 +436,13 @@ class Options extends Component {
   }
 
   onClick(item) {
-    const { data } = this.props
+    const { data, setCurrentValidation } = this.props
+    const { validations } = this.state;
     switch (item.payload_value) {
       case 'close':
         this.close()
         break
       case 'requirements':
-        this.retrieveRequestId();
         this.setState({
           previous: {
             title: 'Settings',
@@ -421,13 +459,25 @@ class Options extends Component {
       }
         break
       case 'transferFundStack': {
-        this.retrieveRequest('transferFundStack')
+        let status = false;
+        if(validations.length > 0) {
+          validations.map((item, index) => {
+            status = item.status === 'accepted' ? true : false
+          })
+          if(status) {
+            this.retrieveRequest('transferFundStack')
+          } else {
+            Alert.alert('Notice', `Enabled requirements aren't accepted yet.`)
+          }
+        } else {
+          Alert.alert('Notice', 'You have not enabled any requirement/s yet.')
+        }
       }
         break
       case 'reviewsStack': {
         // review stack
         if(data.status < 2){
-          Alert.alert('Notice', 'Please complete the transaction before giving reviews. Thank you!')
+          Alert.alert('Notice', 'Please complete the transaction before giving reviews.')
           return
         }else{
           this.retrieveRequest('reviewsStack')
@@ -450,7 +500,8 @@ class Options extends Component {
       case 'signature':
         let result = this.checkValidation('signature');
         if (result.result === true) {
-          this.setState({ currentValidation: result.item })
+          // this.firebaseNotification(result.item.id)
+          setCurrentValidation(result.item)
           this.retrieveReceiverPhoto(result.item.id);
           this.setState({
             showPhotos: true,
@@ -463,8 +514,8 @@ class Options extends Component {
       case 'receiver_picture':
         let result1 = this.checkValidation('receiver_picture');
         if (result1.result === true) {
-          console.log(result1.item.id, "=========================result");
-          this.setState({ currentValidation: result1.item })
+          // this.firebaseNotification(result1.item.id)
+          setCurrentValidation(result1.item)
           this.retrieveReceiverPhoto(result1.item.id);
           this.setState({
             showPhotos: true,
@@ -477,7 +528,8 @@ class Options extends Component {
       case 'valid_id':
         let result2 = this.checkValidation('valid_id');
         if (result2.result === true) {
-          this.setState({ currentValidation: result2.item })
+          // this.firebaseNotification(result2.item.id)
+          setCurrentValidation(result2.item)
           this.retrieveReceiverPhoto(result2.item.id);
           this.setState({
             showPhotos: true,
@@ -601,7 +653,7 @@ class Options extends Component {
           options.map((item, index) => (
             <View
             key={index}>
-              {data && user && data.request?.account?.code == user.code && (
+              { (data?.request?.account?.code == user.code) && (
                 <TouchableOpacity style={{
                   width: '100%',
                   height: 50,
@@ -618,10 +670,10 @@ class Options extends Component {
                   <Text style={{
                     color: item.color,
                     fontSize: BasicStyles.standardFontSize,
-                    width: (data && data.request?.account?.code == user.code) ? '70%' : '90%',
+                    width: (data?.request?.account?.code == user.code) ? '70%' : '90%',
                   }}>{item.title}</Text>
                   {
-                    (item.title != 'Back' && (data && data.request?.account?.code == user.code)) && (
+                    (item.title != 'Back' && (data?.request?.account?.code == user.code)) && (
                       <View style={{
                         width: '30%',
                         justifyContent: 'center',
@@ -654,7 +706,7 @@ class Options extends Component {
                   }
                 </TouchableOpacity>)}
               {
-                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && data && data.request?.account?.code != user.code) && (
+                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.request?.account?.code != user.code)) && (
                   <TouchableOpacity style={{
                     width: '100%',
                     height: 50,
@@ -669,12 +721,13 @@ class Options extends Component {
                     <Text style={{
                       color: item.color,
                       fontSize: BasicStyles.standardFontSize,
-                      width: (data && data.request?.account?.code == user.code) ? '70%' : '90%',
+                      width: '90%',
                     }}>{item.title}</Text>
                     <View style={{
                       width: '10%',
                       justifyContent: 'center',
                       alignItems: 'center',
+                      flexDirection: 'row-reverse',
                       height: 30
                     }}>
                       <FontAwesomeIcon
@@ -717,9 +770,7 @@ class Options extends Component {
 
   renderImages(payload_value) {
     const { data } = this.props;
-    const { user } = this.props.state;
-    const { currentValidation } = this.state;
-    console.log(currentValidation, "======current validation");
+    const { user, currentValidation } = this.props.state;
     return (
       <ScrollView>
         <View style={Style.signatureFrameContainer}>
@@ -748,6 +799,7 @@ class Options extends Component {
               }
             })
           }
+          {this.state.imageLoading ? (<Skeleton size={2} template={'block'} height={75}/>) : null}
         </View>
         <View style={{
           paddingTop: 50,
@@ -757,7 +809,7 @@ class Options extends Component {
           alignItems: 'center'
         }}>
 
-          {data && data.request?.account?.code === user.code && currentValidation?.status === 'pending' && (
+          {!this.state.imageLoading && data?.request?.location?.account_id == user.id && currentValidation?.status === 'pending' && data.status < 2 && (
             <View style={Style.signatureFrameContainer}>
               <Button
                 title={'Decline'}
@@ -778,7 +830,7 @@ class Options extends Component {
               />
             </View>
           )}
-          {data && data.request?.account?.code != user.code && (
+          {data?.request?.location?.account_id != user.id && data.status < 2 && (
             <Button
               title={payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}
               onClick={() => {
@@ -794,7 +846,7 @@ class Options extends Component {
               }}
             />
           )}
-          {data && data.request?.account?.code === user.code && (currentValidation?.status === 'accepted') && (
+          {(currentValidation?.status === 'accepted') && (
             <View style={Style.signatureFrameContainer}>
               <View style={[
                 Style.signatureAction,
@@ -804,7 +856,7 @@ class Options extends Component {
               </View>
             </View>
           )}
-          {data && data.request?.account?.code === user.code && currentValidation?.status === 'declined' && (
+          {currentValidation?.status === 'declined' && (
             <View style={Style.signatureFrameContainer}>
               <View style={[
                 Style.signatureAction,
@@ -823,6 +875,7 @@ class Options extends Component {
     const { current } = this.state;
     return (
       <View>
+        <NotificationsHandler notificationHandler={ref => (this.notificationHandler = ref)} />
         <View style={{
           position: 'absolute',
           zIndex: 1000,
@@ -839,12 +892,12 @@ class Options extends Component {
           <ImageModal visible={this.state.imageModal} url={this.state.url && this.state.url.includes('file') === true ? this.state.url : `data:image/png;base64,${this.state.url}`} action={() => { this.setState({ imageModal: false }) }}></ImageModal>
           <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
-          {this.state.isLoading ? <Spinner mode="overlay" /> : null}
-          {current.title == 'Settings' && this.body(this.state.current.menu)}
-          {current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
-          {current.title == 'signature' && this.renderImages(this.state.current.title)}
-          {current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
-          {current.title == 'valid_id' && this.renderImages(this.state.current.title)}
+          {this.state.isLoading ? (<Skeleton size={2} template={'block'} height={75}/>) : null}
+          {!this.state.isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
+          {!this.state.isLoading && current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
+          {!this.state.isLoading && current.title == 'signature' && this.renderImages(this.state.current.title)}
+          {!this.state.isLoading && current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
+          {!this.state.isLoading && current.title == 'valid_id' && this.renderImages(this.state.current.title)}
         </View>
       </View>
     );
@@ -855,7 +908,8 @@ const mapStateToProps = state => ({ state: state });
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
-    setRequest: (request) => dispatch(actions.setRequest(request))
+    setRequest: (request) => dispatch(actions.setRequest(request)),
+    setCurrentValidation: (currentValidation) => dispatch(actions.setCurrentValidation(currentValidation))
   };
 };
 
