@@ -812,10 +812,9 @@ class Options extends Component {
                 return (
                   <TouchableOpacity style={{
                     height: 100,
-                    width: '48%',
+                    width: '50%',
                     borderWidth: 1,
-                    borderColor: Color.gray,
-                    margin: 1
+                    borderColor: Color.gray
                   }}
                     onPress={() => { this.setState({ imageModal: true, url: ndx.payload_value }) }}
                     key={el}>
