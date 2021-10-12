@@ -455,7 +455,7 @@ class MessagesV3 extends Component {
           }
         </View>
         {
-          messengerGroup.account_id == user.id &&
+          messengerGroup?.account_id == user.id &&
           item != null && item.validations != null &&
           item.validations.status != 'approved' &&
           (
