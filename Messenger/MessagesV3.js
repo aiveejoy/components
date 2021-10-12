@@ -46,7 +46,7 @@ class MessagesV3 extends Component {
       keyRefresh: 0,
       isPullingMessages: false,
       offset: 0,
-      limit: 10,
+      limit: 5,
       isLock: false,
       settingsMenu: [],
       settingsBreadCrumbs: ['Settings'],
