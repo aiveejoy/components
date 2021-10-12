@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, ScrollView, Image, Alert, Platform } from 'react-native';
 import { Routes, Color, BasicStyles, Helper } from 'common';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
@@ -12,6 +12,7 @@ import Button from 'components/Form/Button';
 import ImageModal from 'components/Modal/ImageModal';
 import ImageResizer from 'react-native-image-resizer';
 import moment from 'moment';
+import Config from 'src/config';
 import Skeleton from 'components/Loading/Skeleton';
 import { fcmService } from 'services/broadcasting/FCMService';
 import { localNotificationService } from 'services/broadcasting/LocalNotificationService';
@@ -59,9 +60,9 @@ class Options extends Component {
     this.notificationHandler.onNotification(notify);
   };
 
-  firebaseNotification(){
+  firebaseNotification() {
     const { user } = this.props.state;
-    if(user == null){
+    if (user == null) {
       return
     }
     fcmService.registerAppWithFCM()
@@ -77,16 +78,28 @@ class Options extends Component {
 
   sendSketch = (result) => {
     const { user, currentValidation } = this.props.state;
-    let parameter = {
-      account_id: user.id,
-      payload: 'signature',
-      payload_value: result,
-      category: currentValidation?.id
-    }
+    let formData = new FormData();
+    formData.append('file_url', currentValidation?.id + '_' + this.state.pictures.length);
+    formData.append('account_id', user.id);
+    formData.append('file_base64', result);
     this.setState({ imageLoading: true })
-    Api.request(Routes.uploadImage, parameter, response => {
+    Api.upload(Routes.imageUploadBase64, formData, resp => {
       this.setState({ imageLoading: false })
-      this.retrieveReceiverPhoto(currentValidation?.id);
+      let parameter = {
+        account_id: user.id,
+        payload: 'signature',
+        payload_value: resp.data.data,
+        category: currentValidation?.id
+      }
+      this.setState({ imageLoading: true })
+      Api.request(Routes.uploadImage, parameter, response => {
+        this.setState({ imageLoading: false })
+        this.retrieveReceiverPhoto(currentValidation?.id);
+      }, error => {
+        console.log(error, 'upload photo to payloads')
+      })
+    }, error => {
+      console.log(error, 'base 64 upload')
     })
   }
 
@@ -125,10 +138,10 @@ class Options extends Component {
   }
 
   sendNewMessage = (payload) => {
-    const { messengerGroup, user, messagesOnGroup} = this.props.state;
-    const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
+    const { messengerGroup, user, messagesOnGroup } = this.props.state;
+    const { updateMessagesOnGroup, updateMessageByCode } = this.props;
     const { data } = this.props;
-    if(messengerGroup == null || user == null){
+    if (messengerGroup == null || user == null) {
       return
     }
     let parameter = {
@@ -157,11 +170,11 @@ class Options extends Component {
     }
     console.log('parameter', parameter, Routes.messengerMessagesCreate)
     updateMessagesOnGroup(newMessageTemp);
-    this.setState({newMessage: null})
+    this.setState({ newMessage: null })
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
       if (response.data != null) {
         const { messagesOnGroup } = this.props.state;
-        const { setMessagesOnGroup} = this.props;
+        const { setMessagesOnGroup } = this.props;
         if (messagesOnGroup && messagesOnGroup.messages.length > 0) {
           let temp = messagesOnGroup.messages;
           temp[messagesOnGroup.messages.length - 1].sending_flag = false
@@ -306,7 +319,7 @@ class Options extends Component {
   uploadPhoto = (payload) => {
     const { currentValidation } = this.props.state;
     const options = {
-      noData: true,
+      noData: false,
       error: null
     }
     const { user } = this.props.state;
@@ -321,25 +334,37 @@ class Options extends Component {
         console.log('User tapped custom button: ', response.customButton);
         this.setState({ photo: null })
       } else {
-        ImageResizer.createResizedImage(response.uri, response.width * 0.5, response.height * 0.5, 'JPEG', 72, 0)
-          .then(res => {
-            let parameter = {
-              account_id: user.id,
-              payload: payload,
-              payload_value: res.uri,
-              category: currentValidation?.id
-            }
-            this.setState({ imageLoading: true })
-            Api.request(Routes.uploadImage, parameter, response => {
-              this.setState({ imageLoading: false })
-              this.retrieveReceiverPhoto(currentValidation?.id);
-            })
+        // ImageResizer.createResizedImage(response.uri, response.width * 0.5, response.height * 0.5, 'JPEG', 72, 0)
+        //   .then(res => {
+        let formData = new FormData();
+        formData.append('file_url', currentValidation?.id + '_' + this.state.pictures.length);
+        formData.append('account_id', user.id);
+        formData.append('file_base64', response.data);
+        this.setState({ imageLoading: true })
+        Api.upload(Routes.imageUploadBase64, formData, resp => {
+          this.setState({ imageLoading: false })
+          let parameter = {
+            account_id: user.id,
+            payload: payload,
+            payload_value: resp.data.data,
+            category: currentValidation?.id
+          }
+          this.setState({ imageLoading: true })
+          Api.request(Routes.uploadImage, parameter, response => {
+            this.setState({ imageLoading: false })
+            this.retrieveReceiverPhoto(currentValidation?.id);
+          }, error => {
+            this.setState({ imageLoading: false })
+            console.log(error, 'upload image url to payload')
           })
-          .catch(err => {
-            // Oops, something went wrong. Check that the filename is correct and
-            // inspect err to get more details.
-            console.log(err)
-          });
+        }, error => {
+          this.setState({ imageLoading: false })
+          console.log(error, 'upload image')
+        })
+        // })
+        // .catch(err => {
+        //   console.log(err)
+        // });
       }
     })
   }
@@ -411,8 +436,8 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportRetrieve, parameter, response => {
       this.setState({ isLoading: false })
-      if(response.data.length > 0) {
-        this.setState({supportEnabled: response.data})
+      if (response.data.length > 0) {
+        this.setState({ supportEnabled: response.data })
       }
     })
   }
@@ -429,7 +454,7 @@ class Options extends Component {
     }
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportCreate, parameter, response => {
-      if(response.error = 'Request already exist'){
+      if (response.error = 'Request already exist') {
         Alert.alert('Notice', 'Enable Support is already activated.')
         this.setState({ isLoading: false })
         return
@@ -464,11 +489,11 @@ class Options extends Component {
         break
       case 'transferFundStack': {
         let status = false;
-        if(validations.length > 0) {
+        if (validations.length > 0) {
           validations.map((item, index) => {
             status = item.status === 'accepted' ? true : false
           })
-          if(status) {
+          if (status) {
             this.retrieveRequest('transferFundStack')
           } else {
             Alert.alert('Notice', `Enabled requirements aren't accepted yet.`)
@@ -480,10 +505,10 @@ class Options extends Component {
         break
       case 'reviewsStack': {
         // review stack
-        if(data?.status < 2){
+        if (data?.status < 2) {
           Alert.alert('Notice', 'Please complete the transaction before giving reviews.')
           return
-        }else{
+        } else {
           this.retrieveRequest('reviewsStack')
         }
       }
@@ -629,9 +654,9 @@ class Options extends Component {
                   }}>
                     <FontAwesomeIcon
                       onPress={() => {
-                        if(item.title === 'Enable Support' && this.state.supportEnabled?.length > 0) {
+                        if (item.title === 'Enable Support' && this.state.supportEnabled?.length > 0) {
                           console.log(this.state.supportEnabled.length > 0 && this.state.supportEnabled, 'support');
-                          this.props.navigation.navigate('commentsStack', {payload: 'support_id', payload_value: this.state.supportEnabled.length > 0 && this.state.supportEnabled[0].id})
+                          this.props.navigation.navigate('commentsStack', { payload: 'support_id', payload_value: this.state.supportEnabled.length > 0 && this.state.supportEnabled[0].id })
                         }
                       }}
                       icon={faChevronRight}
@@ -656,8 +681,8 @@ class Options extends Component {
         {
           options.map((item, index) => (
             <View
-            key={index}>
-              { (data?.account?.code == user.code) && (
+              key={index}>
+              {(data?.account?.code == user.code) && (
                 <TouchableOpacity style={{
                   width: '100%',
                   height: 50,
@@ -757,10 +782,12 @@ class Options extends Component {
             borderBottomColor: Color.lightGray
           }}
             onPress={() =>
-              this.setState({current: {
-                title: 'Settings',
-                menu: Helper.MessengerMenu
-              }})
+              this.setState({
+                current: {
+                  title: 'Settings',
+                  menu: Helper.MessengerMenu
+                }
+              })
             }>
             <Text style={{
               color: Color.danger,
@@ -775,7 +802,7 @@ class Options extends Component {
   renderImages(payload_value) {
     const { data } = this.props;
     const { user, currentValidation } = this.props.state;
-    const{ imageLoading } = this.state;
+    const { imageLoading } = this.state;
     return (
       <ScrollView>
         <View style={Style.signatureFrameContainer}>
@@ -793,9 +820,9 @@ class Options extends Component {
                     onPress={() => { this.setState({ imageModal: true, url: ndx.payload_value }) }}
                     key={el}>
                     <Image
-                      source={{ uri: ndx.payload_value.includes('file') === true ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}` }}
+                      source={{ uri: Config.BACKEND_URL + ndx.payload_value }}
                       style={{
-                        width: 205,
+                        width: '100%',
                         height: 98
                       }}
                     />
@@ -804,7 +831,7 @@ class Options extends Component {
               }
             })
           }
-          {this.state.imageLoading ? (<Skeleton size={2} template={'block'} height={75}/>) : null}
+          {this.state.imageLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
         </View>
         <View style={{
           paddingTop: 50,
@@ -894,10 +921,10 @@ class Options extends Component {
           borderTopWidth: 1,
           borderTopColor: Color.lightGray
         }}>
-          <ImageModal visible={this.state.imageModal} url={this.state.url && this.state.url.includes('file') === true ? this.state.url : `data:image/png;base64,${this.state.url}`} action={() => { this.setState({ imageModal: false }) }}></ImageModal>
+          <ImageModal visible={this.state.imageModal} url={Config.BACKEND_URL + this.state.url} action={() => { this.setState({ imageModal: false }) }}></ImageModal>
           <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
-          {this.state.isLoading ? (<Skeleton size={2} template={'block'} height={75}/>) : null}
+          {this.state.isLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
           {!this.state.isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
           {!this.state.isLoading && current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
           {!this.state.isLoading && current.title == 'signature' && this.renderImages(this.state.current.title)}
