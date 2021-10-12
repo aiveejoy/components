@@ -31,7 +31,7 @@ class ProductCard extends Component {
     const { item, theme } = this.props;
     return (
       <TouchableOpacity
-        style={item.batch_number && item.batch_number.length > 0 ? Style.selectedContainer : Style.cardContainer}
+        style={this.props.input ? Style.cardContainer : (item.batch_number && item.batch_number.length > 0 ? Style.selectedContainer : Style.cardContainer)}
         onPress={() => this.redirect()}
 
       >
@@ -59,12 +59,12 @@ class ProductCard extends Component {
                         fontWeight: 'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
                         marginBottom: 3,
-                        color: item.batch_number && item.batch_number.length > 0 ? 'white' : '',
+                        color: this.props.input ? '' : (item.batch_number && item.batch_number.length > 0 ? 'white' : ''),
                       }}>{item.title}</Text>
                     </View>
                     {this.props.batch === true && (<View style={{ flexDirection: 'row' }}>
                       <Text style={{
-                        color: item.batch_number && item.batch_number.length > 0 ? 'white' : '#C0C0C0',
+                        color:  this.props.input ? '#C0C0C0' : (item.batch_number && item.batch_number.length > 0 ? 'white' : '#C0C0C0'),
                         fontSize: BasicStyles.standardFontSize
                       }}>Batch Number:</Text>
                       {item.batch_number && item.batch_number.length > 0 && item.batch_number.map(i => {
