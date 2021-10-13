@@ -16,6 +16,7 @@ class ProductUnallocated extends Component {
 
   render() {
     const { item, keya } = this.props;
+    console.log('[>>>>>>>>>>>>>]', item)
     return (
       <TouchableOpacity
         style={item.batch_number && item.batch_number.length > 0 ? Style.selectedContainer : Style.cardContainer}
@@ -73,8 +74,8 @@ class ProductUnallocated extends Component {
                       borderColor: Color.blue,
                       borderWidth: 0.5
                     }]}>
-                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.applied_rate !=null ? parseFloat(item.applied_rate).toFixed(1) : "N/A"}</Text>
-                    {/* <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.applied_rate !=null ? parseFloat(item.applied_rate).toFixed(1) + (item.units ? Conversion.getUnitsAbbreviation(item.units) : null) : "N/A"}</Text> */}
+                    {/* <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.applied_rate !=null ? parseFloat(item.applied_rate).toFixed(1) : "N/A"}</Text> */}
+                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.applied_rate !=null ? parseFloat(item.applied_rate).toFixed(1) + (item.payload ? Conversion.getUnitsAbbreviation(item.payload) : null) : "N/A"}</Text>
                   </View>
                 </View>
               </View>
