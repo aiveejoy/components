@@ -23,7 +23,7 @@ class ImageModal extends Component {
       id: id
     }
     this.setState({ isLoading: true })
-    Api.request(Routes.accountCardsDelete, parameter, response => {
+    Api.request(this.props.route ? this.props.route : Routes.accountCardsDelete, parameter, response => {
       if(response.data > 0){
         Alert.alert(
           'Message',
@@ -77,12 +77,12 @@ class ImageModal extends Component {
                   resizeMode: 'center'
                 }}
               />
-              <TouchableOpacity onPress={() => this.del(this.props.deleteID)} style={[styles.close, { marginTop: '20%', marginLeft: '48%'
+              {this.props.deleteID && <TouchableOpacity onPress={() => this.del(this.props.deleteID)} style={[styles.close, { marginTop: '20%', marginLeft: '48%'
                 }]}>
                 <FontAwesomeIcon icon={ faTrash } style={{
                   color: Color.white
                 }} size={BasicStyles.iconSize} />
-              </TouchableOpacity>
+              </TouchableOpacity>}
             </View>
           </View>
         </Modal>
