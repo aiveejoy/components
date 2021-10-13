@@ -49,7 +49,7 @@ class SessionCard extends Component {
                         fontWeight:'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
                         marginBottom: 3
-                      }}>{item.session ? item.session : null}</Text>
+                      }}>{item.session ? 'Session: ' + item.session : null}</Text>
                     </View>
                     <View style={{flexDirection:'row'}}>
                       <Text style={{
@@ -78,7 +78,7 @@ class SessionCard extends Component {
                       fontSize: BasicStyles.standardFontSize - 1,
                       color: Color.blue,
                       fontWeight: 'bold'
-                    }}>{item.status}</Text>
+                    }}>{item.status.toUpperCase()}</Text>
                   </View>
                 </View>
               </View>
