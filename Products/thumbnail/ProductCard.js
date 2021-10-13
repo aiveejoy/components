@@ -6,7 +6,7 @@ import { Divider } from 'react-native-elements';
 import { Color, BasicStyles } from 'common'
 import Config from 'src/config.js'
 import Style from './Style';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 import Conversion from 'services/Conversion';
 
 class ProductCard extends Component {
@@ -14,13 +14,14 @@ class ProductCard extends Component {
     super(props);
   }
 
-  redirect(){
+  redirect() {
     const { item } = this.props;
     const { setProduct } = this.props;
-    if(item == null){
+    if (item == null) {
       return
     }
     setProduct(item)
+    console.log(item, 'item---------------------------------');
     this.props.navigation.navigate('productDetailsStack', {
       data: item
     })
@@ -30,10 +31,10 @@ class ProductCard extends Component {
     const { item, theme } = this.props;
     return (
       <TouchableOpacity
-        style={item.batch_number && item.batch_number.length > 0 ? Style.selectedContainer : Style.cardContainer}
+        style={this.props.input ? Style.cardContainer : (item.batch_number && item.batch_number.length > 0 ? Style.selectedContainer : Style.cardContainer)}
         onPress={() => this.redirect()}
-        
-        >
+
+      >
         <View style={{
           width: '100%',
         }}>
@@ -41,35 +42,40 @@ class ProductCard extends Component {
             (theme == 'v2' && item) && (
               <View style={{
                 width: '100%',
-                flexDirection: 'row',
+                // flexDirection: 'row',
                 paddingLeft: 10,
-                paddingRight: 10,
+                paddingRight: 10
+              }}>
+              <View style={{
+                width: '100%',
+                flexDirection: 'row'
               }}>
                 <View style={[Style.paddockInfo, {
                   width: '70%'
                 }]}>
                   <View>
-                    <View style={{flexDirection:'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                       <Text style={{
-                        fontWeight:'bold',
+                        fontWeight: 'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
-                        marginBottom:3,
-                        color: item.batch_number && item.batch_number.length > 0 ? 'white' : '',
+                        marginBottom: 3,
+                        color: this.props.input ? '' : (item.batch_number && item.batch_number.length > 0 ? 'white' : ''),
                       }}>{item.title}</Text>
                     </View>
-                    {this.props.batch === true && (<View style={{flexDirection:'row'}}>
+                    {this.props.batch === true && (<View style={{ flexDirection: 'row' }}>
                       <Text style={{
-                        color: item.batch_number && item.batch_number.length > 0 ? 'white' : '#C0C0C0',
+                        color:  this.props.input ? '#C0C0C0' : (item.batch_number && item.batch_number.length > 0 ? 'white' : '#C0C0C0'),
                         fontSize: BasicStyles.standardFontSize
                       }}>Batch Number:</Text>
                       {item.batch_number && item.batch_number.length > 0 && item.batch_number.map(i => {
                         return (
-                      <Text
-                        style={{
-                        marginLeft: 5,
-                        color: Color.blue,
-                        fontSize: BasicStyles.standardFontSize
-                      }}>{i}</Text>)})}
+                          <Text
+                            style={{
+                              marginLeft: 5,
+                              color: Color.blue,
+                              fontSize: BasicStyles.standardFontSize
+                            }}>{i}</Text>)
+                      })}
                     </View>
                     )}
                   </View>
@@ -84,13 +90,26 @@ class ProductCard extends Component {
                     Style.paddockDate,
                     {
                       justifyContent: 'center',
-                      width:'100%',
+                      width: '100%',
                       borderColor: Color.blue,
                       borderWidth: 0.5
                     }]}>
-                    <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate !=null ? parseFloat(item.rate).toFixed(1) + (item.units ? Conversion.getUnitsAbbreviation(item.units) : null) : "N/A"}</Text>
+                    {/* <Text style={{fontSize: BasicStyles.standardTitle2FontSize}}>{item.rate !=null ? item.rate + (item.units ? Conversion.getUnitsAbbreviation(item.units) : null) : "N/A"}</Text> */}
+                    <Text style={{ fontSize: BasicStyles.standardTitle2FontSize }}>{item.rate != null ? parseFloat(item.rate).toFixed(2) + (item.units ? Conversion.getUnitsAbbreviation(item.units) : null) : "N/A"}</Text>
                   </View>
                 </View>
+              </View>
+                {item.batch_number && item.batch_number.length > 0 && this.props.remaining && this.props.showRemaining && <View style={{
+                  width: '100%',
+                  flexDirection: 'row-reverse',
+                  marginRight: -20,
+                  marginTop: 5
+                }}>
+                  <Text style={{
+                    fontSize: 11,
+                    color: item.batch_number && item.batch_number.length > 0 ? 'white' : '',
+                  }}>Remaining to add: {item.remaining && parseFloat(item.remaining).toFixed(2)}{(item.units ? Conversion.getUnitsAbbreviation(item.units) : null)}</Text>
+                </View>}
               </View>
             )
           }
@@ -109,18 +128,18 @@ class ProductCard extends Component {
                   <View style={{
                     width: '100%'
                   }}>
-                    <View style={{flexDirection:'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                       <FontAwesomeIcon icon={faCircle} color={this.props.state.user ? (item.qty > 0 ? Color.primary : Color.danger) : (item.inventory && item.inventory.qty > 0 ? Color.primary : Color.danger)} size={10} style={{
                         marginTop: 6,
                         marginRight: 5
-                      }}/>
+                      }} />
                       <Text style={{
-                        fontWeight:'bold',
+                        fontWeight: 'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
-                        marginBottom:3
+                        marginBottom: 3
                       }}>{item.title}</Text>
                     </View>
-                    <View style={{flexDirection:'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                       <Text style={{
                         marginLeft: 5,
                         color: Color.gray,
@@ -145,7 +164,7 @@ class ProductCard extends Component {
                     <Text style={{
                       fontSize: BasicStyles.standardTitle2FontSize,
                       color: Color.white
-                    }}>{ item.qty }</Text>
+                    }}>{item.qty}</Text>
                   </View>
                 </View>
               </View>
@@ -166,14 +185,14 @@ class ProductCard extends Component {
                   <View style={{
                     width: '100%'
                   }}>
-                    <View style={{flexDirection:'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                       <Text style={{
-                        fontWeight:'bold',
+                        fontWeight: 'bold',
                         fontSize: BasicStyles.standardTitleFontSize,
-                        marginBottom:3
+                        marginBottom: 3
                       }}>{item.title}</Text>
                     </View>
-                    <View style={{flexDirection:'row'}}>
+                    <View style={{ flexDirection: 'row' }}>
                       <Text style={{
                         color: Color.gray,
                         fontSize: BasicStyles.standardFontSize
@@ -183,10 +202,10 @@ class ProductCard extends Component {
                         }
                       </Text>
                       <Text style={{
-                        marginLeft:5,
+                        marginLeft: 5,
                         color: Color.blue,
                         fontSize: BasicStyles.standardFontSize
-                      }}>({item.variation && item.variation.length > 0 ? Conversion.getConvertedUnit(item.variation[0].payload, item.variation[0].payload_value)  : '100L'})</Text>
+                      }}>({item.variation && item.variation.length > 0 ? Conversion.getConvertedUnit(item.variation[0].payload, item.variation[0].payload_value) : '100L'})</Text>
                     </View>
                   </View>
                 </View>
@@ -218,10 +237,12 @@ class ProductCard extends Component {
   }
 }
 
-const mapStateToProps = state => ({state: state});
+
+
+const mapStateToProps = state => ({ state: state });
 
 const mapDispatchToProps = dispatch => {
-  const {actions} = require('@redux');
+  const { actions } = require('@redux');
   return {
     setProduct: (product) => dispatch(actions.setProduct(product)),
   };

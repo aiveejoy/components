@@ -66,10 +66,8 @@ const styles = StyleSheet.create({
     width: 100,
   },
   CardContainer: {
-    width: (width - 50),
-    borderRadius: BasicStyles.standardBorderRadius,
-    padding: 10,
-    marginBottom: 10
+    width: '100%',
+    borderRadius: BasicStyles.standardBorderRadius
   },
   title: {
     alignItems: 'center',

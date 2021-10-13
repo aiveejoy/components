@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ToastAndroid, TextInput, FlatList, TouchableHighlight } from 'react-native';
+import { View, Text, Dimensions, TextInput, FlatList, TouchableHighlight, Keyboard } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -9,6 +9,8 @@ import Style from './Style.js';
 import { connect } from 'react-redux';
 import Api from 'services/api/index.js';
 import { Spinner } from 'components';
+
+const width = Math.round(Dimensions.get('window').width);
 class LocationAutoComplete extends Component{
   constructor(props){
     super(props);
@@ -64,14 +66,18 @@ class LocationAutoComplete extends Component{
   }
 
   onCancel = () => {
-    const {initialRegion}=this.props;
-    let location ={
-      latitude:initialRegion.latitude,
-      longitude:initialRegion.longitude,
-    }
     this.clear()
-    this.setState({selectedFlag: false})
-    this.props.onFinish(location)
+    this.setState({
+      selectedFlag: false
+    })
+    // const {initialRegion}=this.props;
+    // let location ={
+    //   latitude:initialRegion.latitude,
+    //   longitude:initialRegion.longitude,
+    // }
+    // this.clear()
+    // this.setState({selectedFlag: false})
+    // this.props.onFinish(location)
   }
 
   setSelectedItem = (item) => {
@@ -92,6 +98,7 @@ class LocationAutoComplete extends Component{
       results: null,
       selectedFlag: true
     })
+    Keyboard.dismiss()
     this.props.onFinish(location)
   }
 
@@ -100,14 +107,14 @@ class LocationAutoComplete extends Component{
     return (
       <View style={{
         backgroundColor: Color.white,
-        width: '100%',
+        width: width - 40,
         marginBottom: 50,
         position: 'relative',
+        borderRadius: 12,
         zIndex: this.props.zIndex ? this.props.zIndex + 9 : 5
       }}>
         <FlatList
           style={{
-            backgroundColor: Color.white,
             position: 'relative',
             zIndex: this.props.zIndex ? this.props.zIndex + 10 : 5
           }}
@@ -123,7 +130,6 @@ class LocationAutoComplete extends Component{
                 borderBottomColor: Color.gray,
                 paddingTop: 5,
                 paddingBottom: 5,
-                backgroundColor: Color.white,
                 width: '100%',
                 marginBottom: ((results.length - 1) == index) ? 100 : 0,
                 position: 'relative',
@@ -169,8 +175,10 @@ class LocationAutoComplete extends Component{
               this.getPlaces(searchValue)
               this.props.onChange()
             }}
+            ref={'searchValueField'}
             value={this.state.searchValue}
             placeholder={placeholder ? placeholder : 'Type location'}
+            placeholderTextColor={Color.darkGray}
           />
           {
             (results != null || selectedFlag == true) && (

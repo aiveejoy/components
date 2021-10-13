@@ -30,13 +30,18 @@ class InputSelect extends Component{
   }
 
   closeFilter(){
-
     this.setState({
       filter: false
-    })    
-    this.props.onFinish({
-      categories : this.state.cuisine?.categories?.length >= 1 ? this.state.cuisine.categories : this.state.cuisine
     })
+    if(this.state.cuisine != null){
+      this.props.onFinish({
+        categories : this.state.cuisine?.categories?.length >= 1 ? this.state.cuisine.categories : this.state.cuisine.categories
+      })
+    }else{
+      this.props.onFinish({
+        categories : null
+      })
+    }
   }
 
   render() {
@@ -60,7 +65,7 @@ class InputSelect extends Component{
          onPress={() => this.showFilter()}>
           <Text style={{color: 'black', marginBottom: -10 }}>{this.props.title}</Text>
           <TextInput
-            style={[BasicStyles.formControls, {width: '100%'}]}
+            style={[BasicStyles.formControls]}
             editable={false}
             placeholder={this.props.placeholder}
           />

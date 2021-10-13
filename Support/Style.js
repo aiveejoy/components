@@ -80,8 +80,6 @@ const styles = StyleSheet.create({
     },
     View: {
         flex: 1,
-        borderBottomColor: Color.white,
-        borderBottomWidth: 1,
         marginTop: 50
     },
     Type: {

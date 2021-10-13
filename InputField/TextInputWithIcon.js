@@ -43,6 +43,7 @@ class TextInputWithIcon extends Component{
           onChangeText={(input) => this.setInput(input)}
           value={this.state.input}
           placeholder={this.props.placeholder}
+          placeholderTextColor={Color.darkGray}
         />
       </View>
     );

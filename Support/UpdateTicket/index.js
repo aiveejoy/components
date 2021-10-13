@@ -6,7 +6,7 @@ import Api from 'services/api/index.js';
 import { Routes, BasicStyles } from 'common';
 import ImagePicker from 'react-native-image-picker';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImages, faPaperPlane, faClock, faCaretDown, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import { faImages, faPaperPlane, faClock, faCaretDown, faEllipsisH, faBug } from '@fortawesome/free-solid-svg-icons';
 import Color from 'common/Color';
 import { Dimensions } from 'react-native';
 import { connect } from 'react-redux';
@@ -14,6 +14,7 @@ import PostCard from 'modules/generic/PostCard.js';
 import ImageModal from 'components/Modal/ImageModal';
 import Skeleton from 'components/Loading/Skeleton';
 import moment from 'moment';
+import _ from 'lodash';
 
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -23,52 +24,44 @@ class UpdateTicket extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      title: null,
-      description: null,
-      type: null,
-      id: null,
-      assignee: null,
-      status: null,
       isLoading: false,
-      images: [],
-      comment: null,
-      comments: [],
-      showComments: false,
-      reply: null,
-      date: null,
       modalVisible: false,
-      image: null,
-      closeTicket: false
+      data: null,
+      isLoadingComment: false,
+      limit: 5,
+      offset: 0
     };
   }
 
   componentDidMount() {
+    const { setComments } = this.props;
     this.retrieve();
+    setComments([])
   }
 
   retrieve() {
+    const { u } = this.props.navigation.state.params;
     let parameter = {
       condition: [{
-        value: this.props.navigation.state.params.id,
+        value: u.id,
         column: 'id',
         clause: '='
       }]
     };
     this.setState({ isLoading: true })
+    console.log(Routes.ticketsRetrieve, parameter, '-----');
     Api.request(Routes.ticketsRetrieve, parameter, response => {
       this.setState({ isLoading: false })
       if (response.data.length > 0) {
         this.setState({
-          title: response.data[0].title,
-          description: response.data[0].content,
-          type: response.data[0].type,
-          id: response.data[0].id,
-          images: response.data[0].images ? response.data[0].images.split(' ') : [],
-          date: response.data[0].created_at_human,
-          status: response.data[0].status
+          data: response.data[0]
         })
-        this.retrieveComments(this.props.navigation.state.params.id);
       }
+      this.retrieveComments(false, u.id);
+    }, error => {
+      this.setState({
+        isLoading: false
+      })
     })
   }
 
@@ -81,31 +74,38 @@ class UpdateTicket extends Component {
   }
 
   createComment = (id) => {
+    const { u } = this.props.navigation.state.params;
+    const { user, comments } = this.props.state
     let parameter = {
-      account_id: this.props.state.user.id,
+      account_id: user.id,
       payload_value: id,
       payload: 'ticket_id',
-      text: this.state.comment
+      text: this.state.comment,
+      route: 'updateTicketStack',
+      to: u.assigned_to
     };
-    this.setState({ isLoading: true })
-    console.log(parameter);
+    this.setState({ isLoadingComment: true })
     Api.request(Routes.commentCreate, parameter, response => {
-      this.setState({ isLoading: false })
+      this.setState({ isLoadingComment: false })
       if (response.data !== null) {
         this.setState({ comment: null })
         parameter['account'] = {
-          username: this.props.state.user.username
+          username: user.username
         }
-        parameter['account']['profile'] = this.props.state.user.profile
+        parameter['account']['profile'] = user.profile
         parameter['created_at_human'] = moment(new Date()).format('MMMM DD, YYYY hh:mm a');
-        let temp = [parameter, ...this.props.state.comments?.commentList]
+        let temp = [parameter, ...comments]
         const { setComments } = this.props;
-        setComments({id: id, commentList: temp});
+        setComments(temp);
       }
+    }, error => {
+      console.log(error, 'error');
+      this.setState({ isLoadingComment: false })
     })
   }
 
-  retrieveComments = (id) => {
+  retrieveComments = (flag, id) => {
+    const { u } = this.props.navigation.state.params;
     let parameter = {
       condition: [
         {
@@ -119,24 +119,34 @@ class UpdateTicket extends Component {
           clause: '='
         }
       ],
-      sort: { created_at: 'desc'}
+      sort: { created_at: 'desc' },
+      limit: this.state.limit,
+      offset: flag == true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset
     };
-    this.setState({ isLoading: true })
-    console.log(parameter, Routes.commentsRetrieve, "parameter");
+    this.setState({ isLoadingComment: true })
     Api.request(Routes.commentsRetrieve, parameter, response => {
-      this.setState({ isLoading: false, showComments: true })
+      this.setState({ isLoadingComment: false, showComments: true })
       if (response.data.length > 0) {
-        const { setCurrentTicketId, setComments} = this.props;
-        setCurrentTicketId(id);
-        setComments({id: id, commentList: response.data})
+        const { setCurrentTicket, setComments } = this.props;
+        setCurrentTicket(u);
+        setComments(flag == false ? response.data : _.uniqBy([...this.state.data, ...response.data], 'id'))
+        this.setState({
+          offset: flag == false ? 1 : (this.state.offset + 1)
+        })
+      } else {
+        setComments(flag == false ? [] : this.state.data)
+        this.setState({
+          offset: flag == false ? 0 : this.state.offset
+        })
       }
     })
   }
 
   createReply = () => {
+    const { u } = this.props.navigation.state.params;
     let parameter = {
       account_id: this.props.state.user.id,
-      comment_id: this.props.navigation.state.params.id,
+      comment_id: u.id,
       text: this.state.reply
     }
     this.setState({ isLoading: true });
@@ -175,212 +185,156 @@ class UpdateTicket extends Component {
     })
   }
 
-  choosePhoto = () => {
-    const options = {
-      noData: false,
-    }
-    ImagePicker.launchImageLibrary(options, response => {
-      if (response.uri) {
-        let images = this.state.images;
-        images.push(`data:image/png;base64,${response.data}`);
-        this.setState({ images: images });
-      } else {
-        this.setState({ photo: null });
-      }
-    })
-  }
-
   renderComments = () => {
-    const { theme } = this.props.state;
+    const { theme, comments } = this.props.state;
+    const { u } = this.props.navigation.state.params;
     return (
       <View>
-        {this.state.isLoading && (<Skeleton size={2} template={'block'} height={50}/>)}
-        {this.state.title && (
+        <View style={{
+          marginBottom: 25,
+          marginTop: 10,
+          width: '100%'
+        }}>
           <View style={{
-            marginBottom: 25,
-            marginTop: 10,
-            width: '100%'
+            flexDirection: 'row',
+            padding: 10,
           }}>
-            <View style={{
-              flexDirection: 'row',
-              padding: 10,
-            }}>
-              <TextInput
-                style={
-                  [
-                    {
-                      height: 40,
-                      borderColor: Color.gray,
-                      borderWidth: .3,
-                      borderRadius: 20,
-                      width: '90%'
-                    },
-                    Style.textInput
-                  ]
-                }
-                placeholder={'Comment here...'}
-                onChangeText={value => this.commentHandler(value)}
-                value={this.state.comment}
-              />
-              <TouchableOpacity
-                onPress={() => { this.createComment(this.props.navigation.state.params.id) }}
+            <TextInput
+              style={
+                [
+                  {
+                    height: 40,
+                    borderColor: Color.gray,
+                    borderWidth: .3,
+                    borderRadius: 20,
+                    width: '90%'
+                  },
+                  Style.textInput
+                ]
+              }
+              placeholder={'Comment here...'}
+              onChangeText={value => this.commentHandler(value)}
+              value={this.state.comment}
+            />
+            <TouchableOpacity
+              onPress={() => { this.createComment(u.id) }}
+              style={{
+                padding: 10
+              }}
+            >
+              <FontAwesomeIcon
+                icon={faPaperPlane}
                 style={{
-                  padding: 10
+                  color: theme ? theme.primary : Color.primary
                 }}
-              >
-                <FontAwesomeIcon
-                  icon={faPaperPlane}
-                  style={{
-                    color: theme ? theme.primary : Color.primary
-                  }}
-                  size={20}
-                />
-              </TouchableOpacity>
-            </View>
-            {this.props.state.comments && this.props.state.comments.commentList && this.props.state.comments.commentList.length > 0 && this.props.state.comments.commentList.map((item, index) => {
-              return (
-                <PostCard
-                  data={{
-                    user: item.account,
-                    comments: item.comment_replies,
-                    message: item.text,
-                    date: item.created_at_human
-                  }}
-                  postReply={() => { this.createReply() }}
-                  reply={(value) => { this.replyHandler(value) }}
-                />
-              )
-            })}
-          </View>)}
+                size={20}
+              />
+            </TouchableOpacity>
+          </View>
+          {this.state.isLoadingComment && (<Skeleton size={2} template={'block'} height={50} />)}
+          <View style={{
+            padding: 15
+          }}>
+          {comments?.length > 0 && comments.map((item, index) => {
+            return (
+              <PostCard
+                data={{
+                  user: item.account,
+                  comments: item.comment_replies,
+                  message: item.text,
+                  date: item.created_at_human
+                }}
+                postReply={() => { this.createReply() }}
+                reply={(value) => { this.replyHandler(value) }}
+              />
+            )
+          })}
+          </View>
+        </View>
       </View>
     )
   }
 
-  render() {
+  renderTicket() {
+    const { data } = this.state;
     const { theme } = this.props.state;
-    let data = [{ title: 'Bug', value: 'bug' }, { title: 'Question', value: 'question' }, { title: 'Enhancement', value: 'enhancement' }, { title: 'Invalid', value: 'invalid' }, { title: 'Duplicate', value: 'duplicate' }, { title: 'Help wanted', value: 'help wanted' }]
-    let status = [{ title: 'Pending', value: 'pending' }, { title: 'Open', value: 'open' }, { title: 'Closed', value: 'closed' }]
-    console.log(this.state.date && this.state.date);
+    const { u } = this.props.navigation.state.params;
     return (
-      <View style={styles.CreateTicketContainer}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-        {this.state.isLoading && (<Skeleton size={0} template={'block'} height={50}/>)}
-          {this.state.title && (<View style={{
-            borderColor: Color.gray,
-            borderBottomWidth: .3,
-            paddingBottom: 20
+      <ScrollView showsVerticalScrollIndicator={false}
+        onScroll={(event) => {
+          let scrollingHeight = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y
+          let totalHeight = event.nativeEvent.contentSize.height
+          if (event.nativeEvent.contentOffset.y <= 0) {
+            if (this.state.isLoadingComment == false) {
+              // this.retrieve(false)
+            }
+          }
+          if (scrollingHeight >= (totalHeight)) {
+            if (this.state.isLoadingComment == false) {
+              this.retrieveComments(true, u.id)
+            }
+          }
+        }}
+      >
+        <View style={{
+          borderColor: Color.gray,
+          borderBottomWidth: .3,
+          padding: 20
+        }}>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 20
           }}>
-            <View style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 20
-            }}>
-              <FontAwesomeIcon
-                icon={faClock}
-                size={25}
-                style={{
-                  marginRight: 5,
-                  color: theme ? theme.primary : Color.primary
-                }}
-              />
-              <Text>{this.state.date && this.state.date}</Text>
-              {this.state.status !== 'closed' ? <TouchableOpacity style={{
-                position: 'absolute',
-                right: 10
+            <FontAwesomeIcon
+              icon={faBug}
+              size={25}
+              style={{
+                marginRight: 5,
+                color: theme ? theme.primary : Color.primary
               }}
-                onPress={() => { this.setState({ closeTicket: !this.state.closeTicket }) }}
-              >
-                <FontAwesomeIcon
-                  icon={faEllipsisH}
-                  size={25}
-                  style={{
-                    color: theme ? theme.primary : Color.primary
-                  }}
-                />
-              </TouchableOpacity> :
-                <Text style={{
-                  position: 'absolute',
-                  right: 10,
-                  color: 'red'
-                }}>Closed</Text>
-              }
-              {this.state.closeTicket === true && (<TouchableOpacity style={{
-                position: 'absolute',
-                right: 10,
-                backgroundColor: 'white',
-                top: 30,
-                height: 45,
-                width: 105,
-                borderWidth: 1,
-                borderRadius: 10,
-                borderColor: Color.gray,
-                padding: 10,
-                zIndex: 10
-              }}
-                onPress={() => { this.update() }}>
-                <Text>Close Ticket</Text>
-              </TouchableOpacity>)}
-            </View>
+            />
             <View>
-              <Text style={{ fontWeight: 'bold', textDecorationLine: 'underline' }}>{this.state.title?.toUpperCase()}</Text>
-            </View>
-            <View style={{ marginTop: 20 }}>
-              <Text>{this.state.description && this.state.description}</Text>
-            </View>
-            <Text style={{
-              fontStyle: 'italic',
-              color: theme ? theme.primary : Color.primary,
-              marginTop: 30,
-              fontWeight: 'bold',
-              marginBottom: 10
-            }}>Attachment(s)</Text>
-            <View style={{ flexDirection: 'row', width: '90%' }}>
-              <ScrollView horizontal={true}>
-                {this.state.images.length > 0 && this.state.images.map((u, i) => {
-                  return (
-                    <View key={i} style={{ flexDirection: 'row' }}>
-                      <TouchableOpacity
-                        onPress={() => {
-                          this.setState({
-                            image: u,
-                            modalVisible: true
-                          })
-                        }}
-                      >
-                        <Image
-                          source={{ uri: u }}
-                          style={styles.Image}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  )
-                })}
-              </ScrollView>
-            </View>
-            <View style={{ flexDirection: 'row', marginTop: 30, }}>
               <Text style={{
-                fontWeight: 'bold',
-              }}>STATUS: </Text>
+              }}>{data.type}</Text>
               <Text style={{
-                color: this.state.status && this.state.status.toLowerCase() === 'closed' ? Color.danger : Color.success
-              }}>{this.state.status}</Text>
+                fontSize: 11
+              }}>{moment(data.created_at).format('MMMM DD, YYYY hh:mm a')}</Text>
             </View>
           </View>
-          )}
-          {this.renderComments()}
-          {/* <View style={styles.TicketButtonContainer}>
-            <TicketButton
-              buttonColor={Color.danger}
-              buttonWidth="90%"
-              buttonHeight={50}
-              fontSize={14}
-              textColor="#FFFFFF"
-              buttonText="Close Ticket"
-              onPress={this.update.bind(this)}
-            />
-          </View> */}
-          <ImageModal visible={this.state.modalVisible} url={this.state.image} action={() => { this.setState({ modalVisible: false }) }}></ImageModal>
-        </ScrollView>
+          <Text style={{ fontWeight: 'bold' }}>{data.title}</Text>
+          <Text style={{
+            paddingTop: 20,
+            paddingBottom: 20,
+            fontStyle: 'italic'
+          }}>{data.content}</Text>
+
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{
+              fontWeight: 'bold',
+            }}>STATUS: </Text>
+            <Text style={{
+              color: data.status.toLowerCase() === 'closed' ? Color.danger : Color.success
+            }}>{data.status}</Text>
+          </View>
+        </View>
+        {this.renderComments()}
+      </ScrollView>
+    )
+  }
+  render() {
+    const { theme } = this.props.state;
+    const { data, isLoading } = this.state;
+    return (
+      <View style={{
+        flex: 1
+      }}>
+        {isLoading && (<Skeleton size={3} template={'block'} height={50} />)}
+        {
+          data && (
+            this.renderTicket()
+          )
+        }
       </View>
     );
   }
@@ -391,7 +345,7 @@ const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
   return {
     setComments: (comments) => dispatch(actions.setComments(comments)),
-    setCurrentTicketId: (currentTicketId) => dispatch(actions.setCurrentTicketId(currentTicketId))
+    setCurrentTicket: (currentTicket) => dispatch(actions.setCurrentTicket(currentTicket))
   };
 };
 

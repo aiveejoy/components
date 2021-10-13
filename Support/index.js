@@ -49,12 +49,19 @@ class Support extends Component {
   }
 
   retrieve(flag) {
+    const { user } = this.props.state;
+    if(user == null){
+      return
+    }
     let parameter = {
       condition: [{
-        value: this.props.state.user.id,
+        value: user.id,
         column: 'account_id',
         clause: '='
       }],
+      sort: {
+        created_at: 'desc'
+      },
       limit: this.state.limit,
       offset: flag == true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset
     };
@@ -128,62 +135,92 @@ class Support extends Component {
         onChange={index => this.change(this.state.menu[index])}
       />
       </View> */}
-        {this.state.data.length > 0 && (
-          <ScrollView
-            onScroll={(event) => {
-              let scrollingHeight = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y
-              let totalHeight = event.nativeEvent.contentSize.height
-              if (event.nativeEvent.contentOffset.y <= 0) {
-                if (this.state.loading == false) {
-                  // this.retrieve(false)
-                }
-              }
-              if (scrollingHeight >= (totalHeight)) {
-                if (this.state.loading == false) {
-                  this.retrieve(true)
-                }
-              }
-            }}
-          >
-            <View>
-              <View style={{ padding: 10, marginBottom: 50 }}>
-                <Text style={{ fontWeight: 'bold' }}>TICKETS</Text>
-                {
-                  this.state.data.map((u, i) => {
-                    return (
-                      <View
-                        style={Style.Card}
-                        key={i}
-                      >
-                        <TouchableOpacity
-                          onPress={() => {
-                            this.props.navigation.push('updateTicketStack', { id: u.id });
-                          }}>
-                          <View style={{ alignSelf: 'flex-start', padding: 5, borderRadius: 15, backgroundColor: this.findColor(types, u.type.toLowerCase()) }}>
-                            <Text style={{ color: '#ffffff', fontSize: 11 }}>{u.type}</Text>
-                          </View>
-                          <Text style={Style.TextCard} numberOfLines={2}>{u.title}</Text>
-                          <Text style={Style.TextCard, { fontSize: 11 }} >{u.assigned_to ? 'Assigned to ' + u.assigned_to : 'Not assigned'}</Text>
-                          <View style={{ flexDirection: 'row-reverse' }}>
-                          </View>
-                        </TouchableOpacity>
-                      </View>
-                    );
-                  })
-                }
-              </View>
-            </View>
-          </ScrollView>
-        )}
-        {this.state.isLoading == false && this.state.data.length == 0 && (
-          <View style={{
-            height: height / 2,
-            padding: 10
-          }}>
-            <EmptyMessage navigation={this.props.navigation} message={'No tickets found'}/>
-          </View>
-        )}
         {this.state.isLoading && (<Skeleton size={3} template={'block'} height={50}/>)}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          onScroll={(event) => {
+            let scrollingHeight = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y
+            let totalHeight = event.nativeEvent.contentSize.height
+            if (event.nativeEvent.contentOffset.y <= 0) {
+              if (this.state.loading == false) {
+                // this.retrieve(false)
+              }
+            }
+            if (scrollingHeight >= (totalHeight)) {
+              if (this.state.loading == false) {
+                this.retrieve(true)
+              }
+            }
+          }}
+        >
+          {this.state.data.length > 0 && (
+            <View style={{
+              marginBottom: 50,
+              paddingLeft: 20,
+              paddingRight: 20,
+              minHeight: height * 1.5
+            }}>
+              <Text style={{
+                fontWeight: 'bold',
+                textAlign: 'center',
+                marginBottom: 20
+              }}>My Tickets</Text>
+              {
+                this.state.data.map((u, i) => {
+                  return (
+                    <TouchableOpacity
+                      style={{
+                        marginBottom: 10
+                      }}
+                      onPress={() => {
+                        this.props.navigation.navigate('updateTicketStack', { u });
+                      }}>
+                      <View style={{
+                        padding: 10,
+                        borderRadius: 10,
+                        borderColor: Color.lightGray,
+                        borderWidth: 1
+                      }}>
+                        <View style={{
+                          alignSelf: 'flex-start',
+                          padding: 5,
+                          borderRadius: 15,
+                          backgroundColor: this.findColor(types, u.type.toLowerCase())
+                        }}>
+                          <Text
+                            style={{
+                              color: 'white',
+                              fontSize: 11
+                            }}
+                          >
+                            {u.type}
+                          </Text>
+                        </View>
+                        
+                        <Text style={{
+                          paddingTop: 10
+                        }} numberOfLines={2}>{u.title}</Text>
+                        <Text style={{
+                          fontSize: 11,
+                          paddingTop: 10
+                        }}>{u.assigned_to ? 'Assigned to ' + u.assignTo?.information?.first_name + ' ' + u.assignTo?.information?.last_name : 'Not assigned'}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })
+              }
+            </View>)
+          }
+          {this.state.isLoading == false && this.state.data.length == 0 && (
+            <View style={{
+              minHeight: height * 1.5,
+              padding: 10
+            }}>
+              <EmptyMessage navigation={this.props.navigation} message={'No existing tickets'}/>
+            </View>
+          )}
+        </ScrollView>
+        
         <TouchableOpacity
           style={[Style.floatingButton, {
             backgroundColor: theme ? theme.secondary : Color.secondary,

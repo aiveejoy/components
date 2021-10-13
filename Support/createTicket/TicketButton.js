@@ -10,15 +10,12 @@ class TicketButton extends Component {
   render() {
     return (
       <TouchableOpacity
-        style={[
-          styles.CustomButtonContainer,
-          {
+        style={{
             backgroundColor: this.props.buttonColor,
             width: this.props.buttonWidth,
             height: this.props.buttonHeight,
             borderRadius: 100
-          },
-        ]}
+          }}
         onPress={() => {
           this.props.onPress();
         }}>

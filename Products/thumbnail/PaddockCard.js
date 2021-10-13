@@ -69,7 +69,7 @@ class PaddockCard extends Component {
                         marginLeft: 5,
                         color: Color.gray,
                         fontSize: BasicStyles.standardFontSize
-                      }}>{item.category ? item.category : null}</Text>
+                      }}>{item.spray_mix ? item.spray_mix.name : null}</Text>
                     </View>
                   </View>
                 </View>

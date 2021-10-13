@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import { View, TouchableHighlight, Animated, Text } from 'react-native'
 import { SliderPicker } from 'react-native-slider-picker';
-import { Color, BasicStyles} from 'common';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCaretUp } from '@fortawesome/free-solid-svg-icons';
 
 class Sliders extends Component{
   constructor(props){
