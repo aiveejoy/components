@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Dimensions, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, Dimensions, TouchableOpacity, ScrollView, Image, Alert, Platform } from 'react-native';
 import { Routes, Color, BasicStyles, Helper } from 'common';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
@@ -12,6 +12,7 @@ import Button from 'components/Form/Button';
 import ImageModal from 'components/Modal/ImageModal';
 import ImageResizer from 'react-native-image-resizer';
 import moment from 'moment';
+import Config from 'src/config';
 import Skeleton from 'components/Loading/Skeleton';
 import { fcmService } from 'services/broadcasting/FCMService';
 import { localNotificationService } from 'services/broadcasting/LocalNotificationService';
@@ -38,7 +39,8 @@ class Options extends Component {
       imageModal: false,
       url: null,
       supportEnabled: [],
-      imageLoading: false
+      imageLoading: false,
+      deleteID: null
     }
   }
 
@@ -59,9 +61,9 @@ class Options extends Component {
     this.notificationHandler.onNotification(notify);
   };
 
-  firebaseNotification(){
+  firebaseNotification() {
     const { user } = this.props.state;
-    if(user == null){
+    if (user == null) {
       return
     }
     fcmService.registerAppWithFCM()
@@ -76,17 +78,30 @@ class Options extends Component {
   }
 
   sendSketch = (result) => {
+    let date = (moment(new Date()).format('hh:mm:ss')).split(':')
     const { user, currentValidation } = this.props.state;
-    let parameter = {
-      account_id: user.id,
-      payload: 'signature',
-      payload_value: result,
-      category: currentValidation?.id
-    }
+    let formData = new FormData();
+    formData.append('file_url', currentValidation?.id + '_' + date[0] + '_' + date[1] + '_' + date[2]);
+    formData.append('account_id', user.id);
+    formData.append('file_base64', result);
     this.setState({ imageLoading: true })
-    Api.request(Routes.uploadImage, parameter, response => {
+    Api.upload(Routes.imageUploadBase64, formData, resp => {
       this.setState({ imageLoading: false })
-      this.retrieveReceiverPhoto(currentValidation?.id);
+      let parameter = {
+        account_id: user.id,
+        payload: 'signature',
+        payload_value: resp.data.data,
+        category: currentValidation?.id
+      }
+      this.setState({ imageLoading: true })
+      Api.request(Routes.uploadImage, parameter, response => {
+        this.setState({ imageLoading: false })
+        this.retrieveReceiverPhoto(currentValidation?.id);
+      }, error => {
+        console.log(error, 'upload photo to payloads')
+      })
+    }, error => {
+      console.log(error, 'base 64 upload')
     })
   }
 
@@ -107,6 +122,8 @@ class Options extends Component {
       this.setState({ imageLoading: false })
       if (response.data.length > 0) {
         this.setState({ pictures: response.data })
+      } else {
+        this.setState({ pictures: [] })
       }
     })
   }
@@ -114,20 +131,21 @@ class Options extends Component {
   componentWillUnmount() {
   }
 
-  close() {
+  close = () => {
     this.props.navigation.setParams({
       data: {
-        ...this.props.navigation.state.params.data,
-        menuFlag: !this.props.navigation.state.params.data.menuFlag
+        ...this.props.data,
+        title: this.props.navigation.state?.params?.data?.title,
+        menuFlag: !this.props.navigation.state?.params?.data?.menuFlag
       }
     })
   }
 
   sendNewMessage = (payload) => {
-    const { messengerGroup, user, messagesOnGroup} = this.props.state;
-    const { updateMessagesOnGroup,  updateMessageByCode} = this.props;
-    const { data } = this.props.navigation.state.params;
-    if(messengerGroup == null || user == null){
+    const { messengerGroup, user, messagesOnGroup } = this.props.state;
+    const { updateMessagesOnGroup, updateMessageByCode } = this.props;
+    const { data } = this.props;
+    if (messengerGroup == null || user == null) {
       return
     }
     let parameter = {
@@ -138,7 +156,7 @@ class Options extends Component {
       payload: 'text',
       payload_value: null,
       code: 1,
-      to: data?.request?.location?.account_id
+      to: data?.location?.account_id
     }
     let newMessageTemp = {
       ...parameter,
@@ -156,16 +174,16 @@ class Options extends Component {
     }
     console.log('parameter', parameter, Routes.messengerMessagesCreate)
     updateMessagesOnGroup(newMessageTemp);
-    this.setState({newMessage: null})
+    this.setState({ newMessage: null })
     Api.request(Routes.messengerMessagesCreate, parameter, response => {
       if (response.data != null) {
         const { messagesOnGroup } = this.props.state;
-        const { setMessagesOnGroup} = this.props;
+        const { setMessagesOnGroup } = this.props;
         if (messagesOnGroup && messagesOnGroup.messages.length > 0) {
           let temp = messagesOnGroup.messages;
           temp[messagesOnGroup.messages.length - 1].sending_flag = false
           setMessagesOnGroup({
-            groupId: this.props.navigation.state.params.data.id,
+            groupId: data?.id,
             messages: temp
           })
         }
@@ -181,13 +199,13 @@ class Options extends Component {
     }
     let parameter = {
       condition: [{
-        value: data.title,
+        value: data.id,
         clause: '=',
-        column: 'code'
+        column: 'id'
       }],
       account_id: user.id
     };
-    if (request != null && request.code == data.title) {
+    if (request != null && request.code == data.code) {
       this.props.navigation.navigate(route, {
         data: request,
         members: members,
@@ -197,7 +215,6 @@ class Options extends Component {
     }
     this.setState({ isLoading: true });
     Api.request(Routes.requestRetrieveItem, parameter, (response) => {
-      console.log(response, '--------');
       this.setState({ isLoading: false });
       if (response.data.length > 0) {
         const { setRequest } = this.props;
@@ -216,14 +233,15 @@ class Options extends Component {
   }
 
   addToValidation = (payload) => {
+    const { messengerGroup } = this.props.state;
     const { data } = this.props;
     let parameter = {
       status: 'pending',
       payload: payload,
       account_id: this.props.state.user.id,
-      request_id: data?.request?.id,
+      request_id: data?.id,
       messages: {
-        messenger_group_id: this.props.messengerId,
+        messenger_group_id: messengerGroup.id,
         account_id: this.props.state.user.id
       }
     }
@@ -265,7 +283,7 @@ class Options extends Component {
     const { data } = this.props;
     let parameter = {
       condition: [{
-        value: data?.request?.id,
+        value: data?.id,
         clause: '=',
         column: 'request_id'
       }],
@@ -276,7 +294,7 @@ class Options extends Component {
       limit: 3
     }
     this.setState({ isLoading: true });
-    console.log(Routes.requestValidationRetreive, parameter);
+    console.log(Routes.requestValidationRetreive, parameter, '----');
     Api.request(Routes.requestValidationRetreive, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
@@ -305,7 +323,7 @@ class Options extends Component {
   uploadPhoto = (payload) => {
     const { currentValidation } = this.props.state;
     const options = {
-      noData: true,
+      noData: false,
       error: null
     }
     const { user } = this.props.state;
@@ -320,25 +338,37 @@ class Options extends Component {
         console.log('User tapped custom button: ', response.customButton);
         this.setState({ photo: null })
       } else {
-        ImageResizer.createResizedImage(response.uri, response.width * 0.5, response.height * 0.5, 'JPEG', 72, 0)
-          .then(res => {
-            let parameter = {
-              account_id: user.id,
-              payload: payload,
-              payload_value: res.uri,
-              category: currentValidation?.id
-            }
-            this.setState({ imageLoading: true })
-            Api.request(Routes.uploadImage, parameter, response => {
-              this.setState({ imageLoading: false })
-              this.retrieveReceiverPhoto(currentValidation?.id);
-            })
+        // ImageResizer.createResizedImage(response.uri, response.width * 0.5, response.height * 0.5, 'JPEG', 72, 0)
+        //   .then(res => {
+        let formData = new FormData();
+        formData.append('file_url', currentValidation?.id + '_' + response.fileName);
+        formData.append('account_id', user.id);
+        formData.append('file_base64', response.data);
+        this.setState({ imageLoading: true })
+        Api.upload(Routes.imageUploadBase64, formData, resp => {
+          this.setState({ imageLoading: false })
+          let parameter = {
+            account_id: user.id,
+            payload: payload,
+            payload_value: resp.data.data,
+            category: currentValidation?.id
+          }
+          this.setState({ imageLoading: true })
+          Api.request(Routes.uploadImage, parameter, response => {
+            this.setState({ imageLoading: false })
+            this.retrieveReceiverPhoto(currentValidation?.id);
+          }, error => {
+            this.setState({ imageLoading: false })
+            console.log(error, 'upload image url to payload')
           })
-          .catch(err => {
-            // Oops, something went wrong. Check that the filename is correct and
-            // inspect err to get more details.
-            console.log(err)
-          });
+        }, error => {
+          this.setState({ imageLoading: false })
+          console.log(error, 'upload image')
+        })
+        // })
+        // .catch(err => {
+        //   console.log(err)
+        // });
       }
     })
   }
@@ -366,18 +396,21 @@ class Options extends Component {
       id: currentValidation?.id,
       payload: currentValidation?.payload,
       account_id: user.id,
-      request_id: data?.request?.id,
+      request_id: data?.id,
       messages: {
-        messenger_group_id: this.props.messengerId,
+        messenger_group_id: messengerGroup.id,
         account_id: user.id
       }
     }
     this.setState({ isLoading: true })
+    console.log(Routes.requestValidationUpdate, parameter)
     Api.request(Routes.requestValidationUpdate, parameter, response => {
       this.setState({ isLoading: false })
       let temp = currentValidation
       temp.status = status;
       setCurrentValidation(temp);
+    }, error => {
+      console.log(error)
     })
   }
 
@@ -388,7 +421,7 @@ class Options extends Component {
       condition: [
         {
           clause: '=',
-          value: data?.request?.id,
+          value: data?.id,
           column: 'payload_value'
         },
         {
@@ -407,8 +440,8 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportRetrieve, parameter, response => {
       this.setState({ isLoading: false })
-      if(response.data.length > 0) {
-        this.setState({supportEnabled: response.data})
+      if (response.data.length > 0) {
+        this.setState({ supportEnabled: response.data })
       }
     })
   }
@@ -419,13 +452,13 @@ class Options extends Component {
     let parameter = {
       account_id: user.id,
       payload: 'request_id',
-      payload_value: data?.request?.id,
+      payload_value: data?.id,
       status: 0,
       assigned_to: ''
     }
     this.setState({ isLoading: true })
     Api.request(Routes.enableSupportCreate, parameter, response => {
-      if(response.error = 'Request already exist'){
+      if (response.error = 'Request already exist') {
         Alert.alert('Notice', 'Enable Support is already activated.')
         this.setState({ isLoading: false })
         return
@@ -460,11 +493,11 @@ class Options extends Component {
         break
       case 'transferFundStack': {
         let status = false;
-        if(validations.length > 0) {
+        if (validations.length > 0) {
           validations.map((item, index) => {
             status = item.status === 'accepted' ? true : false
           })
-          if(status) {
+          if (status) {
             this.retrieveRequest('transferFundStack')
           } else {
             Alert.alert('Notice', `Enabled requirements aren't accepted yet.`)
@@ -476,10 +509,10 @@ class Options extends Component {
         break
       case 'reviewsStack': {
         // review stack
-        if(data.status < 2){
+        if (data?.status < 2) {
           Alert.alert('Notice', 'Please complete the transaction before giving reviews.')
           return
-        }else{
+        } else {
           this.retrieveRequest('reviewsStack')
         }
       }
@@ -625,9 +658,9 @@ class Options extends Component {
                   }}>
                     <FontAwesomeIcon
                       onPress={() => {
-                        if(item.title === 'Enable Support' && this.state.supportEnabled?.length > 0) {
+                        if (item.title === 'Enable Support' && this.state.supportEnabled?.length > 0) {
                           console.log(this.state.supportEnabled.length > 0 && this.state.supportEnabled, 'support');
-                          this.props.navigation.navigate('commentsStack', {payload: 'support_id', payload_value: this.state.supportEnabled.length > 0 && this.state.supportEnabled[0].id})
+                          this.props.navigation.navigate('commentsStack', { payload: 'support_id', payload_value: this.state.supportEnabled.length > 0 && this.state.supportEnabled[0].id })
                         }
                       }}
                       icon={faChevronRight}
@@ -652,8 +685,8 @@ class Options extends Component {
         {
           options.map((item, index) => (
             <View
-            key={index}>
-              { (data?.request?.account?.code == user.code) && (
+              key={index}>
+              {(data?.account?.code == user.code) && (
                 <TouchableOpacity style={{
                   width: '100%',
                   height: 50,
@@ -670,10 +703,10 @@ class Options extends Component {
                   <Text style={{
                     color: item.color,
                     fontSize: BasicStyles.standardFontSize,
-                    width: (data?.request?.account?.code == user.code) ? '70%' : '90%',
+                    width: (data?.account?.code == user.code) ? '70%' : '90%',
                   }}>{item.title}</Text>
                   {
-                    (item.title != 'Back' && (data?.request?.account?.code == user.code)) && (
+                    (item.title != 'Back' && (data?.account?.code == user.code)) && (
                       <View style={{
                         width: '30%',
                         justifyContent: 'center',
@@ -706,7 +739,7 @@ class Options extends Component {
                   }
                 </TouchableOpacity>)}
               {
-                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.request?.account?.code != user.code)) && (
+                (this.checkValidation(item.payload_value).result === true && item.title != 'Back' && (data?.account?.code != user.code)) && (
                   <TouchableOpacity style={{
                     width: '100%',
                     height: 50,
@@ -741,7 +774,7 @@ class Options extends Component {
             </View>
           ))
         }
-        {data && data.request?.account?.code != user.code && (
+        {data?.account?.code != user.code && (
           <TouchableOpacity style={{
             width: '100%',
             height: 50,
@@ -753,10 +786,12 @@ class Options extends Component {
             borderBottomColor: Color.lightGray
           }}
             onPress={() =>
-              this.setState({current: {
-                title: 'Settings',
-                menu: Helper.MessengerMenu
-              }})
+              this.setState({
+                current: {
+                  title: 'Settings',
+                  menu: Helper.MessengerMenu
+                }
+              })
             }>
             <Text style={{
               color: Color.danger,
@@ -771,6 +806,7 @@ class Options extends Component {
   renderImages(payload_value) {
     const { data } = this.props;
     const { user, currentValidation } = this.props.state;
+    const { imageLoading } = this.state;
     return (
       <ScrollView>
         <View style={Style.signatureFrameContainer}>
@@ -780,17 +816,22 @@ class Options extends Component {
                 return (
                   <TouchableOpacity style={{
                     height: 100,
-                    width: '48%',
+                    width: '50%',
                     borderWidth: 1,
-                    borderColor: Color.gray,
-                    margin: 1
+                    borderColor: Color.gray
                   }}
-                    onPress={() => { this.setState({ imageModal: true, url: ndx.payload_value }) }}
+                    onPress={() => {
+                      this.setState({
+                        deleteID: ndx.id,
+                        url: ndx.payload_value,
+                        imageModal: true
+                      })
+                    }}
                     key={el}>
                     <Image
-                      source={{ uri: ndx.payload_value.includes('file') === true ? ndx.payload_value : `data:image/png;base64,${ndx.payload_value}` }}
+                      source={{ uri: Config.BACKEND_URL + ndx.payload_value }}
                       style={{
-                        width: 205,
+                        width: '100%',
                         height: 98
                       }}
                     />
@@ -799,7 +840,7 @@ class Options extends Component {
               }
             })
           }
-          {this.state.imageLoading ? (<Skeleton size={2} template={'block'} height={75}/>) : null}
+          {this.state.imageLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
         </View>
         <View style={{
           paddingTop: 50,
@@ -809,7 +850,7 @@ class Options extends Component {
           alignItems: 'center'
         }}>
 
-          {!this.state.imageLoading && data?.request?.location?.account_id == user.id && currentValidation?.status === 'pending' && data.status < 2 && (
+          {!this.state.imageLoading && data?.account?.code == user.code && currentValidation?.status === 'pending' && data?.status < 2 && this.state.pictures.length > 0 && (
             <View style={Style.signatureFrameContainer}>
               <Button
                 title={'Decline'}
@@ -830,7 +871,7 @@ class Options extends Component {
               />
             </View>
           )}
-          {data?.request?.location?.account_id != user.id && data.status < 2 && (
+          {data?.account?.code != user.code && data?.status < 2 && currentValidation?.status !== 'accepted' && imageLoading === false && (
             <Button
               title={payload_value === 'signature' ? 'Upload Signature' : 'Take A Picture'}
               onClick={() => {
@@ -846,7 +887,7 @@ class Options extends Component {
               }}
             />
           )}
-          {(currentValidation?.status === 'accepted') && (
+          {(currentValidation?.status === 'accepted') && imageLoading === false && (
             <View style={Style.signatureFrameContainer}>
               <View style={[
                 Style.signatureAction,
@@ -856,7 +897,7 @@ class Options extends Component {
               </View>
             </View>
           )}
-          {currentValidation?.status === 'declined' && (
+          {currentValidation?.status === 'declined' && imageLoading === false && (
             <View style={Style.signatureFrameContainer}>
               <View style={[
                 Style.signatureAction,
@@ -872,7 +913,9 @@ class Options extends Component {
   }
 
   render() {
-    const { current } = this.state;
+    const { current, deleteID } = this.state;
+    const { data } = this.props;
+    const { user, currentValidation } = this.props.state;
     return (
       <View>
         <NotificationsHandler notificationHandler={ref => (this.notificationHandler = ref)} />
@@ -889,10 +932,20 @@ class Options extends Component {
           borderTopWidth: 1,
           borderTopColor: Color.lightGray
         }}>
-          <ImageModal visible={this.state.imageModal} url={this.state.url && this.state.url.includes('file') === true ? this.state.url : `data:image/png;base64,${this.state.url}`} action={() => { this.setState({ imageModal: false }) }}></ImageModal>
-          <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
+          <ImageModal
+            deleteID={data?.account?.code != user.code && currentValidation?.status !== 'accepted'  ? deleteID : null}
+            visible={this.state.imageModal}
+            url={Config.BACKEND_URL + this.state.url}
+            action={() => { 
+              this.setState({ imageModal: false })
+            }}
+            route={Routes.uploadImageDelete}
+            successDel={() => {this.retrieveReceiverPhoto(currentValidation?.id)}}
+          >
+          </ImageModal>
+          <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible}/>
           {this.header(this.state.current)}
-          {this.state.isLoading ? (<Skeleton size={2} template={'block'} height={75}/>) : null}
+          {this.state.isLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
           {!this.state.isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
           {!this.state.isLoading && current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
           {!this.state.isLoading && current.title == 'signature' && this.renderImages(this.state.current.title)}
