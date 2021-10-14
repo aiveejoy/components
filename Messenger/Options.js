@@ -78,10 +78,11 @@ class Options extends Component {
   }
 
   sendSketch = (result) => {
+    const { myDevice } = this.props.state;
     let date = (moment(new Date()).format('hh:mm:ss')).split(':')
     const { user, currentValidation } = this.props.state;
     let formData = new FormData();
-    formData.append('file_url', currentValidation?.id + '_' + date[0] + '_' + date[1] + '_' + date[2]);
+    formData.append('file_url', currentValidation?.id + '_' + date.join('_') + '_' + myDevice?.unique_code);
     formData.append('account_id', user.id);
     formData.append('file_base64', result);
     this.setState({ imageLoading: true })
@@ -883,7 +884,8 @@ class Options extends Component {
               }}
               style={{
                 width: '50%',
-                backgroundColor: Color.success
+                backgroundColor: Color.success,
+                marginBottom: 20
               }}
             />
           )}
