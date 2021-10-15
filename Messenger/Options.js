@@ -39,7 +39,8 @@ class Options extends Component {
       imageModal: false,
       url: null,
       supportEnabled: [],
-      imageLoading: false
+      imageLoading: false,
+      deleteID: null
     }
   }
 
@@ -77,9 +78,11 @@ class Options extends Component {
   }
 
   sendSketch = (result) => {
+    const { myDevice } = this.props.state;
+    let date = (moment(new Date()).format('hh:mm:ss')).split(':')
     const { user, currentValidation } = this.props.state;
     let formData = new FormData();
-    formData.append('file_url', currentValidation?.id + '_' + this.state.pictures.length);
+    formData.append('file_url', currentValidation?.id + '_' + date.join('_') + '_' + myDevice?.unique_code);
     formData.append('account_id', user.id);
     formData.append('file_base64', result);
     this.setState({ imageLoading: true })
@@ -120,6 +123,8 @@ class Options extends Component {
       this.setState({ imageLoading: false })
       if (response.data.length > 0) {
         this.setState({ pictures: response.data })
+      } else {
+        this.setState({ pictures: [] })
       }
     })
   }
@@ -337,7 +342,7 @@ class Options extends Component {
         // ImageResizer.createResizedImage(response.uri, response.width * 0.5, response.height * 0.5, 'JPEG', 72, 0)
         //   .then(res => {
         let formData = new FormData();
-        formData.append('file_url', currentValidation?.id + '_' + this.state.pictures.length);
+        formData.append('file_url', currentValidation?.id + '_' + response.fileName);
         formData.append('account_id', user.id);
         formData.append('file_base64', response.data);
         this.setState({ imageLoading: true })
@@ -816,7 +821,13 @@ class Options extends Component {
                     borderWidth: 1,
                     borderColor: Color.gray
                   }}
-                    onPress={() => { this.setState({ imageModal: true, url: ndx.payload_value }) }}
+                    onPress={() => {
+                      this.setState({
+                        deleteID: ndx.id,
+                        url: ndx.payload_value,
+                        imageModal: true
+                      })
+                    }}
                     key={el}>
                     <Image
                       source={{ uri: Config.BACKEND_URL + ndx.payload_value }}
@@ -840,7 +851,7 @@ class Options extends Component {
           alignItems: 'center'
         }}>
 
-          {!this.state.imageLoading && data?.account?.code == user.code && currentValidation?.status === 'pending' && data?.status < 2 && (
+          {!this.state.imageLoading && data?.account?.code == user.code && currentValidation?.status === 'pending' && data?.status < 2 && this.state.pictures.length > 0 && (
             <View style={Style.signatureFrameContainer}>
               <Button
                 title={'Decline'}
@@ -873,7 +884,8 @@ class Options extends Component {
               }}
               style={{
                 width: '50%',
-                backgroundColor: Color.success
+                backgroundColor: Color.success,
+                marginBottom: 20
               }}
             />
           )}
@@ -903,7 +915,9 @@ class Options extends Component {
   }
 
   render() {
-    const { current } = this.state;
+    const { current, deleteID } = this.state;
+    const { data } = this.props;
+    const { user, currentValidation } = this.props.state;
     return (
       <View>
         <NotificationsHandler notificationHandler={ref => (this.notificationHandler = ref)} />
@@ -920,8 +934,18 @@ class Options extends Component {
           borderTopWidth: 1,
           borderTopColor: Color.lightGray
         }}>
-          <ImageModal visible={this.state.imageModal} url={Config.BACKEND_URL + this.state.url} action={() => { this.setState({ imageModal: false }) }}></ImageModal>
-          <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
+          <ImageModal
+            deleteID={data?.account?.code != user.code && currentValidation?.status !== 'accepted'  ? deleteID : null}
+            visible={this.state.imageModal}
+            url={Config.BACKEND_URL + this.state.url}
+            action={() => { 
+              this.setState({ imageModal: false })
+            }}
+            route={Routes.uploadImageDelete}
+            successDel={() => {this.retrieveReceiverPhoto(currentValidation?.id)}}
+          >
+          </ImageModal>
+          <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible}/>
           {this.header(this.state.current)}
           {this.state.isLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
           {!this.state.isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
