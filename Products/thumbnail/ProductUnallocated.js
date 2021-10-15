@@ -16,7 +16,6 @@ class ProductUnallocated extends Component {
 
   render() {
     const { item, keya } = this.props;
-    console.log('[>>>>>>>>>>>>>]', item)
     return (
       <TouchableOpacity
         style={item.batch_number && item.batch_number.length > 0 ? Style.selectedContainer : Style.cardContainer}
