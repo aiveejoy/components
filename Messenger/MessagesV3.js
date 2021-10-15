@@ -29,6 +29,7 @@ import moment from 'moment';
 import Button from 'components/Form/Button';
 import { NavigationActions, StackActions } from 'react-navigation';
 import Skeleton from 'components/Loading/Skeleton';
+import ScreenshotHandler from 'services/ScreenshotHandler';
 
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -59,12 +60,12 @@ class MessagesV3 extends Component {
   }
 
   componentDidMount() {
+    ScreenshotHandler.disableScreenshot()
     const { setMessageTitle } = this.props;
     setMessageTitle(null)
     const { user } = this.props.state
     if (user == null) return
     this.retrieveRequest()
-    this.retrieveGroup()
   }
 
   retrieveRequest() {
@@ -83,6 +84,7 @@ class MessagesV3 extends Component {
     console.log(parameter, Routes.requestRetrieveItem)
     Api.request(Routes.requestRetrieveItem, parameter, (response) => {
       this.setState({ isLoading: false });
+      this.retrieveGroup()
       if (response.data.length > 0) {
         this.setState({
           data: response.data[0]
