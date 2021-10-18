@@ -763,7 +763,7 @@ class MessagesV3 extends Component {
       data
     } = this.state;
     const { messengerGroup, user, viewField, theme } = this.props.state;
-    console.log('[MESSEGER GROUP]', this.props.state.viewField);
+    console.log('[MESSEGER GROUP]', data, '----------------');
     return (
       <SafeAreaView>
         {
@@ -843,42 +843,37 @@ class MessagesV3 extends Component {
               backgroundColor: Color.white
             }}>
               {
-                messengerGroup != null && messengerGroup.status < 2 && !isViewing ? (
+                data?.status < 2 ? (
                   this._footer()
                 ) : (
-                  viewField === true ? (
-                    this._footer()
-                  ) : (
-                    <View></View>
-                  )
+                  <View style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: DeviceWidth,
+                  }}>
+                    <View style={{
+                      position: 'absolute',
+                      bottom: 30,
+                      backgroundColor: Color.white
+                    }}>
+                      <Text style={{
+                        marginBottom: 10
+                      }}>This transaction is already completed.</Text>
+                      <Button
+                        title={'Go to Dashboard'}
+                        onClick={() => this.navigateToScreen()}
+                        style={{
+                          width: '100%',
+                          paddingLeft: 20,
+                          paddingRight: 20,
+                          backgroundColor: theme ? theme.secondary : Color.secondary
+                        }}
+                      />
+                    </View>
+                  </View>
                 )
               }
             </View>
-            {data?.status >= 2 && <View style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '100%',
-            }}>
-              <View style={{
-                position: 'absolute',
-                bottom: 30,
-                backgroundColor: Color.white
-              }}>
-                <Text style={{
-                  marginBottom: 10
-                }}>This transaction is already completed.</Text>
-                <Button
-                  title={'Go to Dashboard'}
-                  onClick={() => this.navigateToScreen()}
-                  style={{
-                    width: '100%',
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    backgroundColor: theme ? theme.secondary : Color.secondary
-                  }}
-                />
-              </View>
-            </View>}
             <ImageModal
               visible={isImageModal}
               url={imageModalUrl}
