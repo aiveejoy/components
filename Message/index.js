@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, TouchableOpacity, Image, Alert} from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faSmile } from '@fortawesome/free-solid-svg-icons';
-import styles from './style.js';
 import { Color, BasicStyles, Helper } from 'common';
-import { Dimensions } from 'react-native';
+import { navigationRef } from 'modules/generic/SecurityAlert';
 import {connect} from 'react-redux';
 class Message extends Component{
   
@@ -13,7 +10,7 @@ class Message extends Component{
   }
 
   redirect = (route) => {
-    this.props.navigation.navigate(route);
+    navigationRef.current?._navigation.navigate(route)
   };
 
   validate = () => {
