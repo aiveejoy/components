@@ -836,11 +836,14 @@ class MessagesV3 extends Component {
 
             <View style={{
               position: 'absolute',
-              bottom: 0,
+              bottom: 20,
               left: 0,
               borderTopColor: Color.lightGray,
               borderTopWidth: 1,
-              backgroundColor: Color.white
+              backgroundColor: Color.white,
+              width: DeviceWidth,
+              justifyContent: 'center',
+              alignItems: 'center',
             }}>
               {
                 data?.status < 2 ? (
@@ -849,27 +852,22 @@ class MessagesV3 extends Component {
                   <View style={{
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: DeviceWidth,
+                    width: DeviceWidth / 1.5
                   }}>
-                    <View style={{
-                      position: 'absolute',
-                      bottom: 30,
-                      backgroundColor: Color.white
-                    }}>
-                      <Text style={{
-                        marginBottom: 10
-                      }}>This transaction is already completed.</Text>
-                      <Button
-                        title={'Go to Dashboard'}
-                        onClick={() => this.navigateToScreen()}
-                        style={{
-                          width: '100%',
-                          paddingLeft: 20,
-                          paddingRight: 20,
-                          backgroundColor: theme ? theme.secondary : Color.secondary
-                        }}
-                      />
-                    </View>
+                    <Text style={{
+                      marginBottom: 10,
+                      marginTop: 10
+                    }}>This transaction is already completed.</Text>
+                    <Button
+                      title={'Go to Dashboard'}
+                      onClick={() => this.navigateToScreen()}
+                      style={{
+                        width: '100%',
+                        paddingLeft: 20,
+                        paddingRight: 20,
+                        backgroundColor: theme ? theme.secondary : Color.secondary
+                      }}
+                    />
                   </View>
                 )
               }

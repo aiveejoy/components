@@ -40,13 +40,50 @@ class Options extends Component {
       url: null,
       supportEnabled: [],
       imageLoading: false,
-      deleteID: null
+      deleteID: null,
+      menu: Helper.MessengerMenu
     }
   }
 
   componentDidMount() {
     this.checkIfSupportEnabled();
     this.retrieveValidation();
+    if (this.props.data?.type == 3) {
+      console.log('cash in')
+      let menu = this.state.menu
+      menu.length > 0 && menu.map((item, index) => {
+        if(item.title?.toLowerCase() === 'requirements') {
+          menu.splice(index, 1);
+        }
+      })
+      this.setState({
+        current: {
+          title: 'Settings',
+          menu: menu
+        }
+      })
+    } else {
+      console.log('not cash in')
+      let menu = Helper.MessengerMenu;
+      if(Helper.MessengerMenu[0].title?.toLowerCase() !== 'requirements') {
+        menu = [
+          {
+            title: 'Requirements',
+            payload: 'same_page',
+            payload_value: 'requirements',
+            color: Color.black
+          },
+          ...Helper.MessengerMenu
+        ]
+      }
+      this.setState({
+        current: {
+          title: 'Settings',
+          menu: menu
+        }
+      })
+    }
+
   }
 
   onRegister = () => {
@@ -494,17 +531,21 @@ class Options extends Component {
         break
       case 'transferFundStack': {
         let status = false;
-        if (validations.length > 0) {
-          validations.map((item, index) => {
-            status = item.status === 'accepted' ? true : false
-          })
-          if (status) {
-            this.retrieveRequest('transferFundStack')
+        if (data.type !== 3) {
+          if (validations.length > 0) {
+            validations.map((item, index) => {
+              status = item.status === 'accepted' ? true : false
+            })
+            if (status) {
+              this.retrieveRequest('transferFundStack')
+            } else {
+              Alert.alert('Notice', `Enabled requirements aren't accepted yet.`)
+            }
           } else {
-            Alert.alert('Notice', `Enabled requirements aren't accepted yet.`)
+            Alert.alert('Notice', 'You have not enabled any requirement/s yet.')
           }
         } else {
-          Alert.alert('Notice', 'You have not enabled any requirement/s yet.')
+          this.retrieveRequest('transferFundStack')
         }
       }
         break
@@ -812,7 +853,7 @@ class Options extends Component {
       <ScrollView>
         <View style={Style.signatureFrameContainer}>
           {
-            this.state.pictures.length > 0 && this.state.pictures.map((ndx, el) => {
+            this.state.pictures.length > 0 ? this.state.pictures.map((ndx, el) => {
               if (ndx.payload === payload_value) {
                 return (
                   <TouchableOpacity style={{
@@ -839,7 +880,12 @@ class Options extends Component {
                   </TouchableOpacity>
                 )
               }
-            })
+            }) :
+              <View style={{
+                padding: 10
+              }}>
+                {!this.state.imageLoading && <Text>No requirements submitted yet.</Text>}
+              </View>
           }
           {this.state.imageLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
         </View>
@@ -935,17 +981,17 @@ class Options extends Component {
           borderTopColor: Color.lightGray
         }}>
           <ImageModal
-            deleteID={data?.account?.code != user.code && currentValidation?.status !== 'accepted'  ? deleteID : null}
+            deleteID={data?.account?.code != user.code && currentValidation?.status !== 'accepted' ? deleteID : null}
             visible={this.state.imageModal}
             url={Config.BACKEND_URL + this.state.url}
-            action={() => { 
+            action={() => {
               this.setState({ imageModal: false })
             }}
             route={Routes.uploadImageDelete}
-            successDel={() => {this.retrieveReceiverPhoto(currentValidation?.id)}}
+            successDel={() => { this.retrieveReceiverPhoto(currentValidation?.id) }}
           >
           </ImageModal>
-          <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible}/>
+          <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
           {this.state.isLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
           {!this.state.isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
