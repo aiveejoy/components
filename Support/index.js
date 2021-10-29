@@ -113,6 +113,7 @@ class Support extends Component {
   }
 
   findColor(array, value) {
+    console.log('[>>>>>>>>>>>>>>>>>>>>]', array)
     let type = array.find(array => array.type == value);
     let color = type?.color
     return color
@@ -125,7 +126,7 @@ class Support extends Component {
   render() {
     let div;
     const { theme } = this.props.state;
-    const types = [{ type: 'verification issue', color: Color.danger }, { type: 'account issue', color: Color.warning }, { type: 'transaction issue', color: Color.info }, { type: 'others', color: Color.secondary }]
+    const types = [{ type: 'verification issue', color: Color.danger }, { type: 'account issue', color: Color.warning }, { type: 'transaction issue', color: Color.info }, { type: 'update plan issue', color: Color.primary }, { type: 'others', color: Color.secondary }]
     return (
       <View style={Style.View}>
         {/* <View>
