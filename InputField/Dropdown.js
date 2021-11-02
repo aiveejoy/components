@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity} from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faSmile } from '@fortawesome/free-solid-svg-icons';
+import { View, Text} from 'react-native';
 import { Color, BasicStyles } from 'common';
 import { Dimensions } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
