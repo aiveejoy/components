@@ -32,10 +32,9 @@ class PostCard extends Component {
   renderHeader = (data) => {
     return (
       <View style={{
-        ...BasicStyles.standardWidth,
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 15
+        padding: 10
       }}>
         <UserImage user={data.user} size={30} />
         <View style={{
@@ -105,14 +104,11 @@ class PostCard extends Component {
         ...BasicStyles.standardWidth,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingLeft: 10,
-        paddingRight: 10,
         paddingBottom: 10,
       }}>
         <Text style={{
           fontSize: BasicStyles.standardFontSize
         }}>{data.message}</Text>
-
       </View>
     )
   }
@@ -167,12 +163,9 @@ class PostCard extends Component {
             color: data.joined_status == true ? Color.white : Color.black
           }}>{data.joined_status == true ? 'Joined' : 'Join'}</Text>
         </TouchableOpacity>
-
-        <Text>24 joined</Text>
       </View>
     )
   }
-
 
   renderComments = (comments) => {
     const { user } = this.props.state;
@@ -182,7 +175,7 @@ class PostCard extends Component {
         alignItems: 'center',
         borderTopColor: Color.lightGray,
         borderTopWidth: 1,
-        paddingLeft: 20
+        paddingLeft: 10
       }}>
         {
           comments && comments.map((item, index) => (
@@ -191,7 +184,7 @@ class PostCard extends Component {
               style={{
                 ...BasicStyles.standardWidth
               }}>
-              {this.renderHeader({ user: item.account, date: item.created_at_human })}
+              {this.renderHeader({ user: item.account, date: item.created_at })}
               {this.renderBody({ message: item.text })}
             </View>
           ))
@@ -239,12 +232,10 @@ class PostCard extends Component {
     )
   }
 
-
   render() {
     const { data } = this.props;
     return (
       <View style={{
-        ...BasicStyles.standardWidth,
         borderRadius: BasicStyles.standardBorderRadius,
         borderColor: Color.lightGray,
         borderWidth: 1,

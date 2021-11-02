@@ -1,24 +1,19 @@
 import React, { Component } from 'react';
-import Style from './Style.js';
-import { BottomSheet } from 'react-native-elements';
-import { View, Image, Text, TouchableOpacity, ScrollView, Dimensions, SafeAreaView, TextInput } from 'react-native';
-import { Routes, Color, Helper, BasicStyles } from 'common';
+import { View, TouchableOpacity, ScrollView, TextInput, Text } from 'react-native';
+import { Routes, Color, BasicStyles } from 'common';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons';
-import Footer from 'modules/generic/Footer'
+import { faImages, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import PostCard from './PostCard';
 import { Spinner } from 'components';
 import Api from 'services/api/index.js';
-import { constant } from 'lodash';
 import { connect } from 'react-redux';
+import CreatePost from 'src/components/Comments/Create';
 import _ from 'lodash';
-const height = Math.round(Dimensions.get('window').height);
 
 class Comments extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: [],
       isLoading: false,
       search: null,
       status: null,
@@ -33,6 +28,29 @@ class Comments extends Component {
     this.retrieve(false);
   }
 
+  retrieve = (flag) => {
+    const { setComments } = this.props;
+    let parameter = {
+      limit: this.state.limit,
+      offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
+      sort: {
+        created_at: "desc"
+      }
+    }
+    this.setState({ isLoading: true });
+    Api.request(Routes.commentsRetrieve, parameter, response => {
+      this.setState({ isLoading: false });
+      if (response.data.length > 0) {
+        this.setState({ offset: flag === false ? 1 : (this.state.offset + 1) })
+        setComments(flag === false ? response.data : _.uniqBy([...this.props.state.comments, ...response.data], 'id'));
+        console.log(this.props.state.comments);
+      } else {
+        this.setState({ offset: flag == false ? 0 : this.state.offset, })
+        setComments(flag == false ? [] : this.props.state.comments);
+      }
+    })
+  }
+
   searchHandler = (value) => {
     this.setState({ search: value })
   }
@@ -45,61 +63,27 @@ class Comments extends Component {
     this.setState({ reply: value })
   }
 
-  retrieve = (flag) => {
-    let parameter = {
-      condition: [
-        {
-          value: this.props.navigation.state?.params?.payload,
-          column: 'payload',
-          clause: '='
-        },
-        {
-          value: this.props.navigation.state?.params?.payload_value,
-          column: 'payload_value',
-          clause: '='
-        }
-      ],
-      sort: { created_at: 'desc' }
-    };
-    this.setState({ isLoading: true });
-    Api.request(Routes.commentsRetrieve, parameter, response => {
-      this.setState({ isLoading: false });
-      if (response.data.length > 0) {
-        this.setState({
-          data: flag === false ? response.data : _.uniqBy([...this.state.data, ...response.data], 'id'),
-          offset: flag === false ? 1 : (this.state.offset + 1)
-        })
-      } else {
-        this.setState({
-          data: flag == false ? [] : this.state.data,
-          offset: flag == false ? 0 : this.state.offset,
-        })
-      }
-    })
-  }
-
   onChangeDataHandler = (item) => {
-    const { data } = this.state;
-    if (data == null) {
+    const { comments } = this.props.state;
+    if (comments == null) {
       return
     }
-    let temp = data.map((iItem, iIndex) => {
+    let temp = comments.map((iItem, iIndex) => {
       if (iItem.id == item.id) {
         return item
       }
       return iItem
     })
-
-    this.setState({
-      data: temp
-    })
+    this.props.setComments(temp)
   }
 
   post = () => {
+    const { payload_value, payload } = this.props.navigation.state?.params;
+    const { user } = this.props.state;
     let parameter = {
-      account_id: this.props.state.user.id,
-      payload: this.props.navigation.state?.params?.payload,
-      payload_value: this.props.navigation.state?.params?.payload_value,
+      account_id: user.id,
+      payload: payload,
+      payload_value: payload_value,
       text: this.state.status
     }
     this.setState({ isLoading: true });
@@ -113,13 +97,14 @@ class Comments extends Component {
   }
 
   reply = (comment) => {
+    const { user } = this.props.state;
     let parameter = {
-      account_id: this.props.state.user.id,
+      account_id: user.id,
       comment_id: comment.id,
       text: this.state.reply
     }
     this.setState({ isLoading: true });
-    Api.request(Routes.replyCreate, parameter, response => {
+    Api.request(Routes.commentRepliesCreate, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.setState({ reply: null })
@@ -129,44 +114,13 @@ class Comments extends Component {
   }
 
   render() {
-    const { data, isLoading } = this.state;
+    const { isLoading, createStatus } = this.state;
+    const { comments, user } = this.props.state;
     return (
-      <SafeAreaView>
-        <View style={{
-          backgroundColor: 'white',
-          paddingTop: 10,
-          borderTopEndRadius: 20,
-          borderTopStartRadius: 20,
-          alignItems: 'center'
-        }}>
-          <View style={{ alignItems: 'center', flexDirection: 'row', padding: 10 }}>
-            <TextInput
-              style={{
-                width: '75%',
-                marginRight: 5,
-                paddingLeft: 20,
-                borderColor: Color.gray,
-                borderWidth: .5,
-                borderRadius: 50,
-              }}
-              multiline={true}
-              numberOfLines={2}
-              onChangeText={text => this.statusHandler(text)}
-              value={this.state.status}
-              placeholder="Type your comment here..."
-            />
-            <TouchableOpacity style={{
-              height: 35,
-              width: '10%',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-              onPress={() => { this.post() }}
-            >
-              <FontAwesomeIcon size={20} icon={faPaperPlane} />
-            </TouchableOpacity>
-          </View>
-        </View>
+      <View style={{
+        padding: 20
+      }}>
+        {isLoading ? <Spinner mode="overlay" /> : null}
         <ScrollView style={{
           backgroundColor: Color.containerBackground,
           height: '100%'
@@ -177,7 +131,6 @@ class Comments extends Component {
             let totalHeight = event.nativeEvent.contentSize.height
             if (event.nativeEvent.contentOffset.y <= 0) {
               if (isLoading == false) {
-                // this.retrieve(false)
               }
             }
             if (Math.round(scrollingHeight) >= Math.round(totalHeight)) {
@@ -188,32 +141,100 @@ class Comments extends Component {
           }}
         >
           <View style={{
-            flex: 1,
-            padding: 10
+            backgroundColor: 'white',
+            flexDirection: 'row',
+            padding: 10,
+            borderWidth: 1,
+            borderColor: Color.lightGray,
+            borderRadius: BasicStyles.standardBorderRadius,
+            marginBottom: 20
           }}>
             {
-              data.length > 0 && data.map((item, index) => (
-                <View>
-                  <PostCard
-                    data={{
-                      user: item.account,
-                      comments: item.comment_replies,
-                      message: item.text,
-                      date: item.created_at_human
-                    }}
-                    postReply={() => { this.reply(item) }}
-                    reply={(value) => this.replyHandler(value)}
-                    onLike={(params) => this.onChangeDataHandler(params)}
-                    onJoin={(params) => this.onChangeDataHandler(params)}
-                  />
-                </View>
-              ))
+              user?.profile?.url ? (
+                <Image
+                  source={user?.profile?.url ? { uri: Config.BACKEND_URL + user.profile?.url } : require('assets/logo.png')}
+                  style={[BasicStyles.profileImageSize, {
+                    height: 30,
+                    width: 30,
+                    borderRadius: 100
+                  }]} />
+              ) : <FontAwesomeIcon
+                icon={faUserCircle}
+                size={30}
+                style={{
+                  color: Color.darkGray
+                }}
+              />
             }
+            <TouchableOpacity
+              style={{
+                width: '70%',
+                paddingLeft: '5%',
+                justifyContent: 'center',
+              }}
+              onPress={()=>{
+                this.setState({createStatus: true})
+              }}
+            >
+              {/* <TextInput
+                style={{ height: 35 }}
+                onChangeText={text => this.statusHandler(text)}
+                value={this.state.status}
+                placeholder="Create post"
+              /> */}
+              <Text style={{
+                color: Color.darkGray
+              }}>Create Post</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{
+              height: 35,
+              width: '25%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderLeftWidth: 1,
+              borderLeftColor: Color.darkGray,
+            }}
+              onPress={() => { this.setState({createStatus: true}) }}
+            >
+              <FontAwesomeIcon
+                size={30}
+                icon={faImages}
+                style={{
+                  color: Color.darkGray
+                }}
+              />
+            </TouchableOpacity>
           </View>
+          {comments.length > 0 && comments.map((item, index) => {
+            return (
+              <PostCard
+                navigation={this.props.navigation}
+                loader={this.loader}
+                data={{
+                  user: item.account,
+                  comments: item.comment_replies,
+                  message: item.text,
+                  date: item.created_at_human,
+                  id: item.id,
+                  members: item.members,
+                  index: index
+                }}
+                images={item.images?.length > 0 ? item.images : []}
+                postReply={() => { this.reply(item) }}
+                reply={(value) => this.replyHandler(value)}
+                style={{
+                  backgroundColor: 'white',
+                }}
+              />
+            )
+          })}
         </ScrollView>
-        {isLoading ? <Spinner mode="overlay" /> : null}
-        <Footer layer={1} {...this.props} />
-      </SafeAreaView>
+        <CreatePost
+          visible={createStatus}
+          close={() => this.setState({ createStatus: false })}
+          title={'Create Post'}
+        />
+      </View>
     );
   }
 }
@@ -221,7 +242,9 @@ const mapStateToProps = state => ({ state: state });
 
 const mapDispatchToProps = (dispatch) => {
   const { actions } = require('@redux');
-  return {};
+  return {
+    setComments: (comments) => dispatch(actions.setComments(comments))
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Comments);
