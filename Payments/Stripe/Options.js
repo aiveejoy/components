@@ -5,8 +5,8 @@ import { View, Text, ScrollView, Dimensions, TouchableOpacity, Alert } from 'rea
 import { Color, BasicStyles, Routes } from 'common';
 import { connect } from 'react-redux';
 import styles from './Style';
-import {library} from '@fortawesome/fontawesome-svg-core';
-import {fab} from '@fortawesome/free-brands-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fab } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faAddressCard, faCreditCard, faWallet } from '@fortawesome/free-solid-svg-icons';
 import Api from 'services/api/index.js';
@@ -21,14 +21,16 @@ class Options extends Component {
 
   fromPaypal = () => {
     const { user } = this.props.state;
-    if(this.props.amount === null || this.props.amount === '' || this.props.amount <= 0) {
+    if (this.props.amount === null || this.props.amount === '' || this.props.amount <= 0) {
       Alert.alert(
         `Error`,
         `Invalid amount.`,
         [
-          { text: "OK", onPress: () => {
-            return
-          }}
+          {
+            text: "OK", onPress: () => {
+              return
+            }
+          }
         ]
       );
       return
@@ -44,16 +46,18 @@ class Options extends Component {
     }
     this.setState({ isLoading: true });
     Api.request(Routes.accountRetrieve, parameter, response => {
-      if(response.data?.length > 0) {
+      if (response.data?.length > 0) {
         this.paypalDirect();
       } else {
         Alert.alert(
           `Error`,
           `Cannot be processed. Invalid account.`,
           [
-            { text: "OK", onPress: () => {
-              return
-            }}
+            {
+              text: "OK", onPress: () => {
+                return
+              }
+            }
           ]
         );
       }
@@ -67,45 +71,31 @@ class Options extends Component {
 
   paypalDirect = () => {
     const { setPaypalUrl } = this.props;
-    Paypal.paypalPostRequest(response => {
-      if (response && response.access_token != null) {
-        Paypal.paypalCreateOrderRequest({
-          intent: 'CAPTURE',
-          purchase_units: [{
-            amount: {
-              currency_code: 'USD',
-              value: this.props.amount
-            }
-          }],
-          application_context: {
-            brand_name: 'Header for payment page',
-            locale: 'en-US',
-            landing_page: 'LOGIN', // can be NO_PREFERENCE, LOGIN, BILLING
-            shipping_preference: 'NO_SHIPPING', // because I didn't want shipping info on the page,
-            user_action: 'PAY_NOW',  // Button name, can be PAY_NOW or CONTINUE
-            return_url: 'https://app.gladtithings.com',
-            cancel_url: 'https://example.com/paypalpay/order/cancelled'
+    let parameter = {
+      amount: this.props.amount,
+      currency: 'USD',
+      reference_id: 1
+    }
+    this.setState({ isLoading: true });
+    console.log(Routes.paypalCreateOrder, parameter)
+    Api.request(Routes.paypalCreateOrder, parameter, orderResponse => {
+      if (orderResponse && (orderResponse.links || (orderResponse.links && orderResponse.links.length > 0))) {
+        orderResponse.links.map((item) => {
+          if (item.rel == 'approve') {
+            setPaypalUrl(item.href)
           }
-        }, response.access_token, orderResponse => {
-          console.log(orderResponse);
-          if (orderResponse && (orderResponse.links || (orderResponse.links && orderResponse.links.length > 0))) {
-            orderResponse.links.map((item) => {
-              if (item.rel == 'approve') {
-                setPaypalUrl(item.href)
-              }
-            })
-          }
-        }, errorOrderResponse => {
-          console.log('error', errorOrderResponse.message)
         })
       }
-    }, error => {
-      console.log(error)
-    })
+    },
+      (error) => {
+        console.log('API ERROR', error);
+        this.setState({ isLoading: false });
+      },
+    );
   }
 
   render() {
-    const { theme, user } = this.props.state;
+    const { theme } = this.props.state;
     return (
       <View>
         <ScrollView>
