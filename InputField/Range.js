@@ -8,8 +8,8 @@ class Range extends Component{
     super(props);
     this.state={
       filter: false,
-      value: 100,
-      valueHigh: 9000
+      value: 1,
+      valueHigh: 10000
     }
   }
 

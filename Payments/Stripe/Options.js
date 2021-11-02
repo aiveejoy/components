@@ -83,7 +83,7 @@ class Options extends Component {
             landing_page: 'LOGIN', // can be NO_PREFERENCE, LOGIN, BILLING
             shipping_preference: 'NO_SHIPPING', // because I didn't want shipping info on the page,
             user_action: 'PAY_NOW',  // Button name, can be PAY_NOW or CONTINUE
-            return_url: 'https://www.github.com',
+            return_url: 'https://app.gladtithings.com',
             cancel_url: 'https://example.com/paypalpay/order/cancelled'
           }
         }, response.access_token, orderResponse => {

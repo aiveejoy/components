@@ -47,6 +47,11 @@ class CreateTicket extends Component {
         },
         {
           id: 4,
+          type: 'UPDATE PLAN ISSUE',
+          description: 'Having trouble or encountered issues in updating your plan? Create a ticket to raise an issue and communicate with PayHiram Support for it to be addressed.'
+        },
+        {
+          id: 5,
           type: 'OTHERS',
           description: 'Got other issues that are not mentioned above? Create a ticket to raise the issue and communicate with PayHiram Support for it to be addressed.'
         }
