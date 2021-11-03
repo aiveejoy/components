@@ -8,6 +8,7 @@ import { Spinner } from 'components';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import CreatePost from 'src/components/Comments/Create';
+import Skeleton from 'components/Loading/Skeleton';
 import _ from 'lodash';
 
 class Comments extends Component {
@@ -205,6 +206,11 @@ class Comments extends Component {
               />
             </TouchableOpacity>
           </View>
+          {
+              (isLoading) && (
+                <Skeleton size={2} template={'block'} height={130}/>
+              )
+            }
           {comments.length > 0 && comments.map((item, index) => {
             return (
               <PostCard
