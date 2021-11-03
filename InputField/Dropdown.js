@@ -40,7 +40,7 @@ class Dropdown extends Component{
   }
 
   render () {
-    const { label, data, placeholder } = this.props;
+    const { label, data, placeholder, style } = this.props;
     const { iosData } = this.state;
     return (
         <View style={{
@@ -52,7 +52,7 @@ class Dropdown extends Component{
             Platform.OS == 'android' && (
               <Picker selectedValue={this.state.input}
                 onValueChange={(input) => this.onChange(input)}
-                style={BasicStyles.pickerStyleCreate}
+                style={style == null ? BasicStyles.pickerStyleCreate : style}
                 >
                   {
                     data.map((item, index) => {
@@ -72,7 +72,7 @@ class Dropdown extends Component{
               <RNPickerSelect
                 onValueChange={(input) => this.onChange(input)}
                 items={iosData}
-                style={BasicStyles.pickerStyleIOSNoMargin}
+                style={style == null ? BasicStyles.pickerStyleIOSNoMargin : style}
                 placeholder={{
                   label: placeholder ? placeholder : 'Click to select',
                   value: null,
