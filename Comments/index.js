@@ -118,9 +118,7 @@ class Comments extends Component {
     const { isLoading, createStatus } = this.state;
     const { comments, user } = this.props.state;
     return (
-      <View style={{
-        padding: 20
-      }}>
+      <View>
         {isLoading ? <Spinner mode="overlay" /> : null}
         <ScrollView style={{
           backgroundColor: Color.containerBackground,
@@ -142,98 +140,103 @@ class Comments extends Component {
           }}
         >
           <View style={{
-            backgroundColor: 'white',
-            flexDirection: 'row',
-            padding: 10,
-            borderWidth: 1,
-            borderColor: Color.lightGray,
-            borderRadius: BasicStyles.standardBorderRadius,
-            marginBottom: 20
+            padding: 20
           }}>
-            {
-              user?.profile?.url ? (
-                <Image
-                  source={user?.profile?.url ? { uri: Config.BACKEND_URL + user.profile?.url } : require('assets/logo.png')}
-                  style={[BasicStyles.profileImageSize, {
-                    height: 30,
-                    width: 30,
-                    borderRadius: 100
-                  }]} />
-              ) : <FontAwesomeIcon
-                icon={faUserCircle}
-                size={30}
+            <View style={{
+              backgroundColor: 'white',
+              flexDirection: 'row',
+              padding: 10,
+              borderWidth: 1,
+              borderColor: Color.lightGray,
+              borderRadius: BasicStyles.standardBorderRadius,
+              marginBottom: 20
+            }}>
+              {
+                user?.profile?.url ? (
+                  <Image
+                    source={user?.profile?.url ? { uri: Config.BACKEND_URL + user.profile?.url } : require('assets/logo.png')}
+                    style={[BasicStyles.profileImageSize, {
+                      height: 30,
+                      width: 30,
+                      borderRadius: 100
+                    }]} />
+                ) : <FontAwesomeIcon
+                  icon={faUserCircle}
+                  size={30}
+                  style={{
+                    color: Color.darkGray
+                  }}
+                />
+              }
+              <TouchableOpacity
                 style={{
-                  color: Color.darkGray
+                  width: '70%',
+                  paddingLeft: '5%',
+                  justifyContent: 'center',
                 }}
-              />
-            }
-            <TouchableOpacity
-              style={{
-                width: '70%',
-                paddingLeft: '5%',
-                justifyContent: 'center',
-              }}
-              onPress={()=>{
-                this.setState({createStatus: true})
-              }}
-            >
-              {/* <TextInput
+                onPress={() => {
+                  this.setState({ createStatus: true })
+                }}
+              >
+                {/* <TextInput
                 style={{ height: 35 }}
                 onChangeText={text => this.statusHandler(text)}
                 value={this.state.status}
                 placeholder="Create post"
               /> */}
-              <Text style={{
-                color: Color.darkGray
-              }}>Create Post</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{
-              height: 35,
-              width: '25%',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderLeftWidth: 1,
-              borderLeftColor: Color.darkGray,
-            }}
-              onPress={() => { this.setState({createStatus: true}) }}
-            >
-              <FontAwesomeIcon
-                size={30}
-                icon={faImages}
-                style={{
+                <Text style={{
                   color: Color.darkGray
-                }}
-              />
-            </TouchableOpacity>
+                }}>Create Post</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{
+                height: 35,
+                width: '25%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderLeftWidth: 1,
+                borderLeftColor: Color.darkGray,
+              }}
+                onPress={() => { this.setState({ createStatus: true }) }}
+              >
+                <FontAwesomeIcon
+                  size={30}
+                  icon={faImages}
+                  style={{
+                    color: Color.darkGray
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {comments.length > 0 && comments.map((item, index) => {
+              return (
+                <PostCard
+                  navigation={this.props.navigation}
+                  loader={this.loader}
+                  data={{
+                    user: item.account,
+                    comments: item.comment_replies,
+                    message: item.text,
+                    date: item.created_at_human,
+                    id: item.id,
+                    members: item.members,
+                    index: index
+                  }}
+                  images={item.images?.length > 0 ? item.images : []}
+                  postReply={() => { this.reply(item) }}
+                  reply={(value) => this.replyHandler(value)}
+                  style={{
+                    backgroundColor: 'white',
+                  }}
+                />
+              )
+            })}
           </View>
           {
-              (isLoading) && (
-                <Skeleton size={2} template={'block'} height={130}/>
-              )
-            }
-          {comments.length > 0 && comments.map((item, index) => {
-            return (
-              <PostCard
-                navigation={this.props.navigation}
-                loader={this.loader}
-                data={{
-                  user: item.account,
-                  comments: item.comment_replies,
-                  message: item.text,
-                  date: item.created_at_human,
-                  id: item.id,
-                  members: item.members,
-                  index: index
-                }}
-                images={item.images?.length > 0 ? item.images : []}
-                postReply={() => { this.reply(item) }}
-                reply={(value) => this.replyHandler(value)}
-                style={{
-                  backgroundColor: 'white',
-                }}
-              />
+            (isLoading) && (
+              <Skeleton size={2} template={'block'} height={130} />
             )
-          })}
+          }
         </ScrollView>
         <CreatePost
           visible={createStatus}

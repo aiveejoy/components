@@ -24,7 +24,7 @@ export default {
     elevation: BasicStyles.elevation,
     borderWidth: .3,
     borderColor: Color.gray,
-    height: height / 2.5
+    height: height / 2
   },
   container: {
     borderTopEndRadius: 20,
