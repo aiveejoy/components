@@ -21,7 +21,8 @@ class Comments extends Component {
       reply: null,
       offset: 0,
       limit: 5,
-      createStatus: false
+      createStatus: false,
+      smallLoading: false
     }
   }
 
@@ -105,18 +106,19 @@ class Comments extends Component {
       comment_id: comment.id,
       text: this.state.reply
     }
-    this.setState({ isLoading: true });
+    this.setState({ smallLoading: true });
     Api.request(Routes.commentRepliesCreate, parameter, response => {
-      this.setState({ isLoading: false });
-      if (response.data !== null) {
-        this.setState({ reply: null })
+      this.setState({ smallLoading: false });
+      console.log(response, '------------')
+      if (response.data) {
         this.retrieve(false);
+        this.setState({ reply: null })
       }
     })
   }
 
   render() {
-    const { isLoading, createStatus } = this.state;
+    const { isLoading, createStatus, smallLoading } = this.state;
     const { comments, user } = this.props.state;
     return (
       <View>
@@ -148,8 +150,7 @@ class Comments extends Component {
               padding: 10,
               borderWidth: 1,
               borderColor: Color.lightGray,
-              borderRadius: BasicStyles.standardBorderRadius,
-              marginBottom: 20
+              borderRadius: BasicStyles.standardBorderRadius
             }}>
               {
                 user?.profile?.url ? (
@@ -207,7 +208,16 @@ class Comments extends Component {
                 />
               </TouchableOpacity>
             </View>
-
+          </View>
+          {
+            (smallLoading) && (
+              <Skeleton size={1} template={'block'} height={10} />
+            )
+          }
+          <View style={{
+            paddingLeft: 20,
+            paddingRight: 20
+          }}>
             {comments.length > 0 && comments.map((item, index) => {
               return (
                 <PostCard
