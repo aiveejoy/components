@@ -30,7 +30,7 @@ class Comments extends Component {
   }
 
   retrieve = (flag) => {
-    const { setComments } = this.props;
+    const { setComments, withImages } = this.props;
     let parameter = {
       limit: this.state.limit,
       offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
@@ -39,7 +39,8 @@ class Comments extends Component {
       }
     }
     this.setState({ isLoading: true });
-    Api.request(Routes.commentsRetrieve, parameter, response => {
+    console.log(withImages ? Routes.commentsRetrieveWithImages : Routes.commentsRetrieve, parameter)
+    Api.request(withImages ? Routes.commentsRetrieveWithImages : Routes.commentsRetrieve, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data.length > 0) {
         this.setState({ offset: flag === false ? 1 : (this.state.offset + 1) })
@@ -121,8 +122,7 @@ class Comments extends Component {
       <View>
         {isLoading ? <Spinner mode="overlay" /> : null}
         <ScrollView style={{
-          backgroundColor: Color.containerBackground,
-          height: '100%'
+          backgroundColor: Color.containerBackground
         }}
           showsVerticalScrollIndicator={false}
           onScroll={(event) => {
@@ -222,7 +222,7 @@ class Comments extends Component {
                     members: item.members,
                     index: index
                   }}
-                  images={item.images?.length > 0 ? item.images : []}
+                  images={item.images}
                   postReply={() => { this.reply(item) }}
                   reply={(value) => this.replyHandler(value)}
                   style={{

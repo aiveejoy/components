@@ -6,6 +6,7 @@ import { BasicStyles, Color } from 'common';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import UserImage from 'components/User/Image';
+import CommentImages from './Images';
 
 const height = Math.round(Dimensions.get('window').height);
 const options = [
@@ -233,7 +234,7 @@ class PostCard extends Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, images } = this.props;
     return (
       <View style={{
         borderRadius: BasicStyles.standardBorderRadius,
@@ -244,6 +245,7 @@ class PostCard extends Component {
       }}>
         {this.renderHeader(data)}
         {this.renderBody(data)}
+        <CommentImages images={images}/>
         {/* {this.renderActions(data)} */}
         {this.renderComments(data.comments)}
       </View>
