@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Image, Dimensions, Text, TextInput } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faTimes, faStar, faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faEyeSlash, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faTimes, faStar, faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faEyeSlash, faTrashAlt, faPrayingHands, faCommentAlt, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { BasicStyles, Color } from 'common';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
@@ -115,55 +115,84 @@ class PostCard extends Component {
   }
 
   renderActions = (data) => {
+    const { theme } = this.props.state
     return (
       <View style={{
         ...BasicStyles.standardWidth,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingBottom: 20,
+        paddingBottom: 10,
+        paddingTop: 10,
         flexDirection: 'row'
       }}>
         <TouchableOpacity style={{
-          width: 70,
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: 20,
-          borderColor: data.like_status == true ? Color.primary : Color.lightGray,
-          borderWidth: 1,
-          height: 40,
-          marginRight: 5,
-          backgroundColor: data.like_status == true ? Color.primary : Color.white
+          marginRight: 20,
+          flexDirection: 'row'
         }}
-          onPress={() => this.props.onLike({
-            ...data,
-            like_status: !data.like_status
-          })}
+          onPress={() => {
+            // this.props.onLike(data)
+          }}
         >
+          <FontAwesomeIcon
+            icon={faPrayingHands}
+            size={15}
+            style={{
+            }}
+          />
           <Text style={{
-            color: data.like_status == true ? Color.white : Color.black
-          }}>{data.like_status == true ? 'Liked' : 'Like'}</Text>
+            marginLeft: 5,
+            fontSize: 13,
+          }}>Amen</Text>
         </TouchableOpacity>
 
 
         <TouchableOpacity style={{
-          width: 70,
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: 20,
-          borderColor: data.joined_status == true ? Color.primary : Color.lightGray,
-          borderWidth: 1,
-          height: 40,
-          marginRight: 5,
-          backgroundColor: data.joined_status == true ? Color.primary : Color.white
+          marginRight: 20,
+          flexDirection: 'row'
         }}
-          onPress={() => this.props.onJoin({
-            ...data,
-            joined_status: !data.joined_status
-          })}>
+          onPress={() => {
+            // this.props.onLike(data)
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faHeart}
+            size={15}
+            style={{
+            color: Color.black
+            }}
+          />
           <Text style={{
-            color: data.joined_status == true ? Color.white : Color.black
-          }}>{data.joined_status == true ? 'Joined' : 'Join'}</Text>
+            marginLeft: 5,
+            fontSize: 13
+          }}>Love</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginRight: 20,
+          flexDirection: 'row'
+        }}
+          onPress={() => {
+            // this.props.onLike(data)
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faShare}
+            size={15}
+            style={{
+            }}
+          />
+          <Text style={{
+            marginLeft: 5,
+            fontSize: 13,
+          }}>Share</Text>
+        </TouchableOpacity>
+
       </View>
     )
   }
@@ -246,7 +275,7 @@ class PostCard extends Component {
         {this.renderHeader(data)}
         {this.renderBody(data)}
         <CommentImages images={images}/>
-        {/* {this.renderActions(data)} */}
+        {this.renderActions(data)}
         {this.renderComments(data.comments)}
       </View>
     )

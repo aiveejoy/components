@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, Image, Alert } from 'react-native';
 import { Routes, Color, BasicStyles } from 'common';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
@@ -11,6 +11,7 @@ import { faImages } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import ImagePicker from 'react-native-image-crop-picker';
 import Config from 'src/config';
+import ImageModal from 'components/Modal/ImageModal.js';
 
 class Create extends Component {
   constructor(props) {
@@ -19,7 +20,9 @@ class Create extends Component {
       status: null,
       loading: false,
       errorMessage: null,
-      list: []
+      list: [],
+      imageModalUrl: null,
+      isImageModal: false
     }
   }
 
@@ -82,6 +85,7 @@ class Create extends Component {
     }).then(images => {
       let list = this.state.list
       images?.length > 0 && images.map((item, index) => {
+        console.log(item.size, '------size-----')
         list.push(item)
       })
       this.setState({ list: list });
@@ -120,9 +124,16 @@ class Create extends Component {
     })
   }
 
+  setImage = (url) => {
+    this.setState({ imageModalUrl: url })
+    setTimeout(() => {
+      this.setState({ isImageModal: true })
+    }, 500)
+  }
+
   render() {
     const { theme } = this.props.state;
-    const { loading, errorMessage, list } = this.state;
+    const { loading, errorMessage, list, isImageModal, imageModalUrl } = this.state;
     return (
       <View style={Style.centeredView}>
         <Modal
@@ -177,13 +188,39 @@ class Create extends Component {
                   }}>
                     {list.length > 0 && list.map((item, index) => {
                       return (
-                        <Image
-                          source={{ uri: item.path }}
-                          style={{
-                            width: '25%',
-                            height: 50
-                          }}
-                        />
+                        <TouchableOpacity
+                        onPress={() => {
+                          this.setImage(item.path)
+                        }}
+                        onLongPress={() => {
+                          Alert.alert(
+                            'Remove Photo',
+                            `Click 'Remove' to remove photo.`,
+                            [
+                              { text: 'Close', onPress: () => { return }, style: 'cancel' },
+                              {
+                                text: 'Remove', onPress: () => {
+                                  let images = list;
+                                  images.splice(index, 1);
+                                  this.setState({list: images});
+                                }
+                              },
+                            ],
+                            { cancelable: false }
+                          )
+                        }}
+                        style={{
+                          width: '25%',
+                          height: 50
+                        }}>
+                          <Image
+                            source={{ uri: item.path }}
+                            style={{
+                              width: '100%',
+                              height: '100%'
+                            }}
+                          />
+                        </TouchableOpacity>
                       )
                     })}
                   </View>
@@ -204,7 +241,13 @@ class Create extends Component {
                       backgroundColor: Color.secondary,
                       marginRight: 5,
                     }]}
-                      onPress={() => { this.props.close(), this.setState({ status: null }) }}
+                      onPress={() => {
+                        this.props.close();
+                        this.setState({
+                          status: null,
+                          list: []
+                        });
+                      }}
                     >
                       <Text style={{ color: 'white' }}>Cancel</Text>
                     </TouchableOpacity>
@@ -214,6 +257,11 @@ class Create extends Component {
             </View>
           </View>
         </Modal>
+        <ImageModal
+          visible={isImageModal}
+          url={imageModalUrl}
+          action={() => this.setState({ isImageModal: false })}
+        ></ImageModal>
       </View>
     );
   }
