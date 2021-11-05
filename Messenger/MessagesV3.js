@@ -288,7 +288,7 @@ class MessagesV3 extends Component {
         },
         username: user.username
       },
-      created_at_human: moment(new Date()).format('MMMM DD, YYYY'),
+      created_at_human: moment(new Date()).fromNow(),
       sending_flag: true,
       error: null
     }
@@ -855,6 +855,13 @@ class MessagesV3 extends Component {
                     alignItems: 'center',
                     width: DeviceWidth / 1.5
                   }}>
+                    {/* <Text style={{
+                      marginBottom: 10,
+                      marginTop: 10,
+                      fontWeight: 'bold',
+                      fontSize: 20,
+                      textAlign: 'center'
+                    }}>Click here to rate your experience with this partner.</Text> */}
                     <Text style={{
                       marginBottom: 10,
                       marginTop: 10
