@@ -435,6 +435,7 @@ class Options extends Component {
       payload: currentValidation?.payload,
       account_id: user.id,
       request_id: data?.id,
+      to: user.id,
       messages: {
         messenger_group_id: messengerGroup.id,
         account_id: user.id
