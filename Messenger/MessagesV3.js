@@ -691,6 +691,7 @@ class MessagesV3 extends Component {
           onChangeText={(newMessage) => this.setState({ newMessage })}
           value={this.state.newMessage}
           placeholder={'Type your message here ...'}
+          multiline={true}
           placeholderTextColor={Color.darkGray}
         />
         <TouchableOpacity

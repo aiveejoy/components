@@ -11,7 +11,9 @@ class ButtonWithIcon extends Component {
           height: 'auto',
           ...this.props.style,
           paddingTop: 20,
-          paddingBottom: 20
+          paddingBottom: 20,
+          paddingLeft: 5,
+          paddingRight: 5,
         }}
         onPress={() => {
           this.props.onClick();
@@ -21,7 +23,7 @@ class ButtonWithIcon extends Component {
           color: Color.white,
           textAlign: 'center',
           ...this.props.textStyle,
-          paddingTop: 10
+          paddingTop: 10,
         }}>{this.props.title}</Text>
         {
           this.props.description && (

@@ -21,7 +21,8 @@ class Comments extends Component {
       reply: null,
       offset: 0,
       limit: 5,
-      createStatus: false
+      createStatus: false,
+      smallLoading: false
     }
   }
 
@@ -30,7 +31,7 @@ class Comments extends Component {
   }
 
   retrieve = (flag) => {
-    const { setComments } = this.props;
+    const { setComments, withImages } = this.props;
     let parameter = {
       limit: this.state.limit,
       offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
@@ -39,7 +40,8 @@ class Comments extends Component {
       }
     }
     this.setState({ isLoading: true });
-    Api.request(Routes.commentsRetrieve, parameter, response => {
+    console.log(withImages ? Routes.commentsRetrieveWithImages : Routes.commentsRetrieve, parameter)
+    Api.request(withImages ? Routes.commentsRetrieveWithImages : Routes.commentsRetrieve, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data.length > 0) {
         this.setState({ offset: flag === false ? 1 : (this.state.offset + 1) })
@@ -104,25 +106,25 @@ class Comments extends Component {
       comment_id: comment.id,
       text: this.state.reply
     }
-    this.setState({ isLoading: true });
+    this.setState({ smallLoading: true });
     Api.request(Routes.commentRepliesCreate, parameter, response => {
-      this.setState({ isLoading: false });
-      if (response.data !== null) {
-        this.setState({ reply: null })
+      this.setState({ smallLoading: false });
+      console.log(response, '------------')
+      if (response.data) {
         this.retrieve(false);
+        this.setState({ reply: null })
       }
     })
   }
 
   render() {
-    const { isLoading, createStatus } = this.state;
+    const { isLoading, createStatus, smallLoading } = this.state;
     const { comments, user } = this.props.state;
     return (
       <View>
         {isLoading ? <Spinner mode="overlay" /> : null}
         <ScrollView style={{
-          backgroundColor: Color.containerBackground,
-          height: '100%'
+          backgroundColor: Color.containerBackground
         }}
           showsVerticalScrollIndicator={false}
           onScroll={(event) => {
@@ -148,8 +150,7 @@ class Comments extends Component {
               padding: 10,
               borderWidth: 1,
               borderColor: Color.lightGray,
-              borderRadius: BasicStyles.standardBorderRadius,
-              marginBottom: 20
+              borderRadius: BasicStyles.standardBorderRadius
             }}>
               {
                 user?.profile?.url ? (
@@ -207,7 +208,16 @@ class Comments extends Component {
                 />
               </TouchableOpacity>
             </View>
-
+          </View>
+          {
+            (smallLoading) && (
+              <Skeleton size={1} template={'block'} height={10} />
+            )
+          }
+          <View style={{
+            paddingLeft: 20,
+            paddingRight: 20
+          }}>
             {comments.length > 0 && comments.map((item, index) => {
               return (
                 <PostCard
@@ -222,7 +232,7 @@ class Comments extends Component {
                     members: item.members,
                     index: index
                   }}
-                  images={item.images?.length > 0 ? item.images : []}
+                  images={item.images}
                   postReply={() => { this.reply(item) }}
                   reply={(value) => this.replyHandler(value)}
                   style={{

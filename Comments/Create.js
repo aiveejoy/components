@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, Image, Alert } from 'react-native';
 import { Routes, Color, BasicStyles } from 'common';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
@@ -9,8 +9,9 @@ import { Spinner } from 'components';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImages } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
-import ImagePicker from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import Config from 'src/config';
+import ImageModal from 'components/Modal/ImageModal.js';
 
 class Create extends Component {
   constructor(props) {
@@ -19,7 +20,9 @@ class Create extends Component {
       status: null,
       loading: false,
       errorMessage: null,
-      list: []
+      list: [],
+      imageModalUrl: null,
+      isImageModal: false
     }
   }
 
@@ -76,28 +79,17 @@ class Create extends Component {
   }
 
   handleChoosePhoto = () => {
-    const { user } = this.props.state;
-    const options = {
-      noData: true,
-      error: null
-    }
-    ImagePicker.launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-        this.setState({ photo: null })
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-        this.setState({ photo: null })
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-        this.setState({ photo: null })
-      } else {
-        this.setState({ photo: response })
-        let list = this.state.list
-        list.push(response)
-        this.setState({ list: list })
-      }
-    })
+    ImagePicker.openPicker({
+      multiple: true,
+      includeBase64: true
+    }).then(images => {
+      let list = this.state.list
+      images?.length > 0 && images.map((item, index) => {
+        console.log(item.size, '------size-----')
+        list.push(item)
+      })
+      this.setState({ list: list });
+    });
   }
 
   addPhotos = (id) => {
@@ -105,21 +97,17 @@ class Create extends Component {
     const { user } = this.props.state;
     list.length > 0 && list.map((item, index) => {
       let formData = new FormData();
-      let uri = Platform.OS == "android" ? item.uri : item.uri.replace("file://", "/private");
-      formData.append("file", {
-        name: item.fileName,
-        type: item.type,
-        uri: uri
-      });
-      formData.append('file_url', item.fileName);
+      let name = item.path.split('/')
+      formData.append('file_url', name[name.length - 1]);
       formData.append('account_id', user.id);
-      Api.upload(Routes.imageUploadBase64, formData, resp => {
-        this.setState({ loading: false })
+      formData.append('file_base64', item.data);
+      console.log('uploading', name[name.length - 1], user.id)
+      Api.uploadByFetch(Routes.imageUploadBase64, formData, imageResponse => {
         let parameter = {
           account_id: user.id,
           payload: 'comment_id',
           payload_value: id,
-          category: 'post_image'
+          category: imageResponse.data
         }
         this.setState({ loading: true })
         Api.request(Routes.uploadImage, parameter, res => {
@@ -136,9 +124,16 @@ class Create extends Component {
     })
   }
 
+  setImage = (url) => {
+    this.setState({ imageModalUrl: url })
+    setTimeout(() => {
+      this.setState({ isImageModal: true })
+    }, 500)
+  }
+
   render() {
     const { theme } = this.props.state;
-    const { loading, errorMessage, list } = this.state;
+    const { loading, errorMessage, list, isImageModal, imageModalUrl } = this.state;
     return (
       <View style={Style.centeredView}>
         <Modal
@@ -148,7 +143,7 @@ class Create extends Component {
         >
           <View style={Style.centeredView}>
             <View style={Style.modalView}>
-              <ScrollView>
+              <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={Style.container}>
                   <Text style={{
                     fontFamily: 'Poppins-SemiBold',
@@ -172,9 +167,9 @@ class Create extends Component {
                     padding: 20,
                     alignItems: 'center'
                   }}
-                  onPress={() => {
-                    this.handleChoosePhoto();
-                  }}
+                    onPress={() => {
+                      this.handleChoosePhoto();
+                    }}
                   >
                     <FontAwesomeIcon
                       size={30}
@@ -187,17 +182,46 @@ class Create extends Component {
                     <Text style={{ color: Color.darkGray }}>Add Photos</Text>
                   </TouchableOpacity>
                   <View style={{
+                    flexDirection: 'row',
                     flexWrap: 'wrap',
                     width: '100%'
                   }}>
                     {list.length > 0 && list.map((item, index) => {
-                      <Image
-                        source={{ uri: Config.BACKEND_URL + item.data }}
+                      return (
+                        <TouchableOpacity
+                        onPress={() => {
+                          this.setImage(item.path)
+                        }}
+                        onLongPress={() => {
+                          Alert.alert(
+                            'Remove Photo',
+                            `Click 'Remove' to remove photo.`,
+                            [
+                              { text: 'Close', onPress: () => { return }, style: 'cancel' },
+                              {
+                                text: 'Remove', onPress: () => {
+                                  let images = list;
+                                  images.splice(index, 1);
+                                  this.setState({list: images});
+                                }
+                              },
+                            ],
+                            { cancelable: false }
+                          )
+                        }}
                         style={{
                           width: '25%',
                           height: 50
-                        }}
-                      />
+                        }}>
+                          <Image
+                            source={{ uri: item.path }}
+                            style={{
+                              width: '100%',
+                              height: '100%'
+                            }}
+                          />
+                        </TouchableOpacity>
+                      )
                     })}
                   </View>
                   <View style={{
@@ -217,7 +241,13 @@ class Create extends Component {
                       backgroundColor: Color.secondary,
                       marginRight: 5,
                     }]}
-                      onPress={() => { this.props.close(), this.setState({ status: null }) }}
+                      onPress={() => {
+                        this.props.close();
+                        this.setState({
+                          status: null,
+                          list: []
+                        });
+                      }}
                     >
                       <Text style={{ color: 'white' }}>Cancel</Text>
                     </TouchableOpacity>
@@ -227,6 +257,11 @@ class Create extends Component {
             </View>
           </View>
         </Modal>
+        <ImageModal
+          visible={isImageModal}
+          url={imageModalUrl}
+          action={() => this.setState({ isImageModal: false })}
+        ></ImageModal>
       </View>
     );
   }
