@@ -53,7 +53,7 @@ class Dropdown extends Component{
               <Picker selectedValue={this.state.input}
                 onValueChange={(input) => this.onChange(input)}
                 style={style == null ? BasicStyles.pickerStyleCreate : style}
-                >
+                placeholder={placeholder ? placeholder : 'Click to select'}>
                   {
                     data.map((item, index) => {
                       return (

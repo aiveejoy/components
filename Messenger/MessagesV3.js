@@ -71,7 +71,7 @@ class MessagesV3 extends Component {
   retrieveRequest() {
     const { user } = this.props.state;
     const { data } = this.props.navigation.state.params;
-    const { setMessageTitle } = this.props;
+    const { setMessageTitle, setRequestMessage } = this.props;
     let parameter = {
       condition: [{
         value: data.title,
@@ -89,6 +89,7 @@ class MessagesV3 extends Component {
         this.setState({
           data: response.data[0]
         });
+        setRequestMessage(response.data[0])
         setMessageTitle({
           amount: response.data[0].amount,
           currency: response.data[0].currency
@@ -763,7 +764,8 @@ class MessagesV3 extends Component {
       members,
       data
     } = this.state;
-    const { messengerGroup, user, viewField, theme } = this.props.state;
+    const { requestMessage, theme } = this.props.state;
+    
     console.log('[MESSEGER GROUP]', data, '----------------');
     return (
       <SafeAreaView>
@@ -847,7 +849,7 @@ class MessagesV3 extends Component {
               alignItems: 'center',
             }}>
               {
-                data?.status < 2 ? (
+                requestMessage?.status < 2 ? (
                   this._footer()
                 ) : (
                   <View style={{
@@ -909,7 +911,8 @@ const mapDispatchToProps = dispatch => {
     updateMessageByCode: (message) => dispatch(actions.updateMessageByCode(message)),
     setUnReadMessages: (messages) => dispatch(actions.setUnReadMessages(messages)),
     updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
-    setMessageTitle: (messageTitle) => dispatch(actions.setMessageTitle(messageTitle))
+    setMessageTitle: (messageTitle) => dispatch(actions.setMessageTitle(messageTitle)),
+    setRequestMessage: (requestMessage) => dispatch(actions.setRequestMessage(requestMessage))
   };
 };
 
