@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, ScrollView, TextInput, Text } from 'react-native';
+import { View, TouchableOpacity, ScrollView, Text } from 'react-native';
 import { Routes, Color, BasicStyles } from 'common';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImages, faUserCircle } from '@fortawesome/free-solid-svg-icons';
@@ -112,7 +112,6 @@ class Comments extends Component {
     this.setState({ smallLoading: true });
     Api.request(Routes.commentRepliesCreate, parameter, response => {
       this.setState({ smallLoading: false });
-      console.log(response, '------------')
       if (response.data) {
         this.retrieve(false);
         this.setState({ reply: null })
@@ -182,12 +181,6 @@ class Comments extends Component {
                   this.setState({ createStatus: true })
                 }}
               >
-                {/* <TextInput
-                style={{ height: 35 }}
-                onChangeText={text => this.statusHandler(text)}
-                value={this.state.status}
-                placeholder="Create post"
-              /> */}
                 <Text style={{
                   color: Color.darkGray
                 }}>Create Post</Text>
