@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Image, Dimensions, Text, TextInput } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faTimes, faStar, faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faEyeSlash, faTrashAlt, faPrayingHands, faCommentAlt, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faEyeSlash, faTrashAlt, faPrayingHands, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { BasicStyles, Color } from 'common';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
@@ -274,7 +274,9 @@ class PostCard extends Component {
       }}>
         {this.renderHeader(data)}
         {this.renderBody(data)}
-        <CommentImages images={images}/>
+        <TouchableOpacity onPress={() =>{ this.props.showImages(images)}}>
+          <CommentImages images={images}/>
+        </TouchableOpacity>
         {this.renderActions(data)}
         {this.renderComments(data.comments)}
       </View>
