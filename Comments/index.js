@@ -10,10 +10,12 @@ import { connect } from 'react-redux';
 import CreatePost from 'src/components/Comments/Create';
 import Skeleton from 'components/Loading/Skeleton';
 import _ from 'lodash';
+import ImageModal from 'src/modules/generic/ImagesModal.js';
 
 class Comments extends Component {
   constructor(props) {
     super(props);
+    this.myRef = React.createRef()
     this.state = {
       isLoading: false,
       search: null,
@@ -22,7 +24,8 @@ class Comments extends Component {
       offset: 0,
       limit: 5,
       createStatus: false,
-      smallLoading: false
+      smallLoading: false,
+      images: []
     }
   }
 
@@ -118,7 +121,7 @@ class Comments extends Component {
   }
 
   render() {
-    const { isLoading, createStatus, smallLoading } = this.state;
+    const { isLoading, createStatus, smallLoading, images } = this.state;
     const { comments, user } = this.props.state;
     return (
       <View>
@@ -232,6 +235,9 @@ class Comments extends Component {
                     members: item.members,
                     index: index
                   }}
+                  showImages={(images) => {this.setState({images: images}, () => {
+                    this.myRef.current.openBottomSheet()
+                  })}}
                   images={item.images}
                   postReply={() => { this.reply(item) }}
                   reply={(value) => this.replyHandler(value)}
@@ -253,6 +259,10 @@ class Comments extends Component {
           close={() => this.setState({ createStatus: false })}
           title={'Create Post'}
         />
+        <ImageModal
+          images={images}
+          ref={this.myRef}
+        ></ImageModal>
       </View>
     );
   }

@@ -2,29 +2,15 @@ import React, { Component } from 'react';
 import { View, TouchableOpacity, Image, Text } from 'react-native';
 import { connect } from 'react-redux';
 import Styles from './ImagesStyle';
-import { Color } from 'common';
 import Config from 'src/config';
-import ImageModal from 'components/Modal/ImageModal.js';
 
 class Create extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      imageModalUrl: null,
-      isImageModal: false
-    }
-  }
-
-  setImage = (url) => {
-    this.setState({ imageModalUrl: url })
-    setTimeout(() => {
-      this.setState({ isImageModal: true })
-    }, 500)
   }
 
   render() {
     const { images } = this.props;
-    const { isImageModal, imageModalUrl } = this.state;
     return (
       <View>
         {images?.length < 3 && images?.length != 0 &&
@@ -36,7 +22,7 @@ class Create extends Component {
           }}>
             {images.map((item, index) => {
               return (
-                <TouchableOpacity onPress={() => { this.setImage(Config.BACKEND_URL + item.category) }}
+                <View
                   style={{
                     height: '100%',
                     width: images?.length == 1 ? '100%' : '50%',
@@ -48,7 +34,7 @@ class Create extends Component {
                       width: '100%',
                       resizeMode: 'stretch'
                     }} />
-                </TouchableOpacity>
+                </View>
               )
             })}
           </View>
@@ -62,7 +48,7 @@ class Create extends Component {
             <View style={{
               width: '50%'
             }}>
-              <TouchableOpacity onPress={() => { this.setImage(Config.BACKEND_URL + images[0].category) }}
+              <View
                 style={{
                   height: '100%',
                   width: '100%',
@@ -70,12 +56,12 @@ class Create extends Component {
                 <Image
                   source={{ uri: Config.BACKEND_URL + images[0].category }}
                   style={Styles.image} />
-              </TouchableOpacity>
+              </View>
             </View>
             <View style={{
               width: '50%'
             }}>
-              <TouchableOpacity onPress={() => { this.setImage(Config.BACKEND_URL + images[1].category) }}
+              <View
                 style={{
                   height: '50%',
                   width: '100%',
@@ -83,8 +69,8 @@ class Create extends Component {
                 <Image
                   source={{ uri: Config.BACKEND_URL + images[1].category }}
                   style={Styles.image} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => { this.setImage(Config.BACKEND_URL + images[2].category) }}
+              </View>
+              <View
                 style={{
                   height: '50%',
                   width: '100%'
@@ -92,7 +78,7 @@ class Create extends Component {
                 <Image
                   source={{ uri: Config.BACKEND_URL + images[2].category }}
                   style={Styles.image} />
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
         }
@@ -105,7 +91,7 @@ class Create extends Component {
             <View style={{
               width: '50%'
             }}>
-              <TouchableOpacity onPress={() => { this.setImage(Config.BACKEND_URL + images[0].category) }}
+              <View
                 style={{
                   height: '50%',
                   width: '100%',
@@ -113,8 +99,8 @@ class Create extends Component {
                 <Image
                   source={{ uri: Config.BACKEND_URL + images[0].category }}
                   style={Styles.image} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => { this.setImage(Config.BACKEND_URL + images[1].category) }}
+              </View>
+              <View
                 style={{
                   height: '50%',
                   width: '100%'
@@ -122,12 +108,12 @@ class Create extends Component {
                 <Image
                   source={{ uri: Config.BACKEND_URL + images[1].category }}
                   style={Styles.image} />
-              </TouchableOpacity>
+              </View>
             </View>
             <View style={{
               width: '50%'
             }}>
-              <TouchableOpacity onPress={() => { this.setImage(Config.BACKEND_URL + images[2].category) }}
+              <View
                 style={{
                   height: '50%',
                   width: '100%',
@@ -135,8 +121,8 @@ class Create extends Component {
                 <Image
                   source={{ uri: Config.BACKEND_URL + images[2].category }}
                   style={Styles.image} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => { this.setImage(Config.BACKEND_URL + images[3].category) }}
+              </View>
+              <View
                 style={{
                   height: '50%',
                   width: '100%',
@@ -152,15 +138,10 @@ class Create extends Component {
                     left: '40%',
                     fontSize: 20
                   }}>+{images.length - 4}</Text>}
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
         }
-        <ImageModal
-          visible={isImageModal}
-          url={imageModalUrl}
-          action={() => this.setState({ isImageModal: false })}
-        ></ImageModal>
       </View>
     );
   }
