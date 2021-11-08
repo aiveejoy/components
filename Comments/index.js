@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import CreatePost from 'src/components/Comments/Create';
 import Skeleton from 'components/Loading/Skeleton';
 import _ from 'lodash';
-import ImageModal from 'src/modules/generic/ImagesModal.js';
+import ImageModal from 'components/Modal/ImageModal.js';
 
 class Comments extends Component {
   constructor(props) {
