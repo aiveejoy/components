@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { Dimensions } from 'react-native';
 import Config from 'src/config';
-import { Color } from 'common';
+import { Color, BasicStyles } from 'common';
 import RBSheet from 'react-native-raw-bottom-sheet';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -16,8 +17,21 @@ class ImageModal extends Component {
     this.RBSheet.open()
   }
 
+  manage(item){
+    switch(item.type){
+      case 'navigation':
+        this.props.navigation.navigate(item.route)
+        break
+      case 'callback':
+        if(this.props.onClick){
+          this.props.onClick(item)
+        }
+        break
+    }
+  }
+
   render() {
-    console
+    const { data } = this.props;
     return (
       <RBSheet
         ref={ref => {
@@ -31,8 +45,33 @@ class ImageModal extends Component {
         <ScrollView
           showsVerticalScrollIndicator={false}>
           <View style={{
-            backgroundColor: Color.gray
           }}>
+            {
+              (data && data.length > 0) && data.map(item => (
+                <TouchableOpacity style={{
+                  width: '100%',
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  flexDirection: 'row',
+                  paddingTop: 15,
+                  paddingBottom: 15
+                }}
+                onPress={() => {
+                  this.manage(item)
+                }}
+                >
+                  {
+                    item.icon && (
+                      <FontAwesomeIcon icon={item.icon} size={15} />
+                    )
+                  }
+                  <Text style={{
+                    fontSize: BasicStyles.standardFontSize,
+                    paddingLeft: 10,
+                  }}>{item.title}</Text>
+                </TouchableOpacity>
+              ))
+            }
           </View>
         </ScrollView>
       </RBSheet>
