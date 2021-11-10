@@ -144,15 +144,15 @@ class Comments extends Component {
           }}
         >
           <View style={{
-            padding: 20
+            paddingBottom: 10,
+            paddingTop: 10
           }}>
             <View style={{
               backgroundColor: 'white',
               flexDirection: 'row',
               padding: 10,
               borderWidth: 1,
-              borderColor: Color.lightGray,
-              borderRadius: BasicStyles.standardBorderRadius
+              borderColor: Color.lightGray
             }}>
               {
                 user?.profile?.url ? (
@@ -183,7 +183,7 @@ class Comments extends Component {
               >
                 <Text style={{
                   color: Color.darkGray
-                }}>Create Post</Text>
+                }}>Say something...</Text>
               </TouchableOpacity>
               <TouchableOpacity style={{
                 height: 35,
@@ -210,10 +210,10 @@ class Comments extends Component {
               <Skeleton size={1} template={'block'} height={10} />
             )
           }
-          <View style={{
+          {/* <View style={{
             paddingLeft: 20,
             paddingRight: 20
-          }}>
+          }}> */}
             {comments.length > 0 && comments.map((item, index) => {
               return (
                 <PostCard
@@ -240,7 +240,7 @@ class Comments extends Component {
                 />
               )
             })}
-          </View>
+          {/* </View> */}
           {
             (isLoading) && (
               <Skeleton size={2} template={'block'} height={130} />
