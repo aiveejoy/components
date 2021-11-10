@@ -10,11 +10,11 @@ import CommentImages from './Images';
 
 const height = Math.round(Dimensions.get('window').height);
 const options = [
-  {title: 'Post Actions', action: null, icon: faCog},
-  {title: 'Edit', action: 'edit', icon: faPencilAlt},
-  {title: 'Report', action: 'report', icon: faFileAlt},
-  {title: 'Hide', action: 'hide', icon: faEyeSlash},
-  {title: 'Delete', action: 'delete', icon: faTrashAlt}
+  { title: 'Post Actions', action: null, icon: faCog },
+  { title: 'Edit', action: 'edit', icon: faPencilAlt },
+  { title: 'Report', action: 'report', icon: faFileAlt },
+  { title: 'Hide', action: 'hide', icon: faEyeSlash },
+  { title: 'Delete', action: 'delete', icon: faTrashAlt }
 ]
 class PostCard extends Component {
   constructor(props) {
@@ -65,35 +65,6 @@ class PostCard extends Component {
             onPress={() => { this.setState({ options: !this.state.options }) }}>
             <FontAwesomeIcon icon={faEllipsisH} />
           </TouchableOpacity>
-          {this.state.options === true &&
-          <View style={{
-            position: 'absolute',
-            right: -5,
-            top: 20,
-            width: 150,
-            borderWidth: 1,
-            borderColor: Color.gray,
-            backgroundColor: Color.white,
-            zIndex: 100
-          }}
-            >
-            <View style={{padding: 10}}>  
-              {options.map((item, index) => {
-                return (
-                  <View
-                    style={{
-                      paddingLeft: item.action !== null ? 25 : 10,
-                      flexDirection: 'row',
-                      paddingBottom: 15   
-                    }}
-                  >
-                    <FontAwesomeIcon icon={item.icon} style={{color: item.action === 'delete' ? Color.danger : null}}/>
-                    <Text style={{paddingLeft: 10 }}>{item.title}</Text>
-                  </View>
-                )
-              })}
-            </View>
-          </View>}
         </View>
       </View>
     )
@@ -162,7 +133,7 @@ class PostCard extends Component {
             icon={faHeart}
             size={15}
             style={{
-            color: Color.black
+              color: Color.black
             }}
           />
           <Text style={{
@@ -266,19 +237,48 @@ class PostCard extends Component {
     const { data, images } = this.props;
     return (
       <View style={{
-        borderRadius: BasicStyles.standardBorderRadius,
+        // borderRadius: BasicStyles.standardBorderRadius,
         borderColor: Color.lightGray,
         borderWidth: 1,
-        marginBottom: 20,
+        marginBottom: 10,
         ...this.props.style
       }}>
         {this.renderHeader(data)}
         {this.renderBody(data)}
-        <TouchableOpacity onPress={() =>{ this.props.showImages(images)}}>
-          <CommentImages images={images}/>
+        <TouchableOpacity onPress={() => { this.props.showImages(images) }}>
+          <CommentImages images={images} />
         </TouchableOpacity>
         {this.renderActions(data)}
         {this.renderComments(data.comments)}
+        {this.state.options === true &&
+          <View style={{
+            position: 'absolute',
+            right: -5,
+            top: 20,
+            width: 150,
+            borderWidth: 1,
+            borderColor: Color.gray,
+            backgroundColor: Color.white,
+            zIndex: 10
+          }}
+          >
+            <View style={{ padding: 10 }}>
+              {options.map((item, index) => {
+                return (
+                  <View
+                    style={{
+                      paddingLeft: item.action !== null ? 25 : 10,
+                      flexDirection: 'row',
+                      paddingBottom: 15
+                    }}
+                  >
+                    <FontAwesomeIcon icon={item.icon} style={{ color: item.action === 'delete' ? Color.danger : null }} />
+                    <Text style={{ paddingLeft: 10 }}>{item.title}</Text>
+                  </View>
+                )
+              })}
+            </View>
+          </View>}
       </View>
     )
   }
