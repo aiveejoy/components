@@ -11,6 +11,8 @@ import moment from 'moment';
 import Button from 'components/Form/Button';
 import ImagePicker from 'react-native-image-picker';
 import Skeleton from 'components/Loading/Skeleton';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import ImageModals from 'components/Modal/ImageModal';
 
 const width = Math.round(Dimensions.get('window').width);
 const height = Math.round(Dimensions.get('window').height);
@@ -20,7 +22,9 @@ class ImageModal extends Component {
     this.state = {
       visible: false,
       photo: null,
-      imageLoading: false
+      imageLoading: false,
+      imageModal: false,
+      url: null,
     }
   }
 
@@ -77,6 +81,7 @@ class ImageModal extends Component {
           Api.request(Routes.uploadImage, parameter, response => {
             console.log(response)
             this.setState({ imageLoading: false })
+            this.props.retrieveReceiverPhoto()
           }, error => {
             console.log(error, 'upload image url to payload')
           })
@@ -111,6 +116,7 @@ class ImageModal extends Component {
       }
       this.setState({ imageLoading: true })
       Api.request(Routes.uploadImage, parameter, response => {
+        this.props.retrieveReceiverPhoto()
         console.log(response, 'upload sketch')
         this.setState({ imageLoading: false })
       }, error => {
@@ -164,6 +170,21 @@ class ImageModal extends Component {
       <View>
         {images ? (
           <View>
+            {pictures.length > 0 &&
+              <TouchableOpacity
+                onPress={() => {
+                  this.props.goBack()
+                }}
+                style={{
+                  padding: 10,
+                  zIndex: 100
+                }}><FontAwesomeIcon
+                  icon={faArrowLeft}
+                  size={15}
+                  style={{
+                    color: Color.danger
+                  }} />
+              </TouchableOpacity>}
             <View style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
@@ -178,6 +199,13 @@ class ImageModal extends Component {
                       borderWidth: 1,
                       borderColor: Color.gray
                     }}
+                      onPress={() => {
+                        this.setState({
+                          deleteID: ndx.id,
+                          url: ndx.payload_value,
+                          imageModal: true
+                        })
+                      }}
                       key={el}>
                       <Image
                         source={{ uri: Config.BACKEND_URL + ndx.payload_value }}
@@ -212,21 +240,47 @@ class ImageModal extends Component {
                   }}> Go Back</Text>
                 </TouchableOpacity>
               </View>}
-              <Button
-                title={currentValidation?.payload === 'signature' ? 'Upload Signature' : 'Take A Picture'}
-                onClick={() => {
-                  if (currentValidation?.payload === 'signature') {
-                    this.setState({ visible: true })
-                  } else {
-                    this.uploadPhoto(currentValidation?.payload);
-                  }
-                }}
-                style={{
-                  width: '50%',
-                  backgroundColor: Color.success,
-                  marginBottom: 20
-                }}
-              />
+              {userOwner ? <View style={{
+                flexDirection: 'row',
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <Button
+                  title={'Decline'}
+                  onClick={() => this.props.sendNewMessage(currentValidation.payload)}
+                  style={{
+                    width: '45%',
+                    marginRight: '1%',
+                    backgroundColor: Color.danger
+                  }}
+                />
+                <Button
+                  title={'Accept'}
+                  onClick={() => this.props.updateValidation('accepted')}
+                  style={{
+                    width: '45%',
+                    backgroundColor: Color.success
+                  }}
+                />
+              </View>
+                :
+                <Button
+                  title={currentValidation?.payload === 'signature' ? 'Upload Signature' : 'Take A Picture'}
+                  onClick={() => {
+                    if (currentValidation?.payload === 'signature') {
+                      this.setState({ visible: true })
+                    } else {
+                      this.uploadPhoto(currentValidation?.payload);
+                    }
+                  }}
+                  style={{
+                    width: '50%',
+                    backgroundColor: Color.success,
+                    marginBottom: 20
+                  }}
+                />
+              }
             </View>
           </View>
         ) :
@@ -279,7 +333,7 @@ class ImageModal extends Component {
   }
 
   render() {
-    const { version } = this.props;
+    const { version, isLoading, userOwner, deleteID } = this.props;
     return (
       <RBSheet
         ref={ref => {
@@ -295,11 +349,21 @@ class ImageModal extends Component {
           }
         }}
       >
+        <ImageModals
+          deleteID={userOwner ? deleteID : null}
+          visible={this.state.imageModal}
+          url={Config.BACKEND_URL + this.state.url}
+          action={() => {
+            this.setState({ imageModal: false })
+          }}
+          route={Routes.uploadImageDelete}
+          successDel={() => { this.retrieveReceiverPhoto(currentValidation?.id) }}
+        ></ImageModals>
         <ScrollView
           showsVerticalScrollIndicator={false}>
-          {this.state.imageLoading ? (<Skeleton size={1} template={'block'} height={75} />) : null}
-          {version == 1 && this.versionOne()}
-          {version == 2 && this.versionTwo()}
+          {this.state.imageLoading || isLoading ? (<Skeleton size={1} template={'block'} height={75} />) : null}
+          {!isLoading && version == 1 && this.versionOne()}
+          {!isLoading && version == 2 && this.versionTwo()}
         </ScrollView>
         <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
       </RBSheet>

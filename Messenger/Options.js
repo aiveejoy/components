@@ -1011,13 +1011,14 @@ class Options extends Component {
   }
 
   render() {
-    const { current, deleteID, pictures, images, userOwner } = this.state;
+    const { current, deleteID, pictures, images, userOwner, isLoading } = this.state;
     const { data } = this.props;
     const { user, currentValidation, myDevice } = this.props.state;
     return (
       <View>
         <NotificationsHandler notificationHandler={ref => (this.notificationHandler = ref)} />
-        <View style={{
+        <View>
+        {/* <View style={{
           position: 'absolute',
           zIndex: 1000,
           bottom: 0,
@@ -1043,12 +1044,12 @@ class Options extends Component {
           </ImageModal>
           <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
-          {this.state.isLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
-          {!this.state.isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
-          {!this.state.isLoading && current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
-          {!this.state.isLoading && current.title == 'signature' && this.renderImages(this.state.current.title)}
-          {!this.state.isLoading && current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
-          {!this.state.isLoading && current.title == 'valid_id' && this.renderImages(this.state.current.title)}
+          {isLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
+          {!isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
+          {!isLoading && current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
+          {!isLoading && current.title == 'signature' && this.renderImages(this.state.current.title)}
+          {!isLoading && current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
+          {!isLoading && current.title == 'valid_id' && this.renderImages(this.state.current.title)} */}
           <BottomSheetOptions
             version={2}
             user={user}
@@ -1085,6 +1086,16 @@ class Options extends Component {
             }}
             btnClick={(item) => {
               this.onClick(item)
+            }}
+            isLoading={isLoading}
+            retrieveReceiverPhoto={() => {
+              this.retrieveReceiverPhoto(currentValidation?.id)
+            }}
+            sendNewMessage={(parameter) =>{
+              this.sendNewMessage(parameter)
+            }}
+            updateValidation={(parameter) =>{
+              this.updateValidation(parameter)
             }}
           />
         </View>
