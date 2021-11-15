@@ -17,6 +17,7 @@ import Skeleton from 'components/Loading/Skeleton';
 import { fcmService } from 'services/broadcasting/FCMService';
 import { localNotificationService } from 'services/broadcasting/LocalNotificationService';
 import NotificationsHandler from 'services/NotificationHandler';
+import BottomSheetOptions  from 'src/components/BottomSheet/index';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -24,6 +25,7 @@ const width = Math.round(Dimensions.get('window').width);
 class Options extends Component {
   constructor(props) {
     super(props);
+    this.myRef = React.createRef()
     this.state = {
       current: {
         title: 'Settings',
@@ -41,7 +43,10 @@ class Options extends Component {
       supportEnabled: [],
       imageLoading: false,
       deleteID: null,
-      menu: Helper.MessengerMenu
+      menu: Helper.MessengerMenu,
+      requirements: Helper.requirementsMenu, 
+      images: false,
+      userOwner: false
     }
   }
 
@@ -143,6 +148,14 @@ class Options extends Component {
     })
   }
 
+  componentDidUpdate() {
+    const { data } = this.props.navigation.state?.params
+    if(data.menuFlag) {
+      this.myRef.current.openBottomSheet()
+      return;
+    }
+  }
+
   closeSketch = () => {
     this.setState({ visible: false })
   }
@@ -155,6 +168,7 @@ class Options extends Component {
         value: id
       }]
     }
+    console.log(parameter, Routes.retrieveImage)
     this.setState({ imageLoading: true })
     Api.request(Routes.retrieveImage, parameter, response => {
       this.setState({ imageLoading: false })
@@ -297,11 +311,12 @@ class Options extends Component {
   }
 
   checkValidation = (payload) => {
+    const { validations } = this.state;
     let result = {
       result: null,
       item: null
     }
-    let item = this.state.validations.find(item => item.payload === payload);
+    let item = validations.find(item => item.payload === payload);
     if (item) {
       result = {
         result: true,
@@ -509,12 +524,31 @@ class Options extends Component {
 
   onClick(item) {
     const { data, setCurrentValidation } = this.props
-    const { validations } = this.state;
+    const { validations, requirements } = this.state;
+    const { user, requestMessage } = this.props.state;
     switch (item.payload_value) {
       case 'close':
         this.close()
+        this.setState({images: false})
         break
       case 'requirements':
+        requirements.map((menu, index) => {
+          console.log(this.checkValidation(menu.payload_value).result)
+          try {
+            if(data?.account?.code == user.code && requestMessage?.status < 2) {
+              menu.btn.title = this.checkValidation(menu.payload_value).result === true ? 'Disable' : 'Enable'
+              menu.btn['onClick'] = () => {
+                this.checkValidation(menu.payload_value).result ? this.removeValidation(this.checkValidation(menu.payload_value)) : this.addToValidation(menu.payload_value)
+              }
+              menu.btn.style.backgroundColor = this.checkValidation(menu.payload_value).result === true ? Color.danger : Color.secondary
+              this.setState({userOwner: true})
+            } else {
+              this.setState({userOwner: false})
+            }
+          } catch(e) {
+            console.log(e)
+          }
+        })
         this.setState({
           previous: {
             title: 'Settings',
@@ -523,14 +557,17 @@ class Options extends Component {
           current: {
             title: 'Settings > Requirements',
             menu: Helper.requirementsMenu
-          }
+          },
+          images: false
         })
         break
       case 'requestItemStack': {
+        this.setState({images: false})
         this.retrieveRequest('requestItemStack')
       }
         break
       case 'transferFundStack': {
+        this.setState({images: false})
         let status = false;
         if (data.type !== 3) {
           if (validations.length > 0) {
@@ -551,6 +588,7 @@ class Options extends Component {
       }
         break
       case 'reviewsStack': {
+        this.setState({images: false})
         // review stack
         if (data?.status < 2) {
           Alert.alert('Notice', 'Please complete the transaction before giving reviews.')
@@ -561,10 +599,12 @@ class Options extends Component {
       }
         break
       case 'enableSupport': {
+        this.setState({images: false})
         this.enableSupport();
       }
         break
       case 'back':
+        this.setState({images: false})
         this.setState({
           previous: null,
           current: {
@@ -582,9 +622,12 @@ class Options extends Component {
           this.setState({
             showPhotos: true,
             current: {
-              title: item.payload_value
-            }
+              title: item.payload_value,
+            },
+            images: true
           });
+        } else {
+          Alert.alert('Opps', 'This requirement is disabled.')
         }
         break
       case 'receiver_picture':
@@ -597,8 +640,11 @@ class Options extends Component {
             showPhotos: true,
             current: {
               title: item.payload_value
-            }
+            },
+            images: true
           });
+        } else {
+          Alert.alert('Opps', 'This requirement is disabled.')
         }
         break
       case 'valid_id':
@@ -611,8 +657,11 @@ class Options extends Component {
             showPhotos: true,
             current: {
               title: item.payload_value
-            }
+            },
+            images: true
           });
+        } else {
+          Alert.alert('Opps', 'This requirement is disabled.')
         }
         break
     }
@@ -962,9 +1011,9 @@ class Options extends Component {
   }
 
   render() {
-    const { current, deleteID } = this.state;
+    const { current, deleteID, pictures, images, userOwner } = this.state;
     const { data } = this.props;
-    const { user, currentValidation } = this.props.state;
+    const { user, currentValidation, myDevice } = this.props.state;
     return (
       <View>
         <NotificationsHandler notificationHandler={ref => (this.notificationHandler = ref)} />
@@ -1000,6 +1049,44 @@ class Options extends Component {
           {!this.state.isLoading && current.title == 'signature' && this.renderImages(this.state.current.title)}
           {!this.state.isLoading && current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
           {!this.state.isLoading && current.title == 'valid_id' && this.renderImages(this.state.current.title)}
+          <BottomSheetOptions
+            version={2}
+            user={user}
+            myDevice={myDevice}
+            userOwner={userOwner}
+            images={images}
+            currentValidation={currentValidation}
+            pictures={pictures}
+            ref={this.myRef}
+            goBack={() => {
+              this.setState({
+                previous: {
+                  title: 'Settings',
+                  menu: Helper.MessengerMenu
+                },
+                current: {
+                  title: 'Settings > Requirements', 
+                  menu: Helper.requirementsMenu
+                },
+                images: false
+              })
+            }}
+            data={this.state.current.menu}
+            onClose={() => {
+              this.props.navigation.setParams({
+                data: {
+                  ...this.props.navigation.state.params.data,
+                  menuFlag: !this.props.navigation.state.params.data.menuFlag
+                }
+              })
+            }}
+            onClick={(item) => {
+              this.onClick(item)
+            }}
+            btnClick={(item) => {
+              this.onClick(item)
+            }}
+          />
         </View>
       </View>
     );
