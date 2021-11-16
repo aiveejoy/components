@@ -4,7 +4,7 @@ import { Routes, Color, BasicStyles, Helper } from 'common';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faChevronRight, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import Style from 'modules/messenger/Style.js';
 import Modal from 'components/Modal/Sketch';
 import ImagePicker from 'react-native-image-picker';
@@ -53,8 +53,8 @@ class Options extends Component {
   componentDidMount() {
     this.checkIfSupportEnabled();
     this.retrieveValidation();
-    if (this.props.data?.type == 3) {
-      console.log('cash in')
+    console.log('cash in', this.props.data?.type)
+    if (this.props.data?.type == 3 || this.props.data?.type == 2) {
       let menu = this.state.menu
       menu.length > 0 && menu.map((item, index) => {
         if(item.title?.toLowerCase() === 'requirements') {
@@ -76,7 +76,9 @@ class Options extends Component {
             title: 'Requirements',
             payload: 'same_page',
             payload_value: 'requirements',
-            color: Color.black
+            color: Color.black,
+            type: 'callback',
+            icon: faFileAlt
           },
           ...Helper.MessengerMenu
         ]
@@ -304,6 +306,12 @@ class Options extends Component {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.retrieveValidation();
+        this.onClick({
+          title: 'Requirements',
+          payload: 'same_page',
+          payload_value: 'requirements',
+          type: 'callback'
+        })
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -353,12 +361,6 @@ class Options extends Component {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.setState({ validations: response.data });
-        this.onClick({
-          title: 'Requirements',
-          payload: 'same_page',
-          payload_value: 'requirements',
-          type: 'callback'
-        })
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -442,6 +444,12 @@ class Options extends Component {
     Api.request(Routes.requestValidationDelete, parameter, response => {
       this.setState({ isLoading: false })
       this.retrieveValidation();
+      this.onClick({
+        title: 'Requirements',
+        payload: 'same_page',
+        payload_value: 'requirements',
+        type: 'callback'
+      })
     })
   }
 
@@ -576,7 +584,7 @@ class Options extends Component {
       case 'transferFundStack': {
         this.setState({images: false})
         let status = false;
-        if (data.type !== 3) {
+        if (data.type !== 3 || data.type !== 2) {
           if (validations.length > 0) {
             validations.map((item, index) => {
               status = item.status === 'accepted' ? true : false
