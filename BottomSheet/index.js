@@ -219,6 +219,7 @@ class ImageModal extends Component {
                   )
                 })
               }
+              {this.state.imageLoading ? (<Skeleton size={1} template={'block'} height={75} />) : null}
             </View>
             <View style={{
               justifyContent: 'center',
@@ -374,7 +375,7 @@ class ImageModal extends Component {
         ></ImageModals>
         <ScrollView
           showsVerticalScrollIndicator={false}>
-          {this.state.imageLoading || isLoading ? (<Skeleton size={1} template={'block'} height={75} />) : null}
+          {isLoading ? (<Skeleton size={1} template={'block'} height={75} />) : null}
           {!isLoading && version == 1 && this.versionOne()}
           {!isLoading && version == 2 && this.versionTwo()}
         </ScrollView>
