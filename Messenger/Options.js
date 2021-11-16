@@ -353,6 +353,12 @@ class Options extends Component {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.setState({ validations: response.data });
+        this.onClick({
+          title: 'Requirements',
+          payload: 'same_page',
+          payload_value: 'requirements',
+          type: 'callback'
+        })
       }
     }, error => {
       this.setState({ isLoading: false });
