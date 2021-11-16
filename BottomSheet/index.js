@@ -25,6 +25,7 @@ class ImageModal extends Component {
       imageLoading: false,
       imageModal: false,
       url: null,
+      deleteID: null
     }
   }
 
@@ -240,7 +241,7 @@ class ImageModal extends Component {
                   }}> Go Back</Text>
                 </TouchableOpacity>
               </View>}
-              {userOwner ? <View style={{
+              {userOwner && currentValidation?.status != 'accepted' && <View style={{
                 flexDirection: 'row',
                 flex: 1,
                 justifyContent: 'center',
@@ -264,22 +265,34 @@ class ImageModal extends Component {
                   }}
                 />
               </View>
-                :
-                <Button
-                  title={currentValidation?.payload === 'signature' ? 'Upload Signature' : 'Take A Picture'}
-                  onClick={() => {
-                    if (currentValidation?.payload === 'signature') {
-                      this.setState({ visible: true })
-                    } else {
-                      this.uploadPhoto(currentValidation?.payload);
-                    }
-                  }}
-                  style={{
-                    width: '50%',
-                    backgroundColor: Color.success,
-                    marginBottom: 20
-                  }}
-                />
+              }
+              {!userOwner && currentValidation?.status != 'accepted' && <Button
+                title={currentValidation?.payload === 'signature' ? 'Upload Signature' : 'Take A Picture'}
+                onClick={() => {
+                  if (currentValidation?.payload === 'signature') {
+                    this.setState({ visible: true })
+                  } else {
+                    this.uploadPhoto(currentValidation?.payload);
+                  }
+                }}
+                style={{
+                  width: '50%',
+                  backgroundColor: Color.success,
+                  marginBottom: 20
+                }}
+              />
+              }
+              {currentValidation?.status == 'accepted' && <Button
+                title={'Accepted'}
+                onClick={() => {
+                  console.log('accepted')
+                }}
+                style={{
+                  width: '50%',
+                  backgroundColor: Color.success,
+                  marginBottom: 20
+                }}
+              />
               }
             </View>
           </View>
@@ -333,7 +346,7 @@ class ImageModal extends Component {
   }
 
   render() {
-    const { version, isLoading, userOwner, deleteID } = this.props;
+    const { version, isLoading, userOwner, currentValidation } = this.props;
     return (
       <RBSheet
         ref={ref => {
@@ -350,7 +363,7 @@ class ImageModal extends Component {
         }}
       >
         <ImageModals
-          deleteID={userOwner ? deleteID : null}
+          deleteID={!userOwner && currentValidation?.status != 'accepted' ? this.state.deleteID : null}
           visible={this.state.imageModal}
           url={Config.BACKEND_URL + this.state.url}
           action={() => {

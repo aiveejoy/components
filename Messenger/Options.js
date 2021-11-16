@@ -272,6 +272,7 @@ class Options extends Component {
         const { setRequest } = this.props;
         setRequest(response.data[0])
         this.setState({ sender_id: response.data[0].account_id });
+        this.close();
         this.props.navigation.navigate(route, {
           data: response.data[0],
           members: members,
