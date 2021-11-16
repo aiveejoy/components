@@ -52,7 +52,7 @@ class Options extends Component {
 
   componentDidMount() {
     this.checkIfSupportEnabled();
-    this.retrieveValidation();
+    this.retrieveValidation(false);
     console.log('cash in', this.props.data?.type)
     if (this.props.data?.type == 3 || this.props.data?.type == 2) {
       let menu = this.state.menu
@@ -305,13 +305,7 @@ class Options extends Component {
     Api.request(Routes.requestValidationCreate, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
-        this.retrieveValidation();
-        this.onClick({
-          title: 'Requirements',
-          payload: 'same_page',
-          payload_value: 'requirements',
-          type: 'callback'
-        })
+        this.retrieveValidation(true);
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -340,7 +334,7 @@ class Options extends Component {
     return result;
   }
 
-  retrieveValidation = () => {
+  retrieveValidation = (retrieve) => {
     const { user } = this.props.state;
     const { data } = this.props;
     let parameter = {
@@ -356,11 +350,19 @@ class Options extends Component {
       limit: 3
     }
     this.setState({ isLoading: true });
-    console.log(Routes.requestValidationRetreive, parameter, '----');
+    console.log(Routes.requestValidationRetreive, parameter);
     Api.request(Routes.requestValidationRetreive, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.setState({ validations: response.data });
+        if(retrieve) {
+          this.onClick({
+            title: 'Requirements',
+            payload: 'same_page',
+            payload_value: 'requirements',
+            type: 'callback'
+          })
+        }
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -443,13 +445,7 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.requestValidationDelete, parameter, response => {
       this.setState({ isLoading: false })
-      this.retrieveValidation();
-      this.onClick({
-        title: 'Requirements',
-        payload: 'same_page',
-        payload_value: 'requirements',
-        type: 'callback'
-      })
+      this.retrieveValidation(true);
     })
   }
 
