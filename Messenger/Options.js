@@ -17,7 +17,7 @@ import Skeleton from 'components/Loading/Skeleton';
 import { fcmService } from 'services/broadcasting/FCMService';
 import { localNotificationService } from 'services/broadcasting/LocalNotificationService';
 import NotificationsHandler from 'services/NotificationHandler';
-import BottomSheetOptions  from 'src/components/BottomSheet/index';
+import BottomSheetOptions from 'src/components/BottomSheet/index';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -44,7 +44,7 @@ class Options extends Component {
       imageLoading: false,
       deleteID: null,
       menu: Helper.MessengerMenu,
-      requirements: Helper.requirementsMenu, 
+      requirements: Helper.requirementsMenu,
       images: false,
       userOwner: false
     }
@@ -57,7 +57,7 @@ class Options extends Component {
     if (this.props.data?.type == 3 || this.props.data?.type == 2) {
       let menu = this.state.menu
       menu.length > 0 && menu.map((item, index) => {
-        if(item.title?.toLowerCase() === 'requirements') {
+        if (item.title?.toLowerCase() === 'requirements') {
           menu.splice(index, 1);
         }
       })
@@ -70,7 +70,7 @@ class Options extends Component {
     } else {
       console.log('not cash in')
       let menu = Helper.MessengerMenu;
-      if(Helper.MessengerMenu[0].title?.toLowerCase() !== 'requirements') {
+      if (Helper.MessengerMenu[0].title?.toLowerCase() !== 'requirements') {
         menu = [
           {
             title: 'Requirements',
@@ -152,7 +152,7 @@ class Options extends Component {
 
   componentDidUpdate() {
     const { data } = this.props.navigation.state?.params
-    if(data.menuFlag) {
+    if (data.menuFlag) {
       this.myRef.current.openBottomSheet()
       return;
     }
@@ -540,23 +540,23 @@ class Options extends Component {
     switch (item.payload_value) {
       case 'close':
         this.close()
-        this.setState({images: false})
+        this.setState({ images: false })
         break
       case 'requirements':
         requirements.map((menu, index) => {
           console.log(this.checkValidation(menu.payload_value).result)
           try {
-            if(data?.account?.code == user.code && requestMessage?.status < 2) {
+            if (data?.account?.code == user.code && requestMessage?.status < 2) {
               menu.btn.title = this.checkValidation(menu.payload_value).result === true ? 'Disable' : 'Enable'
               menu.btn['onClick'] = () => {
                 this.checkValidation(menu.payload_value).result ? this.removeValidation(this.checkValidation(menu.payload_value)) : this.addToValidation(menu.payload_value)
               }
               menu.btn.style.backgroundColor = this.checkValidation(menu.payload_value).result === true ? Color.danger : Color.secondary
-              this.setState({userOwner: true})
+              this.setState({ userOwner: true })
             } else {
-              this.setState({userOwner: false})
+              this.setState({ userOwner: false })
             }
-          } catch(e) {
+          } catch (e) {
             console.log(e)
           }
         })
@@ -573,33 +573,18 @@ class Options extends Component {
         })
         break
       case 'requestItemStack': {
-        this.setState({images: false})
+        this.setState({ images: false })
         this.retrieveRequest('requestItemStack')
       }
         break
       case 'transferFundStack': {
-        this.setState({images: false})
+        this.setState({ images: false })
         let status = false;
-        if (data.type !== 3 || data.type !== 2) {
-          if (validations.length > 0) {
-            validations.map((item, index) => {
-              status = item.status === 'accepted' ? true : false
-            })
-            if (status) {
-              this.retrieveRequest('transferFundStack')
-            } else {
-              Alert.alert('Notice', `Enabled requirements aren't accepted yet.`)
-            }
-          } else {
-            Alert.alert('Notice', 'You have not enabled any requirement/s yet.')
-          }
-        } else {
-          this.retrieveRequest('transferFundStack')
-        }
+        this.retrieveRequest('transferFundStack')
       }
         break
       case 'reviewsStack': {
-        this.setState({images: false})
+        this.setState({ images: false })
         // review stack
         if (data?.status < 2) {
           Alert.alert('Notice', 'Please complete the transaction before giving reviews.')
@@ -610,12 +595,12 @@ class Options extends Component {
       }
         break
       case 'enableSupport': {
-        this.setState({images: false})
+        this.setState({ images: false })
         this.enableSupport();
       }
         break
       case 'back':
-        this.setState({images: false})
+        this.setState({ images: false })
         this.setState({
           previous: null,
           current: {
@@ -1029,7 +1014,7 @@ class Options extends Component {
       <View>
         <NotificationsHandler notificationHandler={ref => (this.notificationHandler = ref)} />
         <View>
-        {/* <View style={{
+          {/* <View style={{
           position: 'absolute',
           zIndex: 1000,
           bottom: 0,
@@ -1077,7 +1062,7 @@ class Options extends Component {
                   menu: Helper.MessengerMenu
                 },
                 current: {
-                  title: 'Settings > Requirements', 
+                  title: 'Settings > Requirements',
                   menu: Helper.requirementsMenu
                 },
                 images: false
@@ -1102,10 +1087,10 @@ class Options extends Component {
             retrieveReceiverPhoto={() => {
               this.retrieveReceiverPhoto(currentValidation?.id)
             }}
-            sendNewMessage={(parameter) =>{
+            sendNewMessage={(parameter) => {
               this.sendNewMessage(parameter)
             }}
-            updateValidation={(parameter) =>{
+            updateValidation={(parameter) => {
               this.updateValidation(parameter)
             }}
           />
