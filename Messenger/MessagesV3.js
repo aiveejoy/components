@@ -90,6 +90,7 @@ class MessagesV3 extends Component {
           data: response.data[0]
         });
         setRequestMessage(response.data[0])
+        console.log(response.data[0].status)
         setMessageTitle({
           amount: response.data[0].amount,
           currency: response.data[0].currency

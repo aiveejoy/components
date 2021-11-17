@@ -4,7 +4,7 @@ import { Routes, Color, BasicStyles, Helper } from 'common';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faChevronRight, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import Style from 'modules/messenger/Style.js';
 import Modal from 'components/Modal/Sketch';
 import ImagePicker from 'react-native-image-picker';
@@ -17,6 +17,7 @@ import Skeleton from 'components/Loading/Skeleton';
 import { fcmService } from 'services/broadcasting/FCMService';
 import { localNotificationService } from 'services/broadcasting/LocalNotificationService';
 import NotificationsHandler from 'services/NotificationHandler';
+import BottomSheetOptions from 'src/components/BottomSheet/index';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -24,6 +25,7 @@ const width = Math.round(Dimensions.get('window').width);
 class Options extends Component {
   constructor(props) {
     super(props);
+    this.myRef = React.createRef()
     this.state = {
       current: {
         title: 'Settings',
@@ -41,18 +43,21 @@ class Options extends Component {
       supportEnabled: [],
       imageLoading: false,
       deleteID: null,
-      menu: Helper.MessengerMenu
+      menu: Helper.MessengerMenu,
+      requirements: Helper.requirementsMenu,
+      images: false,
+      userOwner: false
     }
   }
 
   componentDidMount() {
     this.checkIfSupportEnabled();
-    this.retrieveValidation();
-    if (this.props.data?.type == 3) {
-      console.log('cash in')
+    this.retrieveValidation(false);
+    console.log('cash in', this.props.data?.type)
+    if (this.props.data?.type == 3 || this.props.data?.type == 2) {
       let menu = this.state.menu
       menu.length > 0 && menu.map((item, index) => {
-        if(item.title?.toLowerCase() === 'requirements') {
+        if (item.title?.toLowerCase() === 'requirements') {
           menu.splice(index, 1);
         }
       })
@@ -65,13 +70,15 @@ class Options extends Component {
     } else {
       console.log('not cash in')
       let menu = Helper.MessengerMenu;
-      if(Helper.MessengerMenu[0].title?.toLowerCase() !== 'requirements') {
+      if (Helper.MessengerMenu[0].title?.toLowerCase() !== 'requirements') {
         menu = [
           {
             title: 'Requirements',
             payload: 'same_page',
             payload_value: 'requirements',
-            color: Color.black
+            color: Color.black,
+            type: 'callback',
+            icon: faFileAlt
           },
           ...Helper.MessengerMenu
         ]
@@ -143,6 +150,14 @@ class Options extends Component {
     })
   }
 
+  componentDidUpdate() {
+    const { data } = this.props.navigation.state?.params
+    if (data.menuFlag) {
+      this.myRef.current.openBottomSheet()
+      return;
+    }
+  }
+
   closeSketch = () => {
     this.setState({ visible: false })
   }
@@ -155,6 +170,7 @@ class Options extends Component {
         value: id
       }]
     }
+    console.log(parameter, Routes.retrieveImage)
     this.setState({ imageLoading: true })
     Api.request(Routes.retrieveImage, parameter, response => {
       this.setState({ imageLoading: false })
@@ -258,6 +274,7 @@ class Options extends Component {
         const { setRequest } = this.props;
         setRequest(response.data[0])
         this.setState({ sender_id: response.data[0].account_id });
+        this.close();
         this.props.navigation.navigate(route, {
           data: response.data[0],
           members: members,
@@ -288,7 +305,7 @@ class Options extends Component {
     Api.request(Routes.requestValidationCreate, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
-        this.retrieveValidation();
+        this.retrieveValidation(true);
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -297,11 +314,12 @@ class Options extends Component {
   }
 
   checkValidation = (payload) => {
+    const { validations } = this.state;
     let result = {
       result: null,
       item: null
     }
-    let item = this.state.validations.find(item => item.payload === payload);
+    let item = validations.find(item => item.payload === payload);
     if (item) {
       result = {
         result: true,
@@ -316,7 +334,7 @@ class Options extends Component {
     return result;
   }
 
-  retrieveValidation = () => {
+  retrieveValidation = (retrieve) => {
     const { user } = this.props.state;
     const { data } = this.props;
     let parameter = {
@@ -332,11 +350,19 @@ class Options extends Component {
       limit: 3
     }
     this.setState({ isLoading: true });
-    console.log(Routes.requestValidationRetreive, parameter, '----');
+    console.log(Routes.requestValidationRetreive, parameter);
     Api.request(Routes.requestValidationRetreive, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.setState({ validations: response.data });
+        if(retrieve) {
+          this.onClick({
+            title: 'Requirements',
+            payload: 'same_page',
+            payload_value: 'requirements',
+            type: 'callback'
+          })
+        }
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -419,7 +445,7 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.requestValidationDelete, parameter, response => {
       this.setState({ isLoading: false })
-      this.retrieveValidation();
+      this.retrieveValidation(true);
     })
   }
 
@@ -509,12 +535,31 @@ class Options extends Component {
 
   onClick(item) {
     const { data, setCurrentValidation } = this.props
-    const { validations } = this.state;
+    const { validations, requirements } = this.state;
+    const { user, requestMessage } = this.props.state;
     switch (item.payload_value) {
       case 'close':
         this.close()
+        this.setState({ images: false })
         break
       case 'requirements':
+        requirements.map((menu, index) => {
+          console.log(this.checkValidation(menu.payload_value).result)
+          try {
+            if (data?.account?.code == user.code && requestMessage?.status < 2) {
+              menu.btn.title = this.checkValidation(menu.payload_value).result === true ? 'Disable' : 'Enable'
+              menu.btn['onClick'] = () => {
+                this.checkValidation(menu.payload_value).result ? this.removeValidation(this.checkValidation(menu.payload_value)) : this.addToValidation(menu.payload_value)
+              }
+              menu.btn.style.backgroundColor = this.checkValidation(menu.payload_value).result === true ? Color.danger : Color.secondary
+              this.setState({ userOwner: true })
+            } else {
+              this.setState({ userOwner: false })
+            }
+          } catch (e) {
+            console.log(e)
+          }
+        })
         this.setState({
           previous: {
             title: 'Settings',
@@ -523,34 +568,23 @@ class Options extends Component {
           current: {
             title: 'Settings > Requirements',
             menu: Helper.requirementsMenu
-          }
+          },
+          images: false
         })
         break
       case 'requestItemStack': {
+        this.setState({ images: false })
         this.retrieveRequest('requestItemStack')
       }
         break
       case 'transferFundStack': {
+        this.setState({ images: false })
         let status = false;
-        if (data.type !== 3) {
-          if (validations.length > 0) {
-            validations.map((item, index) => {
-              status = item.status === 'accepted' ? true : false
-            })
-            if (status) {
-              this.retrieveRequest('transferFundStack')
-            } else {
-              Alert.alert('Notice', `Enabled requirements aren't accepted yet.`)
-            }
-          } else {
-            Alert.alert('Notice', 'You have not enabled any requirement/s yet.')
-          }
-        } else {
-          this.retrieveRequest('transferFundStack')
-        }
+        this.retrieveRequest('transferFundStack')
       }
         break
       case 'reviewsStack': {
+        this.setState({ images: false })
         // review stack
         if (data?.status < 2) {
           Alert.alert('Notice', 'Please complete the transaction before giving reviews.')
@@ -561,10 +595,12 @@ class Options extends Component {
       }
         break
       case 'enableSupport': {
+        this.setState({ images: false })
         this.enableSupport();
       }
         break
       case 'back':
+        this.setState({ images: false })
         this.setState({
           previous: null,
           current: {
@@ -582,9 +618,12 @@ class Options extends Component {
           this.setState({
             showPhotos: true,
             current: {
-              title: item.payload_value
-            }
+              title: item.payload_value,
+            },
+            images: true
           });
+        } else {
+          Alert.alert('Opps', 'This requirement is disabled.')
         }
         break
       case 'receiver_picture':
@@ -597,8 +636,11 @@ class Options extends Component {
             showPhotos: true,
             current: {
               title: item.payload_value
-            }
+            },
+            images: true
           });
+        } else {
+          Alert.alert('Opps', 'This requirement is disabled.')
         }
         break
       case 'valid_id':
@@ -611,8 +653,11 @@ class Options extends Component {
             showPhotos: true,
             current: {
               title: item.payload_value
-            }
+            },
+            images: true
           });
+        } else {
+          Alert.alert('Opps', 'This requirement is disabled.')
         }
         break
     }
@@ -962,13 +1007,14 @@ class Options extends Component {
   }
 
   render() {
-    const { current, deleteID } = this.state;
+    const { current, deleteID, pictures, images, userOwner, isLoading } = this.state;
     const { data } = this.props;
-    const { user, currentValidation } = this.props.state;
+    const { user, currentValidation, myDevice } = this.props.state;
     return (
       <View>
         <NotificationsHandler notificationHandler={ref => (this.notificationHandler = ref)} />
-        <View style={{
+        <View>
+          {/* <View style={{
           position: 'absolute',
           zIndex: 1000,
           bottom: 0,
@@ -994,12 +1040,60 @@ class Options extends Component {
           </ImageModal>
           <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           {this.header(this.state.current)}
-          {this.state.isLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
-          {!this.state.isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
-          {!this.state.isLoading && current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
-          {!this.state.isLoading && current.title == 'signature' && this.renderImages(this.state.current.title)}
-          {!this.state.isLoading && current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
-          {!this.state.isLoading && current.title == 'valid_id' && this.renderImages(this.state.current.title)}
+          {isLoading ? (<Skeleton size={2} template={'block'} height={75} />) : null}
+          {!isLoading && current.title == 'Settings' && this.body(this.state.current.menu)}
+          {!isLoading && current.title == 'Settings > Requirements' && this.requirements(this.state.current.menu)}
+          {!isLoading && current.title == 'signature' && this.renderImages(this.state.current.title)}
+          {!isLoading && current.title == 'receiver_picture' && this.renderImages(this.state.current.title)}
+          {!isLoading && current.title == 'valid_id' && this.renderImages(this.state.current.title)} */}
+          <BottomSheetOptions
+            version={2}
+            user={user}
+            myDevice={myDevice}
+            userOwner={userOwner}
+            images={images}
+            currentValidation={currentValidation}
+            pictures={pictures}
+            ref={this.myRef}
+            goBack={() => {
+              this.setState({
+                previous: {
+                  title: 'Settings',
+                  menu: Helper.MessengerMenu
+                },
+                current: {
+                  title: 'Settings > Requirements',
+                  menu: Helper.requirementsMenu
+                },
+                images: false
+              })
+            }}
+            data={this.state.current.menu}
+            onClose={() => {
+              this.props.navigation.setParams({
+                data: {
+                  ...this.props.navigation.state.params.data,
+                  menuFlag: !this.props.navigation.state.params.data.menuFlag
+                }
+              })
+            }}
+            onClick={(item) => {
+              this.onClick(item)
+            }}
+            btnClick={(item) => {
+              this.onClick(item)
+            }}
+            isLoading={isLoading}
+            retrieveReceiverPhoto={() => {
+              this.retrieveReceiverPhoto(currentValidation?.id)
+            }}
+            sendNewMessage={(parameter) => {
+              this.sendNewMessage(parameter)
+            }}
+            updateValidation={(parameter) => {
+              this.updateValidation(parameter)
+            }}
+          />
         </View>
       </View>
     );
