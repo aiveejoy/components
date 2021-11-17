@@ -51,10 +51,11 @@ class Options extends Component {
   }
 
   componentDidMount() {
+    const { data } = this.props;
     this.checkIfSupportEnabled();
     this.retrieveValidation(false);
-    console.log('cash in', this.props.data?.type)
-    if (this.props.data?.type == 3 || this.props.data?.type == 2) {
+    console.log('cash in', data)
+    if (data?.type == 3 || data?.type == 2) {
       let menu = this.state.menu
       menu.length > 0 && menu.map((item, index) => {
         if (item.title?.toLowerCase() === 'requirements') {
@@ -579,8 +580,19 @@ class Options extends Component {
         break
       case 'transferFundStack': {
         this.setState({ images: false })
-        let status = false;
-        this.retrieveRequest('transferFundStack')
+        Alert.alert(
+          '',
+          'Are you sure you want to transfer fund?',
+          [
+            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+            {
+              text: 'Yes', onPress: () => {
+                this.retrieveRequest('transferFundStack')
+              }
+            },
+          ],
+          { cancelable: false }
+        )
       }
         break
       case 'reviewsStack': {
