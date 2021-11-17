@@ -30,7 +30,7 @@ class PostCard extends Component {
     this.props.reply(value);
   }
 
-  renderHeader = (data) => {
+  renderHeader = (data, top) => {
     return (
       <View style={{
         flexDirection: 'row',
@@ -56,7 +56,7 @@ class PostCard extends Component {
               {data.date}
             </Text>
           </View>
-          <TouchableOpacity
+          {top && <TouchableOpacity
             style={{
               position: 'absolute',
               right: 5,
@@ -64,7 +64,7 @@ class PostCard extends Component {
             }}
             onPress={() => { this.setState({ options: !this.state.options }) }}>
             <FontAwesomeIcon icon={faEllipsisH} />
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </View>
       </View>
     )
@@ -185,7 +185,7 @@ class PostCard extends Component {
               style={{
                 ...BasicStyles.standardWidth
               }}>
-              {this.renderHeader({ user: item.account, date: item.created_at })}
+              {this.renderHeader({ user: item.account, date: item.created_at}, false )}
               {this.renderBody({ message: item.text })}
             </View>
           ))
@@ -243,7 +243,7 @@ class PostCard extends Component {
         marginBottom: 10,
         ...this.props.style
       }}>
-        {this.renderHeader(data)}
+        {this.renderHeader(data, true)}
         {this.renderBody(data)}
         <TouchableOpacity onPress={() => { this.props.showImages(images) }}>
           <CommentImages images={images} />
@@ -253,8 +253,8 @@ class PostCard extends Component {
         {this.state.options === true &&
           <View style={{
             position: 'absolute',
-            right: -5,
-            top: 20,
+            right: 10,
+            top: 30,
             width: 150,
             borderWidth: 1,
             borderColor: Color.gray,
@@ -267,9 +267,9 @@ class PostCard extends Component {
                 return (
                   <View
                     style={{
-                      paddingLeft: item.action !== null ? 25 : 10,
+                      paddingLeft: item.action !== null ? 15 : 5,
                       flexDirection: 'row',
-                      paddingBottom: 15
+                      paddingBottom: 5
                     }}
                   >
                     <FontAwesomeIcon icon={item.icon} style={{ color: item.action === 'delete' ? Color.danger : null }} />
