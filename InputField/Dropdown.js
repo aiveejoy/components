@@ -59,7 +59,10 @@ class Dropdown extends Component{
                       return (
                         <Picker.Item
                         key={index}
-                        label={item.title} 
+                        label={item.title}
+                        style={{
+                          fontSize: BasicStyles.standardFontSize
+                        }}
                         value={item.value}/>
                       );
                     })

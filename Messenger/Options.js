@@ -4,7 +4,7 @@ import { Routes, Color, BasicStyles, Helper } from 'common';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faTimes, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faChevronRight, faFileAlt } from '@fortawesome/free-solid-svg-icons';
 import Style from 'modules/messenger/Style.js';
 import Modal from 'components/Modal/Sketch';
 import ImagePicker from 'react-native-image-picker';
@@ -52,9 +52,9 @@ class Options extends Component {
 
   componentDidMount() {
     this.checkIfSupportEnabled();
-    this.retrieveValidation();
-    if (this.props.data?.type == 3) {
-      console.log('cash in')
+    this.retrieveValidation(false);
+    console.log('cash in', this.props.data?.type)
+    if (this.props.data?.type == 3 || this.props.data?.type == 2) {
       let menu = this.state.menu
       menu.length > 0 && menu.map((item, index) => {
         if (item.title?.toLowerCase() === 'requirements') {
@@ -76,7 +76,9 @@ class Options extends Component {
             title: 'Requirements',
             payload: 'same_page',
             payload_value: 'requirements',
-            color: Color.black
+            color: Color.black,
+            type: 'callback',
+            icon: faFileAlt
           },
           ...Helper.MessengerMenu
         ]
@@ -303,7 +305,7 @@ class Options extends Component {
     Api.request(Routes.requestValidationCreate, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
-        this.retrieveValidation();
+        this.retrieveValidation(true);
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -332,7 +334,7 @@ class Options extends Component {
     return result;
   }
 
-  retrieveValidation = () => {
+  retrieveValidation = (retrieve) => {
     const { user } = this.props.state;
     const { data } = this.props;
     let parameter = {
@@ -348,11 +350,19 @@ class Options extends Component {
       limit: 3
     }
     this.setState({ isLoading: true });
-    console.log(Routes.requestValidationRetreive, parameter, '----');
+    console.log(Routes.requestValidationRetreive, parameter);
     Api.request(Routes.requestValidationRetreive, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.setState({ validations: response.data });
+        if(retrieve) {
+          this.onClick({
+            title: 'Requirements',
+            payload: 'same_page',
+            payload_value: 'requirements',
+            type: 'callback'
+          })
+        }
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -435,7 +445,7 @@ class Options extends Component {
     this.setState({ isLoading: true })
     Api.request(Routes.requestValidationDelete, parameter, response => {
       this.setState({ isLoading: false })
-      this.retrieveValidation();
+      this.retrieveValidation(true);
     })
   }
 
