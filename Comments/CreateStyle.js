@@ -39,8 +39,7 @@ export default {
     borderWidth: .5,
     borderRadius: 15,
     width: '90%',
-    marginTop: 10,
-    height: 100
+    marginTop: 10
   },
   button: {
     width: '40%',

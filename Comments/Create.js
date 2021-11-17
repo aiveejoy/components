@@ -30,7 +30,7 @@ class Create extends Component {
     this.setState({ status: value })
   }
 
-  post = () => {
+  post = async () => {
     const { status } = this.state;
     if (status === '' || status === null) {
       this.setState({ errorMessage: 'Empty Status!' })
@@ -66,10 +66,8 @@ class Create extends Component {
     Api.request(Routes.commentsCreate, parameter, response => {
       this.setState({ loading: false })
       if (response.data !== null) {
-        this.props.close()
-        this.addPhotos(response.data);
+        this.addPhotos(response.data, data);
         data['id'] = response.data;
-        this.props.setComments([data, ...this.props.state.comments])
         this.setState({
           status: null,
           errorMessage: null
@@ -81,20 +79,23 @@ class Create extends Component {
   handleChoosePhoto = () => {
     ImagePicker.openPicker({
       multiple: true,
-      includeBase64: true
+      includeBase64: true,
+      compressImageMaxWidth: 700,
+      compressImageMaxHeight: 700,
     }).then(images => {
       let list = this.state.list
       images?.length > 0 && images.map((item, index) => {
-        console.log(item.size, '------size-----')
+        console.log(item.size)
         list.push(item)
       })
       this.setState({ list: list });
     });
   }
 
-  addPhotos = (id) => {
+  addPhotos = (id, data) => {
     const { list } = this.state;
     const { user } = this.props.state;
+    let images = [];
     list.length > 0 && list.map((item, index) => {
       let formData = new FormData();
       let name = item.path.split('/')
@@ -102,7 +103,9 @@ class Create extends Component {
       formData.append('account_id', user.id);
       formData.append('file_base64', item.data);
       console.log('uploading', name[name.length - 1], user.id)
+      this.setState({ loading: true })
       Api.uploadByFetch(Routes.imageUploadBase64, formData, imageResponse => {
+        this.setState({ loading: false })
         let parameter = {
           account_id: user.id,
           payload: 'comment_id',
@@ -112,7 +115,12 @@ class Create extends Component {
         this.setState({ loading: true })
         Api.request(Routes.uploadImage, parameter, res => {
           this.setState({ loading: false })
-          console.log(res)
+          images.push(imageResponse.data)
+          if(list.length - 1 == index) {
+            data['images'] = images
+            this.props.setComments([data, ...this.props.state.comments])
+            this.props.close()
+          }
         }, error => {
           this.setState({ loading: false })
           console.log(error, 'upload image url to payload')
@@ -156,6 +164,7 @@ class Create extends Component {
                   <TextInput
                     style={Style.textInput}
                     multiline={true}
+                    numberOfLines={1}
                     onChangeText={text => this.statusHandler(text)}
                     value={this.state.status}
                     placeholder="   Express what's on your mind!"

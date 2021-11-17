@@ -83,6 +83,13 @@ class Comments extends Component {
     this.props.setComments(temp)
   }
 
+  componentDidUpdate(){
+    if(this.props.shouldRetrieve && !this.state.isLoading) {
+      this.retrieve(true);
+      return
+    }
+  }
+
   post = () => {
     const { payload_value, payload } = this.props.navigation.state?.params;
     const { user } = this.props.state;
@@ -125,7 +132,7 @@ class Comments extends Component {
     return (
       <View>
         {isLoading ? <Spinner mode="overlay" /> : null}
-        <ScrollView style={{
+        {/* <ScrollView style={{
           backgroundColor: Color.containerBackground
         }}
           showsVerticalScrollIndicator={false}
@@ -142,7 +149,7 @@ class Comments extends Component {
               }
             }
           }}
-        >
+        > */}
           <View style={{
             paddingBottom: 10,
             paddingTop: 10
@@ -246,11 +253,14 @@ class Comments extends Component {
               <Skeleton size={2} template={'block'} height={130} />
             )
           }
-        </ScrollView>
+        {/* </ScrollView> */}
         <CreatePost
           visible={createStatus}
           close={() => this.setState({ createStatus: false })}
           title={'Create Post'}
+          retrieve={() => {
+            this.retrieve(false);
+          }}
         />
         <ImageModal
           images={images}
