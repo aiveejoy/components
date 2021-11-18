@@ -54,8 +54,21 @@ class Options extends Component {
     const { data } = this.props;
     this.checkIfSupportEnabled();
     this.retrieveValidation(false);
-    console.log('cash in', data)
+    console.log('cash in', data?.type, data?.shipping)
     if (data?.type == 3 || data?.type == 2) {
+      let menu = this.state.menu
+      menu.length > 0 && menu.map((item, index) => {
+        if (item.title?.toLowerCase() === 'requirements') {
+          menu.splice(index, 1);
+        }
+      })
+      this.setState({
+        current: {
+          title: 'Settings',
+          menu: menu
+        }
+      })
+    } else if (data?.type == 1 && (data?.shipping == 'bank' || data?.shipping == 'e-wallet')) {
       let menu = this.state.menu
       menu.length > 0 && menu.map((item, index) => {
         if (item.title?.toLowerCase() === 'requirements') {
@@ -356,7 +369,7 @@ class Options extends Component {
       this.setState({ isLoading: false });
       if (response.data !== null) {
         this.setState({ validations: response.data });
-        if(retrieve) {
+        if (retrieve) {
           this.onClick({
             title: 'Requirements',
             payload: 'same_page',
