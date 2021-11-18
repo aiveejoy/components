@@ -181,7 +181,6 @@ class MessagesV3 extends Component {
 
   retrieveMembers = (data) => {
     this.setState({ isLoading: true });
-    const { toRate } = this.state;
     const parameter = {
       condition: [{
         value: data.id,
@@ -876,15 +875,26 @@ class MessagesV3 extends Component {
                     <TouchableOpacity style={{
                       marginBottom: 10,
                       marginTop: 10
-                    }}><Text
+                    }}>
+                      <Text
                     onPress={() => {
                       this.redirectToRate('reviewsStack')
                     }}
                      style={{
                       fontWeight: 'bold',
-                      fontSize: 20,
+                      fontSize: 15,
                       textAlign: 'center',
-                    }}>Click here to rate your experience with this partner.</Text></TouchableOpacity>
+                    }}>How was your experience with this partner?</Text>
+                      <Text
+                    onPress={() => {
+                      this.redirectToRate('reviewsStack')
+                    }}
+                     style={{
+                      fontWeight: 'bold',
+                      fontSize: 13,
+                      textAlign: 'center',
+                      fontStyle: 'italic'
+                    }}>Click here to rate.</Text></TouchableOpacity>
                     <Text style={{
                       marginBottom: 10,
                       marginTop: 10
