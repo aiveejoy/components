@@ -65,10 +65,10 @@ class MessagesV3 extends Component {
     setMessageTitle(null)
     const { user } = this.props.state
     if (user == null) return
-    this.retrieveRequest(null)
+    this.retrieveRequest()
   }
 
-  retrieveRequest(route) {
+  retrieveRequest() {
     const { user } = this.props.state;
     const { data } = this.props.navigation.state.params;
     const { members } = this.state;
@@ -88,7 +88,7 @@ class MessagesV3 extends Component {
       this.retrieveGroup()
       if (response.data.length > 0) {
         this.setState({
-          data: response.data[0]
+          data: response.data[0],
         });
         setRequestMessage(response.data[0])
         console.log(response.data[0].status)
@@ -96,18 +96,22 @@ class MessagesV3 extends Component {
           amount: response.data[0].amount,
           currency: response.data[0].currency
         })
-        if(route) {
-          this.props.navigation.navigate(route, {
-            data: response.data[0],
-            members: members,
-            from: 'messenger',
-          })
-        }
       }
     }, error => {
       console.log('error', error)
       this.setState({ isLoading: false });
     });
+  }
+
+  redirectToRate = (route) => {
+    const { data, members } = this.state;
+    if(data) {
+      this.props.navigation.navigate(route, {
+        data: data,
+        members: members,
+        from: 'messenger'
+      })
+    }
   }
 
   componentWillUnmount() {
@@ -177,6 +181,7 @@ class MessagesV3 extends Component {
 
   retrieveMembers = (data) => {
     this.setState({ isLoading: true });
+    const { toRate } = this.state;
     const parameter = {
       condition: [{
         value: data.id,
@@ -192,7 +197,9 @@ class MessagesV3 extends Component {
     Api.request(Routes.messengerMembersRetrieve, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data.length > 0) {
-        this.setState({ members: response.data });
+        this.setState({
+          members: response.data
+        });
       }
     }, error => {
       this.setState({ isLoading: false });
@@ -866,17 +873,18 @@ class MessagesV3 extends Component {
                     alignItems: 'center',
                     width: DeviceWidth / 1.5
                   }}>
-                    <Text
+                    <TouchableOpacity style={{
+                      marginBottom: 10,
+                      marginTop: 10
+                    }}><Text
                     onPress={() => {
-                      this.retrieveRequest('reviewsStack')
+                      this.redirectToRate('reviewsStack')
                     }}
                      style={{
-                      marginBottom: 10,
-                      marginTop: 10,
                       fontWeight: 'bold',
                       fontSize: 20,
-                      textAlign: 'center'
-                    }}>Click here to rate your experience with this partner.</Text>
+                      textAlign: 'center',
+                    }}>Click here to rate your experience with this partner.</Text></TouchableOpacity>
                     <Text style={{
                       marginBottom: 10,
                       marginTop: 10
