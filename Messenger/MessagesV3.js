@@ -65,12 +65,13 @@ class MessagesV3 extends Component {
     setMessageTitle(null)
     const { user } = this.props.state
     if (user == null) return
-    this.retrieveRequest()
+    this.retrieveRequest(null)
   }
 
-  retrieveRequest() {
+  retrieveRequest(route) {
     const { user } = this.props.state;
     const { data } = this.props.navigation.state.params;
+    const { members } = this.state;
     const { setMessageTitle, setRequestMessage } = this.props;
     let parameter = {
       condition: [{
@@ -95,6 +96,13 @@ class MessagesV3 extends Component {
           amount: response.data[0].amount,
           currency: response.data[0].currency
         })
+        if(route) {
+          this.props.navigation.navigate(route, {
+            data: response.data[0],
+            members: members,
+            from: 'messenger',
+          })
+        }
       }
     }, error => {
       console.log('error', error)
@@ -858,13 +866,17 @@ class MessagesV3 extends Component {
                     alignItems: 'center',
                     width: DeviceWidth / 1.5
                   }}>
-                    {/* <Text style={{
+                    <Text
+                    onPress={() => {
+                      this.retrieveRequest('reviewsStack')
+                    }}
+                     style={{
                       marginBottom: 10,
                       marginTop: 10,
                       fontWeight: 'bold',
                       fontSize: 20,
                       textAlign: 'center'
-                    }}>Click here to rate your experience with this partner.</Text> */}
+                    }}>Click here to rate your experience with this partner.</Text>
                     <Text style={{
                       marginBottom: 10,
                       marginTop: 10
