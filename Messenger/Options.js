@@ -582,7 +582,7 @@ class Options extends Component {
         this.setState({ images: false })
         Alert.alert(
           '',
-          'Are you sure you want to transfer fund?',
+          'Are you sure you want to proceed?',
           [
             { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
             {
