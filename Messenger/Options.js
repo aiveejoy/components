@@ -567,8 +567,15 @@ class Options extends Component {
               }
               menu.btn.style.backgroundColor = this.checkValidation(menu.payload_value).result === true ? Color.danger : Color.secondary
               this.setState({ userOwner: true })
+              delete menu.hide
             } else {
               this.setState({ userOwner: false })
+              let result = this.checkValidation(menu.payload_value);
+              if(!result.result && menu.payload_value !== 'back') {
+                menu['hide'] = 'hide'
+              } else{
+                delete menu.hide
+              }
             }
           } catch (e) {
             console.log(e)
