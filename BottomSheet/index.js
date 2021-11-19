@@ -302,43 +302,47 @@ class ImageModal extends Component {
           }}>
             {
               (data && data.length > 0) && data.map(item => (
-                <TouchableOpacity style={{
-                  width: '100%',
-                  paddingLeft: 20,
-                  paddingRight: 20,
-                  flexDirection: 'row',
-                  paddingTop: 15,
-                  paddingBottom: 15
-                }}
-                  onPress={() => {
-                    this.manage(item)
-                  }}
-                >
-                  {
-                    item.icon && (
-                      <FontAwesomeIcon icon={item.icon} size={15} />
-                    )
-                  }
-                  <Text style={{
-                    fontSize: BasicStyles.standardFontSize,
-                    paddingLeft: 10,
-                    color: item.color ? item.color : null
-                  }}>{item.title}</Text>
-                  {userOwner && item.btn && <TouchableOpacity style={{
-                    position: 'absolute',
-                    right: 20,
-                    top: 15,
-                    zIndex: 10,
-                    ...item.btn?.style
+                <View>
+                {item.hide ? (null) : (
+                  <TouchableOpacity style={{
+                    width: '100%',
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    flexDirection: 'row',
+                    paddingTop: 15,
+                    paddingBottom: 15
                   }}
                     onPress={() => {
-                      item.btn?.onClick();
-                    }}>
+                      this.manage(item)
+                    }}
+                  >
+                    {
+                      item.icon && (
+                        <FontAwesomeIcon icon={item.icon} size={15} />
+                      )
+                    }
                     <Text style={{
-                      color: item.btn?.color
-                    }}>{item.btn?.title}</Text>
-                  </TouchableOpacity>}
-                </TouchableOpacity>
+                      fontSize: BasicStyles.standardFontSize,
+                      paddingLeft: 10,
+                      color: item.color ? item.color : null
+                    }}>{item.title}</Text>
+                    {userOwner && item.btn && <TouchableOpacity style={{
+                      position: 'absolute',
+                      right: 20,
+                      top: 15,
+                      zIndex: 10,
+                      ...item.btn?.style
+                    }}
+                      onPress={() => {
+                        item.btn?.onClick();
+                      }}>
+                      <Text style={{
+                        color: item.btn?.color
+                      }}>{item.btn?.title}</Text>
+                    </TouchableOpacity>}
+                  </TouchableOpacity>
+                )}
+                </View>
               ))
             }
           </View>}
