@@ -39,8 +39,8 @@ class Create extends Component {
     const { user } = this.props.state;
     let parameter = {
       account_id: user.id,
-      payload: "status",
-      payload_value: "1",
+      payload: 'account_id',
+      payload_value: user.id,
       text: this.state.status,
       to: user.id,
       from: user.id,
@@ -85,8 +85,12 @@ class Create extends Component {
     }).then(images => {
       let list = this.state.list
       images?.length > 0 && images.map((item, index) => {
-        console.log(item.size)
-        list.push(item)
+        let name = item.path.split('/')
+        let image = {
+          file_url: name[name.length - 1],
+          file_base64: item.data
+        }
+        list.push(image)
       })
       this.setState({ list: list });
     });
@@ -95,40 +99,27 @@ class Create extends Component {
   addPhotos = (id, data) => {
     const { list } = this.state;
     const { user } = this.props.state;
-    let images = [];
-    list.length > 0 && list.map((item, index) => {
-      let formData = new FormData();
-      let name = item.path.split('/')
-      formData.append('file_url', name[name.length - 1]);
-      formData.append('account_id', user.id);
-      formData.append('file_base64', item.data);
-      console.log('uploading', name[name.length - 1], user.id)
-      this.setState({ loading: true })
-      Api.uploadByFetch(Routes.imageUploadBase64, formData, imageResponse => {
-        this.setState({ loading: false })
-        let parameter = {
-          account_id: user.id,
-          payload: 'comment_id',
-          payload_value: id,
-          category: imageResponse.data
-        }
-        this.setState({ loading: true })
-        Api.request(Routes.uploadImage, parameter, res => {
-          this.setState({ loading: false })
-          images.push(imageResponse.data)
-          if(list.length - 1 == index) {
-            data['images'] = images
-            this.props.setComments([data, ...this.props.state.comments])
-            this.props.close()
-          }
-        }, error => {
-          this.setState({ loading: false })
-          console.log(error, 'upload image url to payload')
+    let parameter = {
+      images: list,
+      account_id: user.id,
+      payload: 'comment_id',
+      payload_value: id
+    }
+    console.log(parameter)
+    Api.request(Routes.imageUploadArray, parameter, imageResponse => {
+      this.setState({ loading: false })
+      if(imageResponse.data.length > 0) {
+        let images = []
+        imageResponse.data.map(item => {
+          images.push(item.category)
         })
-      }, error => {
-        this.setState({ loading: false })
-        console.log(error, 'upload image')
-      })
+        data['images'] = images
+        this.props.setComments([data, ...this.props.state.comments])
+        this.props.close()
+      }
+    }, error => {
+      this.setState({ loading: false })
+      console.log(error, 'upload image')
     })
   }
 
@@ -199,7 +190,7 @@ class Create extends Component {
                       return (
                         <TouchableOpacity
                         onPress={() => {
-                          this.setImage(item.path)
+                          // this.setImage(item.path)
                         }}
                         onLongPress={() => {
                           Alert.alert(
@@ -223,7 +214,7 @@ class Create extends Component {
                           height: 50
                         }}>
                           <Image
-                            source={{ uri: item.path }}
+                            source={{ uri: `data:image/jpeg;base64,${item.file_base64}` }}
                             style={{
                               width: '100%',
                               height: '100%'
