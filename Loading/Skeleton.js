@@ -36,6 +36,35 @@ class Skeleton extends Component {
     )
   }
 
+  notificationTemplate(i){
+    const { size } = this.props;
+    return (
+      <View style={{
+        width: '100%'
+      }}
+        key={i}>
+
+        <View style={{
+          width: '100%',
+          alignItems: "center",
+          flexDirection: "row",
+        }}>
+          <View style={{
+            width: '100%'
+          }}>
+            <View style={{
+              width: '100%',
+              height: this.props.height ? this.props.height : 75,
+              borderRadius: 15,
+              backgroundColor: 'red',
+              marginBottom: size > 1 ? 20 : 0
+            }} />
+          </View>
+        </View>
+      </View>
+    )
+  }
+
   messagesTemplate(i) {
     return (
       <View style={{
@@ -304,6 +333,13 @@ class Skeleton extends Component {
                 {
                   this.messagesTemplate(i)
                 }
+              </View>
+            )
+            break
+          case 'notification':
+            content.push(
+              <View>
+                {this.notificationTemplate(i)}
               </View>
             )
             break
