@@ -1,84 +1,223 @@
-import React, {Component} from 'react'
-import { Platform } from 'react-native';
-import {
-  RTCPeerConnection,
-  RTCIceCandidate,
-  RTCSessionDescription,
-  RTCView,
-  MediaStream,
-  MediaStreamTrack,
-  mediaDevices,
-  registerGlobals
-} from 'react-native-webrtc';
+import React, {useState, useRef, useEffect} from 'react';
+import {View, SafeAreaView, StyleSheet} from 'react-native';
+import {MediaStream, RTCPeerConnection, RTCIceCandidate, RTCSessionDescription} from 'react-native-webrtc';
+import GettingCall from './GettingCall.js';
+import Video from './Video.js';
+import Button from './Button.js';
+import audioUtils from './audioUtils.js'
+import Api from 'services/api/index.js';
+import firestore from '@react-native-firebase/firestore'
 
-class AudioCall extends Component{
-    state ={
-      videoUrl: null,
-      isFront: true
-  }
+export default function AudioCall() {
+  const [localStream, setLocalStream] = useState();
+  const [remoteStream, setRemoteStream] =useState();
+  const [gettingCall, setGettingCall] = useState(false);
+  const pc = useRef();
+  const connecting = useRef(false);
 
-  componentDidMount() {
-    const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
-    const pc = new RTCPeerConnection(configuration);
-    const {isFront} = this.state;
-    mediaDevices.enumerateDevices().then(sourceInfos => {
-      console.log(sourceInfos);
-      let videoSourceId;
-      for (let i = 0; i < sourceInfos.length; i++) {
-        const sourceInfo = sourceInfos[i];
-        if(sourceInfo.kind == "video" && sourceInfo.facing == (isFront ? "front" : "environment")) {
-          videoSourceId = sourceInfo.deviceId;
+  const configuration = {'iceServers': [{url: 'stun:stun.l.google.com:19302'}]};
+
+  useEffect(() => {
+    const cRef = firestore().collection('meet').doc('chatId');
+
+    const subscribe = cRef.onSnapshot(snapshot => {
+      const data = snapshot.data();
+      
+      if(pc.current && !pc.current.remoteDescription && data && data.answer){
+        pc.current.setRemoteDescription(new RTCSessionDescription(data.answer));
+      }
+
+      if(data && data.offer && !connecting.current){
+        setGettingCall(true);
+      }
+    })
+
+    const subscribeDelete = cRef.collection('callee').onSnapshot(snapshot => {
+      snapshot.docChanges().forEach(item => {
+        if(item.type === 'removed'){
+          hangup();
+        }
+      })
+    })
+    return () => {
+      subscribe();
+      subscribeDelete()
+    }
+  }, [])
+
+  //setup webrtc
+  const setupWebRtc = async() => {
+    console.log('setup');
+    pc.current = new RTCPeerConnection(configuration);
+    const stream = await audioUtils.getStream();
+    if(stream){
+      console.log('[STREAM]', stream);
+      setLocalStream(stream)
+      pc.current.addStream(stream)
+    }
+    pc.current.onAddStream = (event) => {
+      console.log('[ONADDSTREAM]', event);
+      setRemoteStream(event.stream)
+    }
+  };
+  //==============
+
+  //create new connection
+  const create = async () => {
+    console.log('[CALLING!]');
+    connecting.current = true
+
+    await setupWebRtc();
+
+    const cRef = firestore().collection('meet').doc('chatId')
+
+    collectionIceCandidates(cRef, 'caller', 'callee');
+
+    if(pc.current){
+      const offer = await pc.current.createOffer();
+      pc.current.setLocalDescription(offer)
+
+      const cWithOffer = {
+        offer: {
+          type: offer.type,
+          sdp: offer.sdp
         }
       }
-      mediaDevices.getUserMedia({
-        audio: true,
-        video: Platform.OS === 'ios' ? false : {
-          width: 640,
-          height: 480,
-          frameRate: 30,
-          facingMode: (isFront ? "user" : "environment"),
-          deviceId: videoSourceId
+      cRef.set(cWithOffer);
+    }
+  };
+  //==============
+
+  const join = async() => {
+    console.log('[JOINING]');
+    connecting.current = true;
+    setGettingCall(false)
+
+    const cRef = firestore().collection('meet').doc('chatId');
+    const offer = (await cRef.get()).data()?.offer;
+
+    if(offer){
+      await setupWebRtc();
+
+      collectionIceCandidates(cRef, 'callee', 'caller');
+
+      if(pc.current){
+        pc.current.setRemoteDescription(new RTCSessionDescription(offer));
+
+        const answer = await pc.current.createAnswer();
+        pc.current.setLocalDescription(answer)
+
+        const cWithAnswer = {
+          offer: {
+            type: answer.type,
+            sdp: answer.sdp
+          }
+        }
+        cRef.update(cWithAnswer);
+      }
+    }
+  };
+  const hangup = async() => {
+    setGettingCall(false)
+    connecting.current = false;
+    streamClear()
+    fireStoreClear()
+    if(pc.current){
+      pc.current.close();
+    }
+  };
+
+
+  const streamClear = async() => {
+    if(localStream){
+      localStream.getTracks().forEach(el => el.stop());
+      localStream.release();
+    }
+    setLocalStream(null);
+    setRemoteStream(null);
+  };
+  const fireStoreClear = async() => {
+    const cRef = firestore().collection('meet').doc('chatId');
+    if(cRef){
+      const calleeCandidate = await cRef.collection('callee').get();
+      calleeCandidate.forEach(async (item) => {
+        await item.ref.delete();
+      })
+      const callerCandidate = await cRef.collection('caller').get();
+      callerCandidate.forEach(async (item) => {
+        await item.ref.delete();
+      })
+    }
+    cRef.delete();
+  };
+
+  const collectionIceCandidates = async(cRef, localName, remoteName) => {
+    const candidateCollection = cRef.collection(localName);
+    // console.log('[COLLECTION CANDIDATES]', pc.current);
+    if(pc.current){
+      pc.current.onicecandidate = (event) => {
+        if(event.candidate){
+          console.log('[CANDIDATE]', event.candidate);
+          candidateCollection.add(event.candidate)
+        }
+      }
+    }
+    await cRef.collection(remoteName).onSnapshot(snapshot => {
+      console.log('------------', snapshot);
+      snapshot.docChanges().forEach((el) => {
+        console.log('=============', el);
+        if(el.type === 'added'){
+          const candidate = new RTCIceCandidate(el.doc.data())
+          pc.current?.addIceCandidate(candidate);
         }
       })
-      .then(stream => {
-        console.log('[STREAMING]', stream);
-        this.setState({videoUrl: stream.toURL()})
-        pc.addStream(stream);
-      })
-      .catch(error => {
-        console.log('[ERROR]', error);
-      });
-    });
-
-    pc.createOffer().then(desc => {
-      pc.setLocalDescription(desc).then(() => {
-        // Send pc.localDescription to peer
-      }).catch(e => {
-        console.log('[LOCAL ERROR]', e);
-      }).catch(err => {
-        console.log('[offer ERROR]', err);
-      });
-    });
-    pc.onicecandidate = (event) => {
-      // send event.candidate to peer
-      console.log('[EVENT]', event);
-    };
+    })
   }
 
-  render() {
+  if (gettingCall) {
+    return <GettingCall hangup={hangup} join={join} />;
+  }
+
+  if (localStream) {
     return (
-      <RTCView streamURL={this.state.videoUrl} style={styles.container}/>
-    )
+      <Video
+        hangup={hangup}
+        localStream={localStream}
+        remoteStream={remoteStream}
+      />
+    );
   }
+  return (
+    <View style={styles.container}>
+      {/* <GettingCall/> */}
+      {/* <Video/> */}
+      <Button title={'Call'} style={styles.callBtn} onPress={create} />
+    </View>
+  );
 }
 
-const styles = {
+const styles = StyleSheet.create({
   container: {
+    backgroundColor: '#fff',
     flex: 1,
-    backgroundColor: '#ccc',
-    borderWidth: 1,
-    borderColor: '#000'
-  }
-}
-
-export default AudioCall;
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    fontSize: 30,
+  },
+  rtcview: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '40%',
+    width: '80%',
+    backgroundColor: 'black',
+  },
+  rtc: {
+    width: '80%',
+    height: '100%',
+  },
+  callBtn: {
+    backgroundColor: 'gray',
+  },
+});
