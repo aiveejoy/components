@@ -843,7 +843,7 @@ class MessagesV3 extends Component {
               }}
               showsVerticalScrollIndicator={false}
               style={[Style.ScrollView, {
-                Height: '100%'
+                height: '100%'
               }]}
               onScroll={({ nativeEvent }) => {
                 const { layoutMeasurement, contentOffset, contentSize } = nativeEvent
