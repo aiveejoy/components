@@ -11,10 +11,11 @@ import {
   KeyboardAvoidingView,
   SafeAreaView,
   Dimensions,
-  Alert
+  Alert,
+  RefreshControl
 } from 'react-native';
 import { Routes, Color, BasicStyles, Helper } from 'common';
-import { Spinner, UserImage } from 'components';
+import { UserImage } from 'components';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
@@ -332,7 +333,7 @@ class MessagesV3 extends Component {
 
     Api.request(Routes.mmCreateWithImageWithoutPayload, parameter, response => {
       if (response.data != null) {
-        updateMessageByCode(response.data);
+        // updateMessageByCode(response.data);
       }
     }, error => {
       console.log({ sendImageWithoutPayloadError: error })
@@ -405,6 +406,18 @@ class MessagesV3 extends Component {
               ...parameter,
               url: imageResponse.data
             }
+            const { messagesOnGroup, messengerGroup } = this.props.state;
+            let temp = messagesOnGroup.messages;
+            const { setMessagesOnGroup } = this.props;
+            if (messagesOnGroup && messagesOnGroup.messages.length > 0) {
+              temp[messagesOnGroup.messages.length - 1].files[0].url = imageResponse.data
+              temp[messagesOnGroup.messages.length - 1].sending_flag = false
+              setMessagesOnGroup({
+                groupId: messengerGroup.id,
+                messages: temp
+              })
+            }
+            console.log(temp[messagesOnGroup.messages.length - 1])
             this.sendImageWithoutPayload(parameter)
           }
         }, error => {
@@ -754,6 +767,14 @@ class MessagesV3 extends Component {
                 </View>
               )}
               keyExtractor={(item, index) => index.toString()}
+              refreshControl={Platform.OS === 'android' &&
+                <RefreshControl
+                  refreshing={false}
+                  onRefresh={() => {  
+                    this.retrieveMoreMessages()
+                  }}
+                />
+              }
             />
           )
         }
@@ -854,7 +875,7 @@ class MessagesV3 extends Component {
 
             <View style={{
               position: 'absolute',
-              bottom: 20,
+              bottom: 0,
               left: 0,
               borderTopColor: Color.lightGray,
               borderTopWidth: 1,
@@ -870,7 +891,8 @@ class MessagesV3 extends Component {
                   <View style={{
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: DeviceWidth / 1.5
+                    width: DeviceWidth / 1.5,
+                    marginBottom: 20
                   }}>
                     <TouchableOpacity style={{
                       marginBottom: 10,
