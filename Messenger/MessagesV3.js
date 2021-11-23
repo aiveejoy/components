@@ -866,7 +866,7 @@ class MessagesV3 extends Component {
 
             <View style={{
               position: 'absolute',
-              bottom: 20,
+              bottom: 0,
               left: 0,
               borderTopColor: Color.lightGray,
               borderTopWidth: 1,
@@ -882,7 +882,8 @@ class MessagesV3 extends Component {
                   <View style={{
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: DeviceWidth / 1.5
+                    width: DeviceWidth / 1.5,
+                    marginBottom: 20
                   }}>
                     <TouchableOpacity style={{
                       marginBottom: 10,
