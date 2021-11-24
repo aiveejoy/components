@@ -106,15 +106,7 @@ class MessagesV3 extends Component {
   }
 
   multilineHandler(){
-    if(Platform.OS == 'ios'){
-      if(this.state.onFocusFlag == true){
-        return true;
-      }else{
-        return false;
-      }
-    }else{
-      return true;
-    }
+    return this.state.onFocusFlag
   }
 
   redirectToRate = (route) => {
