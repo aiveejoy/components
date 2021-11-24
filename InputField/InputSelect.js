@@ -11,7 +11,7 @@ class InputSelect extends Component{
     this.state = {
       input: null,
       filter: false,
-      cuisine: null
+      cuisine: 'Filipino'
     }
   }
 
@@ -50,6 +50,10 @@ class InputSelect extends Component{
         <View style={{
           marginLeft: 20,
           marginBottom: '5%',
+          borderBottomColor: Color.gray,
+          borderBottomWidth: 1,
+          paddingBottom: 15,
+          paddingTop: 15,
           width: '90%'}}>
             {filter && (
             <Filter
@@ -62,19 +66,24 @@ class InputSelect extends Component{
             />
           )}
         <TouchableOpacity
+         style={{
+           flexDirection: 'row',
+           justifyContent: 'space-between'
+         }}
          onPress={() => this.showFilter()}>
-          <Text style={{color: 'black', marginBottom: -10 }}>{this.props.title}</Text>
-          <TextInput
-            style={[BasicStyles.formControls]}
-            editable={false}
-            placeholder={this.props.placeholder}
-          />
+           <View>
+            <Text>{this.props.title}</Text>
+            <Text style={{
+              color: Color.gray,
+              paddingTop: 10
+            }}>{this.state.cuisine}</Text>
+          </View>
+          <Text>ALL</Text>
         </TouchableOpacity>
-        {
+        {/*
           (this.state.cuisine?.categories?.length < 1 || this.state.cuisine == null || this.state.cuisine?.categories?.length == 10) && (
           <TouchableHighlight
             style={{
-              position: 'absolute',
               right: 10,
               top: 30
             }}
@@ -83,7 +92,7 @@ class InputSelect extends Component{
             <Text>All</Text>
           </TouchableHighlight>
           )
-        }
+          */}
       </View>
     )
   }
