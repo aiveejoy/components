@@ -242,7 +242,7 @@ class ImageModal extends Component {
                   }}> Go Back</Text>
                 </TouchableOpacity>
               </View>}
-              {userOwner && currentValidation?.status != 'accepted' && <View style={{
+              {userOwner && currentValidation?.status != 'accepted' && pictures.length > 0 && <View style={{
                 flexDirection: 'row',
                 flex: 1,
                 justifyContent: 'center',

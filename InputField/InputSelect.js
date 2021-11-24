@@ -11,7 +11,7 @@ class InputSelect extends Component{
     this.state = {
       input: null,
       filter: false,
-      cuisine: null
+      cuisine: ''
     }
   }
 
@@ -46,11 +46,14 @@ class InputSelect extends Component{
 
   render() {
     const { filter } = this.state;
+    console.log('[>>>>>>>>>>>]', this.state.cuisine?.categories?.length < 1, this.state.cuisine?.categories?.length)
     return (
         <View style={{
-          marginLeft: 20,
-          marginBottom: '5%',
-          width: '90%'}}>
+          borderBottomColor: Color.gray,
+          borderBottomWidth: 1,
+          paddingBottom: 15,
+          paddingTop: 15,
+          width: '100%'}}>
             {filter && (
             <Filter
               navigate={this.props.navigation}
@@ -62,19 +65,28 @@ class InputSelect extends Component{
             />
           )}
         <TouchableOpacity
+         style={{
+           flexDirection: 'row',
+           justifyContent: 'space-between'
+         }}
          onPress={() => this.showFilter()}>
-          <Text style={{color: 'black', marginBottom: -10 }}>{this.props.title}</Text>
-          <TextInput
-            style={[BasicStyles.formControls]}
-            editable={false}
-            placeholder={this.props.placeholder}
-          />
+           <View>
+            <Text>{this.props.title}</Text>
+            <Text style={{
+              color: Color.gray,
+              paddingTop: 10
+            }}>{this.props.placeholder}</Text>
+          </View>
+          {
+            (this.state.cuisine?.categories?.length < 1 || this.state.cuisine?.categories === undefined || this.state.cuisine == null || this.state.cuisine?.categories?.length == 10) && (
+              <Text>ALL</Text>
+            )
+          }
         </TouchableOpacity>
-        {
+        {/*
           (this.state.cuisine?.categories?.length < 1 || this.state.cuisine == null || this.state.cuisine?.categories?.length == 10) && (
           <TouchableHighlight
             style={{
-              position: 'absolute',
               right: 10,
               top: 30
             }}
@@ -83,7 +95,7 @@ class InputSelect extends Component{
             <Text>All</Text>
           </TouchableHighlight>
           )
-        }
+          */}
       </View>
     )
   }
