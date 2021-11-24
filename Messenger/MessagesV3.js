@@ -11,10 +11,11 @@ import {
   KeyboardAvoidingView,
   SafeAreaView,
   Dimensions,
-  Alert
+  Alert,
+  RefreshControl
 } from 'react-native';
 import { Routes, Color, BasicStyles, Helper } from 'common';
-import { Spinner, UserImage } from 'components';
+import { UserImage } from 'components';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
@@ -766,6 +767,14 @@ class MessagesV3 extends Component {
                 </View>
               )}
               keyExtractor={(item, index) => index.toString()}
+              refreshControl={Platform.OS === 'android' &&
+                <RefreshControl
+                  refreshing={false}
+                  onRefresh={() => {  
+                    this.retrieveMoreMessages()
+                  }}
+                />
+              }
             />
           )
         }

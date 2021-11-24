@@ -274,6 +274,7 @@ class Options extends Component {
       account_id: user.id
     };
     if (request != null && request.code == data.code) {
+      this.close();
       this.props.navigation.navigate(route, {
         data: request,
         members: members,
