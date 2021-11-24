@@ -74,9 +74,13 @@ class InputSelect extends Component{
             <Text style={{
               color: Color.gray,
               paddingTop: 10
-            }}>{this.state.cuisine}</Text>
+            }}>{this.props.placeholder}</Text>
           </View>
-          <Text>ALL</Text>
+          {
+            (this.state.cuisine?.categories?.length < 1 || this.state.cuisine == null || this.state.cuisine?.categories?.length == 10) && (
+              <Text>ALL</Text>
+            )
+          }
         </TouchableOpacity>
         {/*
           (this.state.cuisine?.categories?.length < 1 || this.state.cuisine == null || this.state.cuisine?.categories?.length == 10) && (
