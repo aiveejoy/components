@@ -56,7 +56,8 @@ class MessagesV3 extends Component {
       request_id: null,
       isViewing: false,
       members: [],
-      data: null
+      data: null,
+      onFocusFlag: false
     }
   }
 
@@ -102,6 +103,18 @@ class MessagesV3 extends Component {
       console.log('error', error)
       this.setState({ isLoading: false });
     });
+  }
+
+  multilineHandler(){
+    if(Platform.OS == 'ios'){
+      if(this.state.onFocusFlag == true){
+        return true;
+      }else{
+        return false;
+      }
+    }else{
+      return true;
+    }
   }
 
   redirectToRate = (route) => {
@@ -694,52 +707,69 @@ class MessagesV3 extends Component {
   _footer = () => {
     const { theme } = this.props.state;
     return (
-      <View style={{
-        flexDirection: 'row'
-      }}>
-        <TouchableOpacity
-          onPress={() => this.handleChoosePhoto()}
-          style={{
-            height: 50,
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '10%'
-          }}
-        >
-          <FontAwesomeIcon
-            icon={faImage}
-            size={BasicStyles.iconSize}
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}>
+          <TouchableOpacity
+            onPress={() => this.handleChoosePhoto()}
             style={{
-              color: theme ? theme.primary : Color.primary
+              height: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '10%'
             }}
+          >
+            <FontAwesomeIcon
+              icon={faImage}
+              size={BasicStyles.iconSize}
+              style={{
+                color: theme ? theme.primary : Color.primary
+              }}
+            />
+          </TouchableOpacity>
+          <TextInput
+            style={{...Style.formControl,
+              paddingTop: 0,
+              paddingBottom: 0,
+              alignSelf: 'center'
+            }}
+            onChangeText={(newMessage) => this.setState({ newMessage })}
+            value={this.state.newMessage}
+            
+            onBlur={() => {
+              this.setState({
+                onFocusFlag: false
+              })
+            }}
+
+            onFocus={() => {
+              this.setState({
+                onFocusFlag: true
+              })
+            }}
+            placeholder={'Type your message here ...'}
+            multiline={this.multilineHandler()}
+            placeholderTextColor={Color.darkGray}
           />
-        </TouchableOpacity>
-        <TextInput
-          style={Style.formControl}
-          onChangeText={(newMessage) => this.setState({ newMessage })}
-          value={this.state.newMessage}
-          placeholder={'Type your message here ...'}
-          multiline={true}
-          placeholderTextColor={Color.darkGray}
-        />
-        <TouchableOpacity
-          onPress={() => this.sendNewMessage()}
-          style={{
-            height: 50,
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '10%'
-          }}
-        >
-          <FontAwesomeIcon
-            icon={faPaperPlane}
-            size={BasicStyles.iconSize}
+          <TouchableOpacity
+            onPress={() => this.sendNewMessage()}
             style={{
-              color: theme ? theme.primary : Color.primary
+              height: 50,
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '10%'
             }}
-          />
-        </TouchableOpacity>
-      </View>
+          >
+            <FontAwesomeIcon
+              icon={faPaperPlane}
+              size={BasicStyles.iconSize}
+              style={{
+                color: theme ? theme.primary : Color.primary
+              }}
+            />
+          </TouchableOpacity>
+        </View>
     );
   }
 
@@ -828,7 +858,7 @@ class MessagesV3 extends Component {
           behavior={'padding'}
           keyboardVerticalOffset={
             Platform.select({
-              ios: () => 65,
+              ios: () => 80,
               android: () => -200
             })()}
         >
