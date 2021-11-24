@@ -1,6 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {View, SafeAreaView, StyleSheet} from 'react-native';
 import {MediaStream, RTCPeerConnection, RTCIceCandidate, RTCSessionDescription} from 'react-native-webrtc';
+import InCallManager from 'react-native-incall-manager';
 import GettingCall from './GettingCall.js';
 import Video from './Video.js';
 import Button from './Button.js';
@@ -59,6 +60,10 @@ export default function AudioCall() {
       console.log('[ONADDSTREAM]', event);
       setRemoteStream(event.stream)
     }
+
+    InCallManager.start({media: 'audio'});
+    InCallManager.setForceSpeakerphoneOn(true);
+    InCallManager.setSpeakerphoneOn(true);
   };
   //==============
 
@@ -108,7 +113,7 @@ export default function AudioCall() {
         pc.current.setLocalDescription(answer)
 
         const cWithAnswer = {
-          offer: {
+          answer: {
             type: answer.type,
             sdp: answer.sdp
           }
@@ -157,17 +162,16 @@ export default function AudioCall() {
     if(pc.current){
       pc.current.onicecandidate = (event) => {
         if(event.candidate){
-          console.log('[CANDIDATE]', event.candidate);
+          // console.log('[CANDIDATE]', event.candidate);
           candidateCollection.add(event.candidate)
         }
       }
     }
     await cRef.collection(remoteName).onSnapshot(snapshot => {
-      console.log('------------', snapshot);
       snapshot.docChanges().forEach((el) => {
-        console.log('=============', el);
         if(el.type === 'added'){
           const candidate = new RTCIceCandidate(el.doc.data())
+          console.log('[ICE]', candidate);
           pc.current?.addIceCandidate(candidate);
         }
       })
