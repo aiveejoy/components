@@ -78,7 +78,7 @@ class InputSelect extends Component{
             }}>{this.props.placeholder}</Text>
           </View>
           {
-            (this.state.cuisine?.categories === undefined || this.state.cuisine == null || this.state.cuisine === ' ' || this.state.cuisine?.categories?.length == 10) && (
+            (this.state.cuisine?.categories?.length < 1 || this.state.cuisine?.categories === undefined || this.state.cuisine == null || this.state.cuisine?.categories?.length == 10) && (
               <Text>ALL</Text>
             )
           }
