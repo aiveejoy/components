@@ -730,8 +730,8 @@ class MessagesV3 extends Component {
           </TouchableOpacity>
           <TextInput
             style={{...Style.formControl,
-              paddingTop: 0,
-              paddingBottom: 0,
+              paddingTop: 15,
+              paddingBottom: 15,
               alignSelf: 'center'
             }}
             onChangeText={(newMessage) => this.setState({ newMessage })}
