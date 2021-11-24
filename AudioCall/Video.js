@@ -11,6 +11,7 @@ function ButtonContainer(props) {
   );
 }
 export default function Video(props) {
+  console.log('-------------------------->>>>', props.localStream, props.remoteStream)
   // const [localStream, setLocalStream] = useState({})
   if (props.localStream && !props.remoteStream) {
     return (
