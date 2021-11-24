@@ -349,24 +349,24 @@ class LocationWithMap extends Component {
       alert('Please Input an Address or Use the Pin');
     } else
       this.setState({locationPicked: true}, () => {
-        const location = {
-          route: this.state.route,
-          address: this.state.address,
-          province: this.state.province,
-          locality: this.state.locality,
-          region: this.state.address_region,
-          country: this.state.country,
-          postal: this.state.postal ? this.state.postal : null,
-          latitude: this.state.region.latitude,
-          longitude: this.state.region.longitude,
-        };
-        console.log({
-          newLocation: location
-        })
-        // console.log('LOCATION IN COMPONENT', location);
-        setLocation(location);
-        this.props.navigation.pop();
-      });
+      const location = {
+        route: this.state.route,
+        address: this.state.address,
+        province: this.state.province,
+        locality: this.state.locality,
+        region: this.state.address_region,
+        country: this.state.country,
+        postal: this.state.postal ? this.state.postal : null,
+        latitude: this.state.region.latitude,
+        longitude: this.state.region.longitude,
+      };
+      console.log({
+        newLocation: location
+      })
+      // console.log('LOCATION IN COMPONENT', location);
+      setLocation(location);
+      this.props.navigation.pop();
+    });
   };
 
   clearLocation = () => {
