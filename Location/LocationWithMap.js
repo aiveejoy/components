@@ -617,6 +617,18 @@ class LocationWithMap extends Component {
         {this.renderMap()}
         {Platform.OS  == 'android' && this.renderSearchBar()}
         {Platform.OS  == 'ios' && this.renderSearchBarIOS()}
+        <View
+          style={{
+            justifyContent: 'center',
+            width: '90%',
+            marginLeft: '5%',
+            marginRight: '5%',
+            bottom: 30
+          }}>
+          <Text style={{
+            fontWeight: 'bold'
+          }}>Long Press To Drag</Text>
+        </View>
         {
           this.state.address && (
             <TouchableOpacity
