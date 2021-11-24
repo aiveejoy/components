@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, TextInput, Text } from 'react-native'
-import { BasicStyles} from 'common';
+import { View, TouchableOpacity, TextInput, Text, ColorPropType } from 'react-native'
+import { BasicStyles, Color} from 'common';
 import Filter from 'modules/filter/Filter.js'
 
 class Range extends Component{
@@ -36,9 +36,10 @@ class Range extends Component{
     const { filter } = this.state;
     return (
       <View style={{
-        position: 'absolute',
-        marginLeft: 20,
-        width: '90%'}}>
+        flexDirection: 'row',
+        borderBottomColor: Color.gray,
+        borderBottomWidth: 1,
+        width: '100%'}}>
           {filter && (
             <Filter
               navigate={this.props.navigation}
@@ -51,9 +52,9 @@ class Range extends Component{
           )}
         <TouchableOpacity
          onPress={() => this.showFilter()}>
-        <Text style={{color: 'black', marginBottom: -10 }}>{this.props.title}</Text>
+        <Text style={{color: 'black'}}>{this.props.title}</Text>
           <TextInput
-            style={[BasicStyles.formControls, {width: '100%'}]}
+            style={[BasicStyles.formControls, {width: '100%', borderBottomWidth: 0, marginBottom: 0}]}
             editable={false}
             placeholder={'$' + ((this.state.value?.amount?.low === undefined) ? this.state.value : this.state.value?.amount?.low) + '-' + '$' + ((this.state.value?.amount?.high === undefined) ? this.state.valueHigh : this.state.value?.amount?.high)}
           />

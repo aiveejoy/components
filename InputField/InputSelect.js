@@ -48,13 +48,11 @@ class InputSelect extends Component{
     const { filter } = this.state;
     return (
         <View style={{
-          marginLeft: 20,
-          marginBottom: '5%',
           borderBottomColor: Color.gray,
           borderBottomWidth: 1,
           paddingBottom: 15,
           paddingTop: 15,
-          width: '90%'}}>
+          width: '100%'}}>
             {filter && (
             <Filter
               navigate={this.props.navigation}
