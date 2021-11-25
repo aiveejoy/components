@@ -20,7 +20,7 @@ import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import Style from 'modules/messenger/Style.js'
@@ -32,6 +32,7 @@ import { NavigationActions, StackActions } from 'react-navigation';
 import Skeleton from 'components/Loading/Skeleton';
 import ScreenshotHandler from 'services/ScreenshotHandler';
 import _ from 'lodash';
+import Ratings from 'components/Messenger/Ratings';
 
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -802,7 +803,6 @@ class MessagesV3 extends Component {
       data
     } = this.state;
     const { requestMessage, theme } = this.props.state;
-    
     console.log('[MESSEGER GROUP]', data, '----------------');
     return (
       <SafeAreaView>
@@ -895,29 +895,26 @@ class MessagesV3 extends Component {
                     width: DeviceWidth / 1.5,
                     marginBottom: 20
                   }}>
-                    <TouchableOpacity style={{
-                      marginBottom: 10,
+                    {data && members.length > 0 && <Ratings
+                    members={members}
+                    data={data}/>}
+                    <TouchableOpacity
+                    onPress={() => {
+                      this.redirectToRate('reviewsStack')
+                    }}
+                    style={{
+                      width: '20%',
+                      alignItems: 'center',
                       marginTop: 10
                     }}>
-                      <Text
-                    onPress={() => {
-                      this.redirectToRate('reviewsStack')
-                    }}
-                     style={{
-                      fontWeight: 'bold',
-                      fontSize: 15,
-                      textAlign: 'center',
-                    }}>How was your experience with this partner?</Text>
-                      <Text
-                    onPress={() => {
-                      this.redirectToRate('reviewsStack')
-                    }}
-                     style={{
-                      fontWeight: 'bold',
-                      fontSize: 13,
-                      textAlign: 'center',
-                      fontStyle: 'italic'
-                    }}>Click here to rate.</Text></TouchableOpacity>
+                    <FontAwesomeIcon
+                      icon={faChevronDown}
+                      size={BasicStyles.iconSize}
+                      style={{
+                        color: theme ? theme.primary : Color.primary
+                      }}
+                    />
+                    </TouchableOpacity>
                     <Text style={{
                       marginBottom: 10,
                       marginTop: 10
