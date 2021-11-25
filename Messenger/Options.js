@@ -601,19 +601,23 @@ class Options extends Component {
         break
       case 'transferFundStack': {
         this.setState({ images: false })
-        Alert.alert(
-          '',
-          'Are you sure you want to proceed?',
-          [
-            { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-            {
-              text: 'Yes', onPress: () => {
-                this.retrieveRequest('transferFundStack')
-              }
-            },
-          ],
-          { cancelable: false }
-        )
+        if(requestMessage?.status < 2) {
+          Alert.alert(
+            '',
+            'Are you sure you want to proceed?',
+            [
+              { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+              {
+                text: 'Yes', onPress: () => {
+                  this.retrieveRequest('transferFundStack')
+                }
+              },
+            ],
+            { cancelable: false }
+          )
+        } else {
+          this.retrieveRequest('transferFundStack')
+        }
       }
         break
       case 'reviewsStack': {
