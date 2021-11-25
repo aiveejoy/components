@@ -766,7 +766,7 @@ class MessagesV3 extends Component {
   }
 
   _flatList = () => {
-    const { user, messagesOnGroup } = this.props.state;
+    const { user, messagesOnGroup, requestMessage } = this.props.state;
     return (
       <View style={{
         width: '100%',
@@ -779,9 +779,8 @@ class MessagesV3 extends Component {
               extraData={this.props}
               ItemSeparatorComponent={this.FlatListItemSeparator}
               style={{
-                marginBottom: 50,
-                flex: 1,
-
+                marginBottom: requestMessage?.status >= 2 ? DeviceHeight - 500 : 100,
+                flex: 1
               }}
               renderItem={({ item, index }) => (
                 <View>
