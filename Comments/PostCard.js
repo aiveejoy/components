@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Image, Dimensions, Text, TextInput } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faEyeSlash, faTrashAlt, faPrayingHands, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
-import { BasicStyles, Color } from 'common';
+import { faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faTrashAlt, faPrayingHands, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { BasicStyles, Color, Routes } from 'common';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import UserImage from 'components/User/Image';
 import CommentImages from './Images';
+import Api from 'services/api/index.js';
 
 const height = Math.round(Dimensions.get('window').height);
 const options = [
   { title: 'Post Actions', action: null, icon: faCog },
   { title: 'Edit', action: 'edit', icon: faPencilAlt },
   { title: 'Report', action: 'report', icon: faFileAlt },
-  { title: 'Hide', action: 'hide', icon: faEyeSlash },
   { title: 'Delete', action: 'delete', icon: faTrashAlt }
 ]
 class PostCard extends Component {
@@ -22,6 +22,36 @@ class PostCard extends Component {
     this.state = {
       reply: null,
       options: false
+    }
+  }
+
+  optionClick = (id, action) => {
+    this.setState({options: false});
+    switch(action) {
+      case 'edit':
+        break;
+      case 'report':
+        break;
+      case 'delete':
+          let parameter = {
+            id: id
+          }
+          Api.request(Routes.commentsDelete, parameter, response => {
+            if (response.data) {
+              let comments = this.props.state.comments;
+              comments.length > 0 && comments.map((item, index) => {
+                if(item.id == id) {
+                  comments.splice(index, 1);
+                  return
+                }
+              })
+              this.props.setComments(comments);
+            }
+          })
+        break;
+      default:
+        return;
+        break;
     }
   }
 
@@ -235,6 +265,7 @@ class PostCard extends Component {
 
   render() {
     const { data, images } = this.props;
+    const {user} = this.props.state;
     return (
       <View style={{
         // borderRadius: BasicStyles.standardBorderRadius,
@@ -265,15 +296,33 @@ class PostCard extends Component {
             <View style={{ padding: 10 }}>
               {options.map((item, index) => {
                 return (
-                  <View
-                    style={{
-                      paddingLeft: item.action !== null ? 15 : 5,
-                      flexDirection: 'row',
-                      paddingBottom: 5
+                  <View>
+                    {item.title !== 'Report' && data.user.id === user.id && <TouchableOpacity
+                    onPress={() => {
+                      this.optionClick(data.id, item.action)
                     }}
-                  >
-                    <FontAwesomeIcon icon={item.icon} style={{ color: item.action === 'delete' ? Color.danger : null }} />
-                    <Text style={{ paddingLeft: 10 }}>{item.title}</Text>
+                      style={{
+                        paddingLeft: item.action !== null ? 15 : 5,
+                        flexDirection: 'row',
+                        paddingBottom: 5
+                      }}
+                    >
+                      <FontAwesomeIcon icon={item.icon} style={{ color: item.action === 'delete' ? Color.danger : null }} />
+                      <Text style={{ paddingLeft: 10 }}>{item.title}</Text>
+                    </TouchableOpacity>}
+                    {(item.title === 'Report' || item.action === null) && data.user.id !== user.id && <TouchableOpacity
+                     onPress={() => {
+                      this.optionClick(data.id, item.action)
+                    }}
+                      style={{
+                        paddingLeft: item.action !== null ? 15 : 5,
+                        flexDirection: 'row',
+                        paddingBottom: 5
+                      }}
+                    >
+                      <FontAwesomeIcon icon={item.icon} style={{ color: item.action === 'delete' ? Color.danger : null }} />
+                      <Text style={{ paddingLeft: 10 }}>{item.title}</Text>
+                    </TouchableOpacity>}
                   </View>
                 )
               })}
@@ -288,7 +337,9 @@ const mapStateToProps = state => ({ state: state });
 
 const mapDispatchToProps = dispatch => {
   const { actions } = require('@redux');
-  return {};
+  return {
+    setComments: (comments) => dispatch(actions.setComments(comments))
+  };
 };
 
 export default connect(

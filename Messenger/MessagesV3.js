@@ -20,7 +20,7 @@ import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import Style from 'modules/messenger/Style.js'
@@ -31,6 +31,8 @@ import Button from 'components/Form/Button';
 import { NavigationActions, StackActions } from 'react-navigation';
 import Skeleton from 'components/Loading/Skeleton';
 import ScreenshotHandler from 'services/ScreenshotHandler';
+import _ from 'lodash';
+import Ratings from 'components/Messenger/Ratings';
 
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -56,8 +58,7 @@ class MessagesV3 extends Component {
       request_id: null,
       isViewing: false,
       members: [],
-      data: null,
-      onFocusFlag: false
+      data: null
     }
   }
 
@@ -103,10 +104,6 @@ class MessagesV3 extends Component {
       console.log('error', error)
       this.setState({ isLoading: false });
     });
-  }
-
-  multilineHandler(){
-    return this.state.onFocusFlag
   }
 
   redirectToRate = (route) => {
@@ -235,9 +232,9 @@ class MessagesV3 extends Component {
       offset,
       limit,
     }
-
+    console.log(Routes.messengerMessagesRetrieve, parameter, '-------------------parameter----------')
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
-      const newMessages = [...response.data.reverse(), ...messagesOnGroup.messages]
+      const newMessages = _.uniqBy([...response.data.reverse(), ...messagesOnGroup.messages], 'id')
       this.setState({ isLoading: false, offset: offset + limit });
       setMessagesOnGroup({
         messages: newMessages,
@@ -699,74 +696,57 @@ class MessagesV3 extends Component {
   _footer = () => {
     const { theme } = this.props.state;
     return (
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center'
-        }}>
-          <TouchableOpacity
-            onPress={() => this.handleChoosePhoto()}
+      <View style={{
+        flexDirection: 'row'
+      }}>
+        <TouchableOpacity
+          onPress={() => this.handleChoosePhoto()}
+          style={{
+            height: 50,
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '10%'
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faImage}
+            size={BasicStyles.iconSize}
             style={{
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '10%'
+              color: theme ? theme.primary : Color.primary
             }}
-          >
-            <FontAwesomeIcon
-              icon={faImage}
-              size={BasicStyles.iconSize}
-              style={{
-                color: theme ? theme.primary : Color.primary
-              }}
-            />
-          </TouchableOpacity>
-          <TextInput
-            style={{...Style.formControl,
-              paddingTop: 15,
-              paddingBottom: 15,
-              alignSelf: 'center'
-            }}
-            onChangeText={(newMessage) => this.setState({ newMessage })}
-            value={this.state.newMessage}
-            
-            onBlur={() => {
-              this.setState({
-                onFocusFlag: false
-              })
-            }}
-
-            onFocus={() => {
-              this.setState({
-                onFocusFlag: true
-              })
-            }}
-            placeholder={'Type your message here ...'}
-            multiline={this.multilineHandler()}
-            placeholderTextColor={Color.darkGray}
           />
-          <TouchableOpacity
-            onPress={() => this.sendNewMessage()}
+        </TouchableOpacity>
+        <TextInput
+          style={Style.formControl}
+          onChangeText={(newMessage) => this.setState({ newMessage })}
+          value={this.state.newMessage}
+          placeholder={'Type your message here ...'}
+          multiline={true}
+          placeholderTextColor={Color.darkGray}
+        />
+        <TouchableOpacity
+          onPress={() => this.sendNewMessage()}
+          style={{
+            height: 50,
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '10%'
+          }}
+        >
+          <FontAwesomeIcon
+            icon={faPaperPlane}
+            size={BasicStyles.iconSize}
             style={{
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '10%'
+              color: theme ? theme.primary : Color.primary
             }}
-          >
-            <FontAwesomeIcon
-              icon={faPaperPlane}
-              size={BasicStyles.iconSize}
-              style={{
-                color: theme ? theme.primary : Color.primary
-              }}
-            />
-          </TouchableOpacity>
-        </View>
+          />
+        </TouchableOpacity>
+      </View>
     );
   }
 
   _flatList = () => {
-    const { user, messagesOnGroup, requestMessage } = this.props.state;
+    const { user, messagesOnGroup } = this.props.state;
     return (
       <View style={{
         width: '100%',
@@ -779,8 +759,9 @@ class MessagesV3 extends Component {
               extraData={this.props}
               ItemSeparatorComponent={this.FlatListItemSeparator}
               style={{
-                marginBottom: requestMessage?.status >= 2 ? DeviceHeight - 500 : 100,
-                flex: 1
+                marginBottom: 50,
+                flex: 1,
+
               }}
               renderItem={({ item, index }) => (
                 <View>
@@ -849,7 +830,7 @@ class MessagesV3 extends Component {
           behavior={'padding'}
           keyboardVerticalOffset={
             Platform.select({
-              ios: () => 80,
+              ios: () => 65,
               android: () => -200
             })()}
         >
@@ -899,7 +880,7 @@ class MessagesV3 extends Component {
               bottom: 0,
               left: 0,
               borderTopColor: Color.lightGray,
-              borderTopWidth: 1,
+              borderTopWidth: requestMessage?.status < 2 ? 1 : 0,
               backgroundColor: Color.white,
               width: DeviceWidth,
               justifyContent: 'center',
@@ -915,29 +896,26 @@ class MessagesV3 extends Component {
                     width: DeviceWidth / 1.5,
                     marginBottom: 20
                   }}>
-                    <TouchableOpacity style={{
-                      marginBottom: 10,
+                    {data && members.length > 0 && <Ratings
+                    members={members}
+                    data={data}/>}
+                    <TouchableOpacity
+                    onPress={() => {
+                      this.redirectToRate('reviewsStack')
+                    }}
+                    style={{
+                      width: '20%',
+                      alignItems: 'center',
                       marginTop: 10
                     }}>
-                      <Text
-                    onPress={() => {
-                      this.redirectToRate('reviewsStack')
-                    }}
-                     style={{
-                      fontWeight: 'bold',
-                      fontSize: 15,
-                      textAlign: 'center',
-                    }}>How was your experience with this partner?</Text>
-                      <Text
-                    onPress={() => {
-                      this.redirectToRate('reviewsStack')
-                    }}
-                     style={{
-                      fontWeight: 'bold',
-                      fontSize: 13,
-                      textAlign: 'center',
-                      fontStyle: 'italic'
-                    }}>Click here to rate.</Text></TouchableOpacity>
+                    <FontAwesomeIcon
+                      icon={faChevronDown}
+                      size={BasicStyles.iconSize}
+                      style={{
+                        color: theme ? theme.primary : Color.primary
+                      }}
+                    />
+                    </TouchableOpacity>
                     <Text style={{
                       marginBottom: 10,
                       marginTop: 10
