@@ -803,6 +803,7 @@ class MessagesV3 extends Component {
       data
     } = this.state;
     const { requestMessage, theme } = this.props.state;
+    
     console.log('[MESSEGER GROUP]', data, '----------------');
     return (
       <SafeAreaView>
@@ -879,7 +880,7 @@ class MessagesV3 extends Component {
               bottom: 0,
               left: 0,
               borderTopColor: Color.lightGray,
-              borderTopWidth: 1,
+              borderTopWidth: requestMessage?.status < 2 ? 1 : 0,
               backgroundColor: Color.white,
               width: DeviceWidth,
               justifyContent: 'center',
