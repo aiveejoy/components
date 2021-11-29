@@ -332,7 +332,6 @@ class MessagesV3 extends Component {
 
   sendImageWithoutPayload = (parameter) => {
     const { updateMessageByCode } = this.props;
-    console.log('[>>>>>>>>>>>>>>>>>>>>>>>]', parameter, 'LLLLLLLLLLLLLLLLLLLLL', Routes.mmCreateWithImageWithoutPayload)
     Api.request(Routes.mmCreateWithImageWithoutPayload, parameter, response => {
       if (response.data != null) {
         // updateMessageByCode(response.data);
