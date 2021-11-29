@@ -332,7 +332,7 @@ class MessagesV3 extends Component {
 
   sendImageWithoutPayload = (parameter) => {
     const { updateMessageByCode } = this.props;
-
+    console.log('[>>>>>>>>>>>>>>>>>>>>>>>]', parameter, 'LLLLLLLLLLLLLLLLLLLLL', Routes.mmCreateWithImageWithoutPayload)
     Api.request(Routes.mmCreateWithImageWithoutPayload, parameter, response => {
       if (response.data != null) {
         // updateMessageByCode(response.data);
@@ -344,6 +344,7 @@ class MessagesV3 extends Component {
 
   handleChoosePhoto = () => {
     const { user, messengerGroup, messagesOnGroup } = this.props.state;
+    const { members } = this.state;
     const options = {
       noData: true,
       error: null
@@ -387,7 +388,10 @@ class MessagesV3 extends Component {
           payload: 'image',
           payload_value: null,
           url: uri,
-          code: messagesOnGroup.messages.length + 1
+          code: messagesOnGroup.messages.length + 1,
+          to: members[0]?.account_id === user.id ? members[1]?.account_id : members[0]?.account_id,
+          title: 'New message',
+          topic: 'message'
         }
         let newMessageTemp = {
           ...parameter,
