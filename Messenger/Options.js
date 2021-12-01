@@ -630,10 +630,15 @@ class Options extends Component {
           this.retrieveRequest('reviewsStack')
         }
       }
-        break
       case 'enableSupport': {
         this.setState({ images: false })
         this.enableSupport();
+      }
+        break
+      case 'activity': {
+        this.setState({ images: false })
+        this.props.navigation.navigate('activityStack', {from: 'messenger'})
+        this.close()
       }
         break
       case 'back':
