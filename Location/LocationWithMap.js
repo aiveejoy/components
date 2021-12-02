@@ -270,6 +270,7 @@ class LocationWithMap extends Component {
   };
 
   manageLocation = (location) => {
+    console.log('[lcoation]', location)
     let address = null;
     let route = null;
     let locality = null;
@@ -363,7 +364,7 @@ class LocationWithMap extends Component {
       console.log({
         newLocation: location
       })
-      // console.log('LOCATION IN COMPONENT', location);
+      console.log('LOCATION IN COMPONENT', location);
       setLocation(location);
       this.props.navigation.pop();
     });
