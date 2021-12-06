@@ -20,7 +20,7 @@ import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane, faLock, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock, faChevronDown, faTruckMoving } from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import Style from 'modules/messenger/Style.js'
@@ -87,6 +87,7 @@ class MessagesV3 extends Component {
     this.setState({ isLoading: true });
     console.log(parameter, Routes.requestRetrieveItem)
     Api.request(Routes.requestRetrieveItem, parameter, (response) => {
+      console.log(response, '-------------------------------------------------')
       this.setState({ isLoading: false });
       this.retrieveGroup()
       if (response.data.length > 0) {
@@ -108,7 +109,7 @@ class MessagesV3 extends Component {
 
   redirectToRate = (route) => {
     const { data, members } = this.state;
-    if(data) {
+    if (data) {
       this.props.navigation.navigate(route, {
         data: data,
         members: members,
@@ -775,7 +776,7 @@ class MessagesV3 extends Component {
               refreshControl={Platform.OS === 'android' &&
                 <RefreshControl
                   refreshing={false}
-                  onRefresh={() => {  
+                  onRefresh={() => {
                     this.retrieveMoreMessages()
                   }}
                 />
@@ -806,7 +807,7 @@ class MessagesV3 extends Component {
       data
     } = this.state;
     const { requestMessage, theme } = this.props.state;
-    
+
     console.log('[MESSEGER GROUP]', data, '----------------');
     return (
       <SafeAreaView>
@@ -838,6 +839,72 @@ class MessagesV3 extends Component {
             })()}
         >
           <View key={keyRefresh}>
+            <View style={{
+              padding: 10,
+              width: '95%'
+            }}>
+            {requestMessage?.status == 1 && <TouchableOpacity
+              style={{
+                margin: 10,
+                borderColor: theme ? theme.secondary : Color.secondary,
+                borderWidth: 1,
+                flexDirection: 'row',
+                marginBottom: 20,
+                height: 50,
+                borderRadius: 10,
+                alignItems: 'center',
+                width: '100%'
+              }}>
+              <View style={{
+                width: '80%',
+                padding: 10,
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}>
+                <FontAwesomeIcon
+                  icon={faTruckMoving}
+                  size={40}
+                  style={{
+                    color: theme ? theme.secondary : Color.secondary,
+                    width: '10%',
+                    marginRight: '2%'
+                  }}
+                />
+                <Text style={{
+                  width: '38%',
+                  fontSize: 12,
+                }}>Processing Time</Text>
+                <View style={{
+                  width: '45%',
+                  marginRight: '1%',
+                  height: 10,
+                  backgroundColor: Color.lightGray,
+                  borderRadius: 5
+                }}>
+                  <View style={{
+                    width: Helper.getProcessingTimePercent(data?.activity) + '%',
+                    backgroundColor: theme ? theme.primary : Color.primary,
+                    borderRadius: 5,
+                    height: 10,
+                  }}>
+                  </View>
+                </View>
+              </View>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '20%',
+                height: '100%',
+                borderTopRightRadius: 8,
+                borderBottomRightRadius: 8,
+                backgroundColor: theme ? theme.secondary : Color.secondary
+              }}>
+                <Text style={{
+                  color: Color.white
+                }}>{data?.activity?.date_time}</Text>
+              </View>
+            </TouchableOpacity>}
+            </View>
             {isLoading ? <Skeleton size={1} template={'messages'} /> : null}
             <ScrollView
               ref={ref => this.scrollView = ref}
@@ -900,24 +967,24 @@ class MessagesV3 extends Component {
                     marginBottom: 20
                   }}>
                     {data && members.length > 0 && <Ratings
-                    members={members}
-                    data={data}/>}
+                      members={members}
+                      data={data} />}
                     <TouchableOpacity
-                    onPress={() => {
-                      this.redirectToRate('reviewsStack')
-                    }}
-                    style={{
-                      width: '20%',
-                      alignItems: 'center',
-                      marginTop: 10
-                    }}>
-                    <FontAwesomeIcon
-                      icon={faChevronDown}
-                      size={BasicStyles.iconSize}
-                      style={{
-                        color: theme ? theme.primary : Color.primary
+                      onPress={() => {
+                        this.redirectToRate('reviewsStack')
                       }}
-                    />
+                      style={{
+                        width: '20%',
+                        alignItems: 'center',
+                        marginTop: 10
+                      }}>
+                      <FontAwesomeIcon
+                        icon={faChevronDown}
+                        size={BasicStyles.iconSize}
+                        style={{
+                          color: theme ? theme.primary : Color.primary
+                        }}
+                      />
                     </TouchableOpacity>
                     <Text style={{
                       marginBottom: 10,
