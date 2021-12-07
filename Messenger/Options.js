@@ -637,7 +637,7 @@ class Options extends Component {
         break
       case 'activity': {
         this.setState({ images: false })
-        this.props.navigation.navigate('activityStack', {from: 'messenger'})
+        this.props.navigation.navigate('activityStack', {from: 'messenger', data: data.activity})
         this.close()
       }
         break

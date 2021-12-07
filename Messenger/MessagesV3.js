@@ -69,6 +69,27 @@ class MessagesV3 extends Component {
     const { user } = this.props.state
     if (user == null) return
     this.retrieveRequest()
+    this.props.navigation.addListener('didFocus', () => {
+      this.retrieveActivity()
+    })
+  }
+
+  retrieveActivity = () => {
+    let temp = this.state.data;
+    let parameter = {
+      id: temp?.activity?.id,
+    }
+    this.setState({ isLoading: true });
+    Api.request(Routes.activitiesRetrieve, parameter, response => {
+      this.setState({ isLoading: false})
+      if (response.data) {
+        temp.activity = response.data
+        this.setState({data: temp})
+      }
+    }, error => {
+      console.log(error);
+      this.setState({ isLoading: false})
+    });
   }
 
   retrieveRequest() {
@@ -87,7 +108,6 @@ class MessagesV3 extends Component {
     this.setState({ isLoading: true });
     console.log(parameter, Routes.requestRetrieveItem)
     Api.request(Routes.requestRetrieveItem, parameter, (response) => {
-      console.log(response, '-------------------------------------------------')
       this.setState({ isLoading: false });
       this.retrieveGroup()
       if (response.data.length > 0) {
@@ -233,7 +253,7 @@ class MessagesV3 extends Component {
       offset,
       limit,
     }
-    console.log(Routes.messengerMessagesRetrieve, parameter, '-------------------parameter----------')
+    console.log(Routes.messengerMessagesRetrieve, parameter)
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
       const newMessages = _.uniqBy([...response.data.reverse(), ...messagesOnGroup.messages], 'id')
       this.setState({ isLoading: false, offset: offset + limit });
@@ -808,7 +828,7 @@ class MessagesV3 extends Component {
     } = this.state;
     const { requestMessage, theme } = this.props.state;
 
-    console.log('[MESSEGER GROUP]', data, '----------------');
+    console.log('[MESSEGER GROUP]', data);
     return (
       <SafeAreaView>
         {
@@ -841,9 +861,14 @@ class MessagesV3 extends Component {
           <View key={keyRefresh}>
             <View style={{
               padding: 10,
-              width: '95%'
+              width: '95%',
+              position: 'absolute',
+              zIndex: 10
             }}>
-            {requestMessage?.status == 1 && <TouchableOpacity
+            {requestMessage?.status == 1 && data?.activity != null && !isLoading && <TouchableOpacity
+              onPress={() => {
+                this.props.navigation.navigate('activityStack', {from: 'messenger', data: data.activity})
+              }}
               style={{
                 margin: 10,
                 borderColor: theme ? theme.secondary : Color.secondary,
@@ -870,10 +895,18 @@ class MessagesV3 extends Component {
                     marginRight: '2%'
                   }}
                 />
-                <Text style={{
-                  width: '38%',
-                  fontSize: 12,
-                }}>Processing Time</Text>
+                <View style={{
+                   width: '38%',
+                   alignItems: 'center'
+                }}>
+                  <Text style={{
+                    fontSize: 11,
+                    fontWeight: 'bold'
+                  }}>{data?.activity?.orig_time}</Text>
+                  <Text style={{
+                    fontSize: 11,
+                  }}>Processing Time</Text>
+                </View>
                 <View style={{
                   width: '45%',
                   marginRight: '1%',
@@ -883,7 +916,7 @@ class MessagesV3 extends Component {
                 }}>
                   <View style={{
                     width: Helper.getProcessingTimePercent(data?.activity) + '%',
-                    backgroundColor: theme ? theme.primary : Color.primary,
+                    backgroundColor: Helper.getProcessingTimePercent(data?.activity) > 0 ? theme ? theme.primary : Color.primary : Color.lightGray,
                     borderRadius: 5,
                     height: 10,
                   }}>
@@ -900,7 +933,9 @@ class MessagesV3 extends Component {
                 backgroundColor: theme ? theme.secondary : Color.secondary
               }}>
                 <Text style={{
-                  color: Color.white
+                  color: Color.white,
+                  textAlign: 'center',
+                  fontSize: 11
                 }}>{data?.activity?.date_time}</Text>
               </View>
             </TouchableOpacity>}
@@ -939,13 +974,14 @@ class MessagesV3 extends Component {
             >
               <View style={{
                 flexDirection: 'row',
-                width: '100%'
+                width: '100%',
+                marginTop: 70
               }}>
                 {this._flatList()}
               </View>
             </ScrollView>
 
-            <View style={{
+            {!isLoading && <View style={{
               position: 'absolute',
               bottom: 0,
               left: 0,
@@ -1003,7 +1039,7 @@ class MessagesV3 extends Component {
                   </View>
                 )
               }
-            </View>
+            </View>}
             <ImageModal
               visible={isImageModal}
               url={imageModalUrl}
