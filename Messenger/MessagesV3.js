@@ -79,16 +79,11 @@ class MessagesV3 extends Component {
     let parameter = {
       id: temp?.activity?.id,
     }
-    this.setState({ isLoading: true });
     Api.request(Routes.activitiesRetrieve, parameter, response => {
-      this.setState({ isLoading: false})
       if (response.data) {
         temp.activity = response.data
         this.setState({data: temp})
       }
-    }, error => {
-      console.log(error);
-      this.setState({ isLoading: false})
     });
   }
 
@@ -871,7 +866,7 @@ class MessagesV3 extends Component {
               }}
               style={{
                 margin: 10,
-                borderColor: theme ? theme.secondary : Color.secondary,
+                borderColor: data?.activity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
                 borderWidth: 1,
                 flexDirection: 'row',
                 marginBottom: 20,
@@ -890,7 +885,7 @@ class MessagesV3 extends Component {
                   icon={faTruckMoving}
                   size={40}
                   style={{
-                    color: theme ? theme.secondary : Color.secondary,
+                    color: data?.activity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
                     width: '10%',
                     marginRight: '2%'
                   }}
@@ -916,7 +911,7 @@ class MessagesV3 extends Component {
                 }}>
                   <View style={{
                     width: Helper.getProcessingTimePercent(data?.activity) + '%',
-                    backgroundColor: Helper.getProcessingTimePercent(data?.activity) > 0 ? theme ? theme.primary : Color.primary : Color.lightGray,
+                    backgroundColor: Helper.getProcessingTimePercent(data?.activity) > 0 ? (data?.activity?.date_time  === 'Arrived' ? theme ? theme.primary : Color.primary : theme ? theme.secondary : Color.secondary) : Color.lightGray,
                     borderRadius: 5,
                     height: 10,
                   }}>
@@ -930,7 +925,7 @@ class MessagesV3 extends Component {
                 height: '100%',
                 borderTopRightRadius: 8,
                 borderBottomRightRadius: 8,
-                backgroundColor: theme ? theme.secondary : Color.secondary
+                backgroundColor: data?.activity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)
               }}>
                 <Text style={{
                   color: Color.white,
