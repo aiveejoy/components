@@ -806,9 +806,9 @@ class MessagesV3 extends Component {
       members,
       data
     } = this.state;
-    const { requestMessage, theme, updateActivity } = this.props.state;
+    const { requestMessage, theme, updateActivity, user } = this.props.state;
 
-    console.log('[MESSEGER GROUP]', updateActivity);
+    console.log('[MESSEGER GROUP]', data);
     return (
       <SafeAreaView>
         {
@@ -847,7 +847,9 @@ class MessagesV3 extends Component {
             }}>
             {requestMessage?.status == 1 && updateActivity != null && !isLoading && <TouchableOpacity
               onPress={() => {
-                this.props.navigation.navigate('activityStack', {from: 'messenger', data: updateActivity, members: members})
+                if(data?.account_id !== user.id) {
+                  this.props.navigation.navigate('activityStack', {from: 'messenger', data: updateActivity, members: members})
+                }
               }}
               style={{
                 margin: 10,
