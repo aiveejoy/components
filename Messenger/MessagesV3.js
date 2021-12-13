@@ -1,26 +1,12 @@
 import React, { Component } from 'react';
-import {
-  TextInput,
-  View,
-  Image,
-  Text,
-  ScrollView,
-  FlatList,
-  TouchableOpacity,
-  Platform,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Dimensions,
-  Alert,
-  RefreshControl
-} from 'react-native';
+import { TextInput, View, Image, Text, ScrollView, FlatList, TouchableOpacity, Platform, KeyboardAvoidingView, SafeAreaView, Dimensions, Alert, RefreshControl } from 'react-native';
 import { Routes, Color, BasicStyles, Helper } from 'common';
 import { UserImage } from 'components';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane, faLock, faChevronDown, faTruckMoving } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock, faChevronDown, faTruckMoving, faTrashAlt, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import Style from 'modules/messenger/Style.js'
@@ -33,6 +19,7 @@ import Skeleton from 'components/Loading/Skeleton';
 import ScreenshotHandler from 'services/ScreenshotHandler';
 import _ from 'lodash';
 import Ratings from 'components/Messenger/Ratings';
+import BottomSheetOptions from 'src/components/BottomSheet/index';
 
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -40,6 +27,7 @@ const DeviceWidth = Math.round(Dimensions.get('window').width);
 class MessagesV3 extends Component {
   constructor(props) {
     super(props);
+    this.myRef = React.createRef()
     this.state = {
       isLoading: false,
       selected: null,
@@ -58,7 +46,25 @@ class MessagesV3 extends Component {
       request_id: null,
       isViewing: false,
       members: [],
-      data: null
+      data: null,
+      buttons: [
+        {
+          title: 'Delete',
+          payload: 'delete',
+          color: Color.black,
+          type: 'callback',
+          icon: faTrashAlt
+        },
+        {
+          title: 'Enable Support',
+          payload: 'update',
+          color: Color.black,
+          type: 'callback',
+          icon: faPencilAlt
+        }
+      ],
+      updatingText: null,
+      isUpdate: false
     }
   }
 
@@ -440,6 +446,26 @@ class MessagesV3 extends Component {
     }, 500)
   }
 
+  onClick = (item) => {
+    if(item.payload === 'delete') {
+      Alert.alert(
+        '',
+        'Are you sure you want to delete this message?',
+        [
+          { text: 'Cancel', onPress: () => {return}, style: 'cancel' },
+          {
+            text: 'Yes', onPress: () => {
+              console.log('deleting')
+            }
+          },
+        ],
+        { cancelable: false }
+      )
+    } else {
+      console.log('updating')
+    }
+  }
+
 
   _image = (item) => {
     const { messengerGroup, user, theme } = this.props.state;
@@ -636,7 +662,11 @@ class MessagesV3 extends Component {
   _leftTemplate = (item, index) => {
     const { theme, messagesOnGroup } = this.props.state;
     return (
-      <View>
+      <TouchableOpacity onPress={() => {
+        if(item.payload == 'text') {
+          this.setState({isUpdate: true})
+        }
+      }}>
         {(index > 0 && messagesOnGroup && messagesOnGroup.messages != null) && item.account_id != (messagesOnGroup.messages[index - 1].account_id) && (this._headerLeft(item, index))}
         {
           index == 0 && (this._headerLeft(item, index))
@@ -672,7 +702,7 @@ class MessagesV3 extends Component {
             }}>Sending...</Text>
           )
         }
-      </View>
+      </TouchableOpacity>
     );
   }
 
@@ -794,20 +824,8 @@ class MessagesV3 extends Component {
   }
 
   render() {
-    const {
-      isLoading,
-      isImageModal,
-      imageModalUrl,
-      photo,
-      keyRefresh,
-      isPullingMessages,
-      isLock,
-      isViewing,
-      members,
-      data
-    } = this.state;
+    const { isLoading, isImageModal, imageModalUrl, photo, keyRefresh, isPullingMessages, isLock, isViewing, members, data, isUpdate} = this.state;
     const { requestMessage, theme, updateActivity, user } = this.props.state;
-
     console.log('[MESSEGER GROUP]', data);
     return (
       <SafeAreaView>
@@ -1030,6 +1048,18 @@ class MessagesV3 extends Component {
             <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           </View>
         </KeyboardAvoidingView>
+        {isUpdate && <BottomSheetOptions
+          version={1}
+          user={user}
+          ref={this.myRef}
+          data={this.state.buttons}
+          onClick={(item) => {
+            this.onClick(item)
+          }}
+          onClose={() => {
+            this.setState({isUpdate: false})
+          }}
+        />}
         {
           (data && this.props.navigation.state?.params?.data?.menuFlag) && (
             <MessageOptions
