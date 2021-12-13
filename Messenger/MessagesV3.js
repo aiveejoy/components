@@ -69,29 +69,13 @@ class MessagesV3 extends Component {
     const { user } = this.props.state
     if (user == null) return
     this.retrieveRequest()
-    this.props.navigation.addListener('didFocus', () => {
-      this.retrieveActivity()
-    })
-  }
-
-  retrieveActivity = () => {
-    let temp = this.state.data;
-    let parameter = {
-      id: temp?.activity?.id,
-    }
-    Api.request(Routes.activitiesRetrieve, parameter, response => {
-      if (response.data) {
-        temp.activity = response.data
-        this.setState({data: temp})
-      }
-    });
   }
 
   retrieveRequest() {
     const { user } = this.props.state;
     const { data } = this.props.navigation.state.params;
     const { members } = this.state;
-    const { setMessageTitle, setRequestMessage } = this.props;
+    const { setMessageTitle, setRequestMessage, setUpdateActivity } = this.props;
     let parameter = {
       condition: [{
         value: data.title,
@@ -109,6 +93,7 @@ class MessagesV3 extends Component {
         this.setState({
           data: response.data[0],
         });
+        setUpdateActivity(response.data[0].activity)
         setRequestMessage(response.data[0])
         console.log(response.data[0].status)
         setMessageTitle({
@@ -821,9 +806,9 @@ class MessagesV3 extends Component {
       members,
       data
     } = this.state;
-    const { requestMessage, theme } = this.props.state;
+    const { requestMessage, theme, updateActivity } = this.props.state;
 
-    console.log('[MESSEGER GROUP]', data);
+    console.log('[MESSEGER GROUP]', updateActivity);
     return (
       <SafeAreaView>
         {
@@ -860,13 +845,13 @@ class MessagesV3 extends Component {
               position: 'absolute',
               zIndex: 10
             }}>
-            {requestMessage?.status == 1 && data?.activity != null && !isLoading && <TouchableOpacity
+            {requestMessage?.status == 1 && updateActivity != null && !isLoading && <TouchableOpacity
               onPress={() => {
-                this.props.navigation.navigate('activityStack', {from: 'messenger', data: data.activity})
+                this.props.navigation.navigate('activityStack', {from: 'messenger', data: updateActivity, members: members})
               }}
               style={{
                 margin: 10,
-                borderColor: data?.activity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
+                borderColor: updateActivity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
                 borderWidth: 1,
                 flexDirection: 'row',
                 marginBottom: 20,
@@ -885,7 +870,7 @@ class MessagesV3 extends Component {
                   icon={faTruckMoving}
                   size={40}
                   style={{
-                    color: data?.activity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
+                    color: updateActivity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
                     width: '10%',
                     marginRight: '2%'
                   }}
@@ -897,7 +882,7 @@ class MessagesV3 extends Component {
                   <Text style={{
                     fontSize: 11,
                     fontWeight: 'bold'
-                  }}>{data?.activity?.orig_time}</Text>
+                  }}>{updateActivity?.orig_time}</Text>
                   <Text style={{
                     fontSize: 11,
                   }}>Processing Time</Text>
@@ -910,8 +895,8 @@ class MessagesV3 extends Component {
                   borderRadius: 5
                 }}>
                   <View style={{
-                    width: Helper.getProcessingTimePercent(data?.activity) + '%',
-                    backgroundColor: Helper.getProcessingTimePercent(data?.activity) > 0 ? (data?.activity?.date_time  === 'Arrived' ? theme ? theme.primary : Color.primary : theme ? theme.secondary : Color.secondary) : Color.lightGray,
+                    width: Helper.getProcessingTimePercent(updateActivity) + '%',
+                    backgroundColor: Helper.getProcessingTimePercent(updateActivity) > 0 ? (updateActivity?.date_time  === 'Arrived' ? theme ? theme.primary : Color.primary : theme ? theme.secondary : Color.secondary) : Color.lightGray,
                     borderRadius: 5,
                     height: 10,
                   }}>
@@ -925,13 +910,13 @@ class MessagesV3 extends Component {
                 height: '100%',
                 borderTopRightRadius: 8,
                 borderBottomRightRadius: 8,
-                backgroundColor: data?.activity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)
+                backgroundColor: updateActivity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)
               }}>
                 <Text style={{
                   color: Color.white,
                   textAlign: 'center',
                   fontSize: 11
-                }}>{data?.activity?.date_time}</Text>
+                }}>{updateActivity?.date_time}</Text>
               </View>
             </TouchableOpacity>}
             </View>
@@ -1072,7 +1057,8 @@ const mapDispatchToProps = dispatch => {
     setUnReadMessages: (messages) => dispatch(actions.setUnReadMessages(messages)),
     updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
     setMessageTitle: (messageTitle) => dispatch(actions.setMessageTitle(messageTitle)),
-    setRequestMessage: (requestMessage) => dispatch(actions.setRequestMessage(requestMessage))
+    setRequestMessage: (requestMessage) => dispatch(actions.setRequestMessage(requestMessage)),
+    setUpdateActivity: (updateActivity) => dispatch(actions.setUpdateActivity(updateActivity))
   };
 };
 
