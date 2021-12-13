@@ -20,7 +20,7 @@ import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane, faLock, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock, faChevronDown, faTruckMoving } from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import Style from 'modules/messenger/Style.js'
@@ -75,7 +75,7 @@ class MessagesV3 extends Component {
     const { user } = this.props.state;
     const { data } = this.props.navigation.state.params;
     const { members } = this.state;
-    const { setMessageTitle, setRequestMessage } = this.props;
+    const { setMessageTitle, setRequestMessage, setUpdateActivity } = this.props;
     let parameter = {
       condition: [{
         value: data.title,
@@ -93,6 +93,7 @@ class MessagesV3 extends Component {
         this.setState({
           data: response.data[0],
         });
+        setUpdateActivity(response.data[0].activity)
         setRequestMessage(response.data[0])
         console.log(response.data[0].status)
         setMessageTitle({
@@ -108,7 +109,7 @@ class MessagesV3 extends Component {
 
   redirectToRate = (route) => {
     const { data, members } = this.state;
-    if(data) {
+    if (data) {
       this.props.navigation.navigate(route, {
         data: data,
         members: members,
@@ -232,7 +233,7 @@ class MessagesV3 extends Component {
       offset,
       limit,
     }
-    console.log(Routes.messengerMessagesRetrieve, parameter, '-------------------parameter----------')
+    console.log(Routes.messengerMessagesRetrieve, parameter)
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
       const newMessages = _.uniqBy([...response.data.reverse(), ...messagesOnGroup.messages], 'id')
       this.setState({ isLoading: false, offset: offset + limit });
@@ -332,7 +333,6 @@ class MessagesV3 extends Component {
 
   sendImageWithoutPayload = (parameter) => {
     const { updateMessageByCode } = this.props;
-    console.log('[>>>>>>>>>>>>>>>>>>>>>>>]', parameter, 'LLLLLLLLLLLLLLLLLLLLL', Routes.mmCreateWithImageWithoutPayload)
     Api.request(Routes.mmCreateWithImageWithoutPayload, parameter, response => {
       if (response.data != null) {
         // updateMessageByCode(response.data);
@@ -776,7 +776,7 @@ class MessagesV3 extends Component {
               refreshControl={Platform.OS === 'android' &&
                 <RefreshControl
                   refreshing={false}
-                  onRefresh={() => {  
+                  onRefresh={() => {
                     this.retrieveMoreMessages()
                   }}
                 />
@@ -806,9 +806,9 @@ class MessagesV3 extends Component {
       members,
       data
     } = this.state;
-    const { requestMessage, theme } = this.props.state;
-    
-    console.log('[MESSEGER GROUP]', data, '----------------');
+    const { requestMessage, theme, updateActivity, user } = this.props.state;
+
+    console.log('[MESSEGER GROUP]', data);
     return (
       <SafeAreaView>
         {
@@ -839,6 +839,89 @@ class MessagesV3 extends Component {
             })()}
         >
           <View key={keyRefresh}>
+            <View style={{
+              padding: 10,
+              width: '95%',
+              position: 'absolute',
+              zIndex: 10
+            }}>
+            {requestMessage?.status == 1 && updateActivity != null && !isLoading && <TouchableOpacity
+              onPress={() => {
+                if(data?.account_id !== user.id) {
+                  this.props.navigation.navigate('activityStack', {from: 'messenger', data: updateActivity, members: members})
+                }
+              }}
+              style={{
+                margin: 10,
+                borderColor: updateActivity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
+                borderWidth: 1,
+                flexDirection: 'row',
+                marginBottom: 20,
+                height: 50,
+                borderRadius: 10,
+                alignItems: 'center',
+                width: '100%'
+              }}>
+              <View style={{
+                width: '80%',
+                padding: 10,
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}>
+                <FontAwesomeIcon
+                  icon={faTruckMoving}
+                  size={40}
+                  style={{
+                    color: updateActivity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
+                    width: '10%',
+                    marginRight: '2%'
+                  }}
+                />
+                <View style={{
+                   width: '38%',
+                   alignItems: 'center'
+                }}>
+                  <Text style={{
+                    fontSize: 11,
+                    fontWeight: 'bold'
+                  }}>{updateActivity?.orig_time}</Text>
+                  <Text style={{
+                    fontSize: 11,
+                  }}>Processing Time</Text>
+                </View>
+                <View style={{
+                  width: '45%',
+                  marginRight: '1%',
+                  height: 10,
+                  backgroundColor: Color.lightGray,
+                  borderRadius: 5
+                }}>
+                  <View style={{
+                    width: Helper.getProcessingTimePercent(updateActivity) + '%',
+                    backgroundColor: Helper.getProcessingTimePercent(updateActivity) > 0 ? (updateActivity?.date_time  === 'Arrived' ? theme ? theme.primary : Color.primary : theme ? theme.secondary : Color.secondary) : Color.lightGray,
+                    borderRadius: 5,
+                    height: 10,
+                  }}>
+                  </View>
+                </View>
+              </View>
+              <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '20%',
+                height: '100%',
+                borderTopRightRadius: 8,
+                borderBottomRightRadius: 8,
+                backgroundColor: updateActivity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)
+              }}>
+                <Text style={{
+                  color: Color.white,
+                  textAlign: 'center',
+                  fontSize: 11
+                }}>{updateActivity?.date_time}</Text>
+              </View>
+            </TouchableOpacity>}
+            </View>
             {isLoading ? <Skeleton size={1} template={'messages'} /> : null}
             <ScrollView
               ref={ref => this.scrollView = ref}
@@ -873,13 +956,14 @@ class MessagesV3 extends Component {
             >
               <View style={{
                 flexDirection: 'row',
-                width: '100%'
+                width: '100%',
+                marginTop: 70
               }}>
                 {this._flatList()}
               </View>
             </ScrollView>
 
-            <View style={{
+            {!isLoading && <View style={{
               position: 'absolute',
               bottom: 0,
               left: 0,
@@ -901,24 +985,24 @@ class MessagesV3 extends Component {
                     marginBottom: 20
                   }}>
                     {data && members.length > 0 && <Ratings
-                    members={members}
-                    data={data}/>}
+                      members={members}
+                      data={data} />}
                     <TouchableOpacity
-                    onPress={() => {
-                      this.redirectToRate('reviewsStack')
-                    }}
-                    style={{
-                      width: '20%',
-                      alignItems: 'center',
-                      marginTop: 10
-                    }}>
-                    <FontAwesomeIcon
-                      icon={faChevronDown}
-                      size={BasicStyles.iconSize}
-                      style={{
-                        color: theme ? theme.primary : Color.primary
+                      onPress={() => {
+                        this.redirectToRate('reviewsStack')
                       }}
-                    />
+                      style={{
+                        width: '20%',
+                        alignItems: 'center',
+                        marginTop: 10
+                      }}>
+                      <FontAwesomeIcon
+                        icon={faChevronDown}
+                        size={BasicStyles.iconSize}
+                        style={{
+                          color: theme ? theme.primary : Color.primary
+                        }}
+                      />
                     </TouchableOpacity>
                     <Text style={{
                       marginBottom: 10,
@@ -937,7 +1021,7 @@ class MessagesV3 extends Component {
                   </View>
                 )
               }
-            </View>
+            </View>}
             <ImageModal
               visible={isImageModal}
               url={imageModalUrl}
@@ -975,7 +1059,8 @@ const mapDispatchToProps = dispatch => {
     setUnReadMessages: (messages) => dispatch(actions.setUnReadMessages(messages)),
     updateMessagesOnGroup: (message) => dispatch(actions.updateMessagesOnGroup(message)),
     setMessageTitle: (messageTitle) => dispatch(actions.setMessageTitle(messageTitle)),
-    setRequestMessage: (requestMessage) => dispatch(actions.setRequestMessage(requestMessage))
+    setRequestMessage: (requestMessage) => dispatch(actions.setRequestMessage(requestMessage)),
+    setUpdateActivity: (updateActivity) => dispatch(actions.setUpdateActivity(updateActivity))
   };
 };
 

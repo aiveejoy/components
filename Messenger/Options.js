@@ -630,7 +630,6 @@ class Options extends Component {
           this.retrieveRequest('reviewsStack')
         }
       }
-        break
       case 'enableSupport': {
         this.setState({ images: false })
         this.enableSupport();

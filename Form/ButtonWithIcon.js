@@ -8,7 +8,7 @@ class ButtonWithIcon extends Component {
       <TouchableOpacity
         style={{
           ...BasicStyles.standardButton,
-          height: 'auto',
+          height: 100,
           ...this.props.style,
           paddingTop: 20,
           paddingBottom: 20,
