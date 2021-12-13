@@ -635,12 +635,6 @@ class Options extends Component {
         this.enableSupport();
       }
         break
-      case 'activity': {
-        this.setState({ images: false })
-        this.props.navigation.navigate('activityStack', {from: 'messenger', data: data.activity})
-        this.close()
-      }
-        break
       case 'back':
         this.setState({ images: false })
         this.setState({
