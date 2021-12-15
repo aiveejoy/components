@@ -1,19 +1,5 @@
 import React, { Component } from 'react';
-import {
-  TextInput,
-  View,
-  Image,
-  Text,
-  ScrollView,
-  FlatList,
-  TouchableOpacity,
-  Platform,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  Dimensions,
-  Alert,
-  RefreshControl
-} from 'react-native';
+import { Modal, TextInput, View, Image, Text, ScrollView, FlatList, TouchableOpacity, Platform, KeyboardAvoidingView, SafeAreaView, Dimensions, Alert, RefreshControl } from 'react-native';
 import { Routes, Color, BasicStyles, Helper } from 'common';
 import { UserImage } from 'components';
 import Api from 'services/api/index.js';
@@ -24,7 +10,7 @@ import { faImage, faPaperPlane, faLock, faChevronDown, faTruckMoving } from '@fo
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import Style from 'modules/messenger/Style.js'
-import Modal from 'components/Modal/Sketch';
+import Modals from 'components/Modal/Sketch';
 import MessageOptions from './Options.js'
 import moment from 'moment';
 import Button from 'components/Form/Button';
@@ -33,6 +19,7 @@ import Skeleton from 'components/Loading/Skeleton';
 import ScreenshotHandler from 'services/ScreenshotHandler';
 import _ from 'lodash';
 import Ratings from 'components/Messenger/Ratings';
+import styles from 'components/Messenger/Style';
 
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -58,7 +45,10 @@ class MessagesV3 extends Component {
       request_id: null,
       isViewing: false,
       members: [],
-      data: null
+      data: null,
+      updatingMessage: null,
+      isUpdate: false,
+      updatingText: null
     }
   }
 
@@ -433,6 +423,34 @@ class MessagesV3 extends Component {
     })
   }
 
+  updateMessage = () => {
+    const { updatingMessage, updatingText } = this.state;
+    const { messagesOnGroup } = this.props.state;
+    const { setMessagesOnGroup } = this.props;
+    let parameter = {
+      id: updatingMessage?.id,
+      message: updatingText
+    }
+    console.log(Routes.messengerMessagesUpdateMessage, parameter, '--')
+    Api.request(Routes.messengerMessagesUpdateMessage, parameter, response => {
+      if (response.data != null) {
+        let temp = messagesOnGroup;
+        temp.messages?.length > 0 && temp.messages.map((item, index) => {
+          if (item.id == updatingMessage.id) {
+            item.message = updatingText
+          }
+        })
+        setMessagesOnGroup(temp);
+        this.setState({
+          updatingMessage: null,
+          updatingText: null
+        })
+      }
+    }, error => {
+      console.log(error, '--')
+    })
+  }
+
   setImage = (url) => {
     this.setState({ imageModalUrl: url })
     setTimeout(() => {
@@ -440,6 +458,43 @@ class MessagesV3 extends Component {
     }, 500)
   }
 
+  delete = () => {
+    Alert.alert(
+      '',
+      'Are you sure you want to delete this message?',
+      [
+        { text: 'Cancel', onPress: () => { return }, style: 'cancel' },
+        {
+          text: 'Yes', onPress: () => {
+            const { updatingMessage } = this.state;
+            const { messagesOnGroup } = this.props.state;
+            const { setMessagesOnGroup } = this.props;
+            let parameter = {
+              id: updatingMessage?.id
+            }
+            Api.request(Routes.messengerMessagesDeleteMessage, parameter, response => {
+              if (response.data != null) {
+                let temp = messagesOnGroup;
+                temp.messages?.length > 0 && temp.messages.map((item, index) => {
+                  if (item.id == updatingMessage.id) {
+                    temp.messages.splice(index, 1)
+                  }
+                })
+                setMessagesOnGroup(temp);
+                this.setState({
+                  updatingMessage: null,
+                  isUpdate: false
+                })
+              }
+            }, error => {
+              console.log(error, '--')
+            })
+          }
+        },
+      ],
+      { cancelable: false }
+    )
+  }
 
   _image = (item) => {
     const { messengerGroup, user, theme } = this.props.state;
@@ -634,9 +689,16 @@ class MessagesV3 extends Component {
   }
 
   _leftTemplate = (item, index) => {
-    const { theme, messagesOnGroup } = this.props.state;
+    const { theme, messagesOnGroup, requestMessage } = this.props.state;
     return (
-      <View>
+      <TouchableOpacity onLongPress={() => {
+        if (item.payload == 'text' && requestMessage?.status == 1) {
+          this.setState({
+            isUpdate: true,
+            updatingMessage: item
+          })
+        }
+      }}>
         {(index > 0 && messagesOnGroup && messagesOnGroup.messages != null) && item.account_id != (messagesOnGroup.messages[index - 1].account_id) && (this._headerLeft(item, index))}
         {
           index == 0 && (this._headerLeft(item, index))
@@ -672,7 +734,7 @@ class MessagesV3 extends Component {
             }}>Sending...</Text>
           )
         }
-      </View>
+      </TouchableOpacity>
     );
   }
 
@@ -722,14 +784,14 @@ class MessagesV3 extends Component {
         </TouchableOpacity>
         <TextInput
           style={Style.formControl}
-          onChangeText={(newMessage) => this.setState({ newMessage })}
-          value={this.state.newMessage}
+          onChangeText={(newMessage) => { this.state.updatingText != null ? this.setState({ updatingText: newMessage }) : this.setState({ newMessage }) }}
+          value={this.state.updatingText != null ? this.state.updatingText : this.state.newMessage}
           placeholder={'Type your message here ...'}
           multiline={true}
           placeholderTextColor={Color.darkGray}
         />
         <TouchableOpacity
-          onPress={() => this.sendNewMessage()}
+          onPress={() => this.state.updatingMessage != null ? this.updateMessage() : this.sendNewMessage()}
           style={{
             height: 50,
             justifyContent: 'center',
@@ -793,21 +855,75 @@ class MessagesV3 extends Component {
     viewMenu(false) // new
   }
 
-  render() {
-    const {
-      isLoading,
-      isImageModal,
-      imageModalUrl,
-      photo,
-      keyRefresh,
-      isPullingMessages,
-      isLock,
-      isViewing,
-      members,
-      data
-    } = this.state;
-    const { requestMessage, theme, updateActivity, user } = this.props.state;
+  updatingOptions = () => {
+    const { isUpdate, updatingMessage } = this.state;
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isUpdate}
+        onRequestClose={() => {
+          this.setState({ isUpdate: false })
+        }}
+      >
+        <View style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 22
+        }}>
+          <View style={{
+            margin: 20,
+            padding: 10,
+            backgroundColor: 'white',
+            alignItems: 'center',
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 2
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            elevation: 5
+          }}>
+            <TouchableOpacity style={[styles.modalButtons, {
+              borderBottomWidth: 1
+            }]}
+              onPress={() => {
+                this.setState({
+                  isUpdate: false,
+                  updatingText: updatingMessage?.message
+                })
+              }}>
+              <Text>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.modalButtons, {
+              borderBottomWidth: 1
+            }]}
+              onPress={() => {
+                this.delete()
+              }}>
+              <Text style={{
+                color: Color.danger
+              }}>Delete</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButtons}
+              onPress={() => {
+                this.setState({ isUpdate: false })
+              }}>
+              <Text style={{
+                color: Color.danger
+              }}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    )
+  }
 
+  render() {
+    const { isLoading, isImageModal, imageModalUrl, photo, keyRefresh, isPullingMessages, isLock, isViewing, members, data, isUpdate, updatingText } = this.state;
+    const { requestMessage, theme, updateActivity, user } = this.props.state;
     console.log('[MESSEGER GROUP]', data);
     return (
       <SafeAreaView>
@@ -845,82 +961,82 @@ class MessagesV3 extends Component {
               position: 'absolute',
               zIndex: 10
             }}>
-            {requestMessage?.status == 1 && updateActivity != null && !isLoading && <TouchableOpacity
-              onPress={() => {
-                if(data?.account_id !== user.id) {
-                  this.props.navigation.navigate('activityStack', {from: 'messenger', data: updateActivity, members: members})
-                }
-              }}
-              style={{
-                margin: 10,
-                borderColor: updateActivity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
-                borderWidth: 1,
-                flexDirection: 'row',
-                marginBottom: 20,
-                height: 50,
-                borderRadius: 10,
-                alignItems: 'center',
-                width: '100%'
-              }}>
-              <View style={{
-                width: '80%',
-                padding: 10,
-                flexDirection: 'row',
-                alignItems: 'center'
-              }}>
-                <FontAwesomeIcon
-                  icon={faTruckMoving}
-                  size={40}
-                  style={{
-                    color: updateActivity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
-                    width: '10%',
-                    marginRight: '2%'
-                  }}
-                />
-                <View style={{
-                   width: '38%',
-                   alignItems: 'center'
+              {requestMessage?.status == 1 && updateActivity != null && !isLoading && <TouchableOpacity
+                onPress={() => {
+                  if (data?.account_id !== user.id) {
+                    this.props.navigation.navigate('activityStack', { from: 'messenger', data: updateActivity, members: members })
+                  }
+                }}
+                style={{
+                  margin: 10,
+                  borderColor: updateActivity?.date_time === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
+                  borderWidth: 1,
+                  flexDirection: 'row',
+                  marginBottom: 20,
+                  height: 50,
+                  borderRadius: 10,
+                  alignItems: 'center',
+                  width: '100%'
                 }}>
-                  <Text style={{
-                    fontSize: 11,
-                    fontWeight: 'bold'
-                  }}>{updateActivity?.orig_time}</Text>
-                  <Text style={{
-                    fontSize: 11,
-                  }}>Processing Time</Text>
-                </View>
                 <View style={{
-                  width: '45%',
-                  marginRight: '1%',
-                  height: 10,
-                  backgroundColor: Color.lightGray,
-                  borderRadius: 5
+                  width: '80%',
+                  padding: 10,
+                  flexDirection: 'row',
+                  alignItems: 'center'
                 }}>
+                  <FontAwesomeIcon
+                    icon={faTruckMoving}
+                    size={40}
+                    style={{
+                      color: updateActivity?.date_time === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary),
+                      width: '10%',
+                      marginRight: '2%'
+                    }}
+                  />
                   <View style={{
-                    width: Helper.getProcessingTimePercent(updateActivity) + '%',
-                    backgroundColor: Helper.getProcessingTimePercent(updateActivity) > 0 ? (updateActivity?.date_time  === 'Arrived' ? theme ? theme.primary : Color.primary : theme ? theme.secondary : Color.secondary) : Color.lightGray,
-                    borderRadius: 5,
-                    height: 10,
+                    width: '38%',
+                    alignItems: 'center'
                   }}>
+                    <Text style={{
+                      fontSize: 11,
+                      fontWeight: 'bold'
+                    }}>{updateActivity?.orig_time}</Text>
+                    <Text style={{
+                      fontSize: 11,
+                    }}>Processing Time</Text>
+                  </View>
+                  <View style={{
+                    width: '45%',
+                    marginRight: '1%',
+                    height: 10,
+                    backgroundColor: Color.lightGray,
+                    borderRadius: 5
+                  }}>
+                    <View style={{
+                      width: Helper.getProcessingTimePercent(updateActivity) + '%',
+                      backgroundColor: Helper.getProcessingTimePercent(updateActivity) > 0 ? (updateActivity?.date_time === 'Arrived' ? theme ? theme.primary : Color.primary : theme ? theme.secondary : Color.secondary) : Color.lightGray,
+                      borderRadius: 5,
+                      height: 10,
+                    }}>
+                    </View>
                   </View>
                 </View>
-              </View>
-              <View style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '20%',
-                height: '100%',
-                borderTopRightRadius: 8,
-                borderBottomRightRadius: 8,
-                backgroundColor: updateActivity?.date_time  === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)
-              }}>
-                <Text style={{
-                  color: Color.white,
-                  textAlign: 'center',
-                  fontSize: 11
-                }}>{updateActivity?.date_time}</Text>
-              </View>
-            </TouchableOpacity>}
+                <View style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '20%',
+                  height: '100%',
+                  borderTopRightRadius: 8,
+                  borderBottomRightRadius: 8,
+                  backgroundColor: updateActivity?.date_time === 'Arrived' ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)
+                }}>
+                  <Text style={{
+                    color: Color.white,
+                    textAlign: 'center',
+                    fontSize: 11
+                  }}>{updateActivity?.date_time}</Text>
+                </View>
+              </TouchableOpacity>}
             </View>
             {isLoading ? <Skeleton size={1} template={'messages'} /> : null}
             <ScrollView
@@ -962,7 +1078,23 @@ class MessagesV3 extends Component {
                 {this._flatList()}
               </View>
             </ScrollView>
-
+            {updatingText != null ? <TouchableOpacity onPress={() => {
+              this.setState({
+                updatingMessage: null,
+                updatingText: null
+              })
+            }}
+              style={{
+                position: 'absolute',
+                bottom: 55,
+                right: 5
+              }}>
+              <Text style={{
+                color: Color.danger
+              }}>
+                Cancel Edit
+              </Text>
+            </TouchableOpacity> : null}
             {!isLoading && <View style={{
               position: 'absolute',
               bottom: 0,
@@ -1022,12 +1154,13 @@ class MessagesV3 extends Component {
                 )
               }
             </View>}
+            {this.updatingOptions()}
             <ImageModal
               visible={isImageModal}
               url={imageModalUrl}
               action={() => this.setState({ isImageModal: false })}
             ></ImageModal>
-            <Modal send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
+            <Modals send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           </View>
         </KeyboardAvoidingView>
         {
