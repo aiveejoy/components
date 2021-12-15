@@ -152,5 +152,12 @@ export default {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 10
+  },
+  modalButtons: {
+    borderBottomColor: Color.lightGray,
+    width: width / 2,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 }

@@ -19,6 +19,7 @@ import Skeleton from 'components/Loading/Skeleton';
 import ScreenshotHandler from 'services/ScreenshotHandler';
 import _ from 'lodash';
 import Ratings from 'components/Messenger/Ratings';
+import styles from 'components/Messenger/Style';
 
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -425,16 +426,29 @@ class MessagesV3 extends Component {
 
   updateMessage = () => {
     const { updatingMessage, updatingText } = this.state;
+    const { messagesOnGroup } = this.props.state;
+    const { setMessagesOnGroup } = this.props;
     let parameter = {
       id: updatingMessage?.id,
       message: updatingText
     }
+    console.log(Routes.messengerMessagesUpdateMessage, parameter, '--')
     Api.request(Routes.messengerMessagesUpdateMessage, parameter, response => {
       if (response.data != null) {
-        this.setState({updatingMessage: response})
+        let temp = messagesOnGroup;
+        temp.messages?.length > 0 && temp.messages.map((item, index) => {
+          if (item.id == updatingMessage.id) {
+            item.message = updatingText
+          }
+        })
+        setMessagesOnGroup(temp);
+        this.setState({
+          updatingMessage: null,
+          updatingText: null
+        })
       }
     }, error => {
-      console.log({ sendImageWithoutPayloadError: error })
+      console.log(error, '--')
     })
   }
 
@@ -445,26 +459,43 @@ class MessagesV3 extends Component {
     }, 500)
   }
 
-  onClick = (item) => {
-    if (item.payload === 'delete') {
-      Alert.alert(
-        '',
-        'Are you sure you want to delete this message?',
-        [
-          { text: 'Cancel', onPress: () => { return }, style: 'cancel' },
-          {
-            text: 'Yes', onPress: () => {
-              console.log('deleting')
+  delete = () => {
+    Alert.alert(
+      '',
+      'Are you sure you want to delete this message?',
+      [
+        { text: 'Cancel', onPress: () => { return }, style: 'cancel' },
+        {
+          text: 'Yes', onPress: () => {
+            const { updatingMessage } = this.state;
+            const { messagesOnGroup } = this.props.state;
+            const { setMessagesOnGroup } = this.props;
+            let parameter = {
+              id: updatingMessage?.id
             }
-          },
-        ],
-        { cancelable: false }
-      )
-    } else {
-      console.log('updating')
-    }
+            Api.request(Routes.messengerMessagesDeleteMessage, parameter, response => {
+              if (response.data != null) {
+                let temp = messagesOnGroup;
+                temp.messages?.length > 0 && temp.messages.map((item, index) => {
+                  if (item.id == updatingMessage.id) {
+                    temp.messages.splice(index, 1)
+                  }
+                })
+                setMessagesOnGroup(temp);
+                this.setState({
+                  updatingMessage: null,
+                  isUpdate: false
+                })
+              }
+            }, error => {
+              console.log(error, '--')
+            })
+          }
+        },
+      ],
+      { cancelable: false }
+    )
   }
-
 
   _image = (item) => {
     const { messengerGroup, user, theme } = this.props.state;
@@ -659,10 +690,10 @@ class MessagesV3 extends Component {
   }
 
   _leftTemplate = (item, index) => {
-    const { theme, messagesOnGroup } = this.props.state;
+    const { theme, messagesOnGroup, requestMessage } = this.props.state;
     return (
       <TouchableOpacity onLongPress={() => {
-        if (item.payload == 'text') {
+        if (item.payload == 'text' && requestMessage?.status == 1) {
           this.setState({
             isUpdate: true,
             updatingMessage: item
@@ -754,7 +785,7 @@ class MessagesV3 extends Component {
         </TouchableOpacity>
         <TextInput
           style={Style.formControl}
-          onChangeText={(newMessage) => {this.state.updatingText != null ? this.setState({updatingText: newMessage}) : this.setState({ newMessage })}}
+          onChangeText={(newMessage) => { this.state.updatingText != null ? this.setState({ updatingText: newMessage }) : this.setState({ newMessage }) }}
           value={this.state.updatingText != null ? this.state.updatingText : this.state.newMessage}
           placeholder={'Type your message here ...'}
           multiline={true}
@@ -856,44 +887,31 @@ class MessagesV3 extends Component {
             shadowRadius: 4,
             elevation: 5
           }}>
-            <TouchableOpacity style={{
-              borderBottomWidth: 1,
-              borderBottomColor: Color.lightGray,
-              width: DeviceWidth/2,
-              height: 40,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              this.setState({
-                isUpdate: false,
-                updatingText: updatingMessage?.message
-              })
-            }}>
+            <TouchableOpacity style={[styles.modalButtons, {
+              borderBottomWidth: 1
+            }]}
+              onPress={() => {
+                this.setState({
+                  isUpdate: false,
+                  updatingText: updatingMessage?.message
+                })
+              }}>
               <Text>Edit</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{
-              borderBottomWidth: 1,
-              borderBottomColor: Color.lightGray,
-              width: DeviceWidth/2,
-              height: 40,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              this.delete()
-            }}>
-              <Text>Delete</Text>
+            <TouchableOpacity style={[styles.modalButtons, {
+              borderBottomWidth: 1
+            }]}
+              onPress={() => {
+                this.delete()
+              }}>
+              <Text style={{
+                color: Color.danger
+              }}>Delete</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{
-              width: DeviceWidth/2,
-              height: 40,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-            onPress={() => {
-              this.setState({isUpdate: false})
-            }}>
+            <TouchableOpacity style={styles.modalButtons}
+              onPress={() => {
+                this.setState({ isUpdate: false })
+              }}>
               <Text style={{
                 color: Color.danger
               }}>Close</Text>
@@ -905,7 +923,7 @@ class MessagesV3 extends Component {
   }
 
   render() {
-    const { isLoading, isImageModal, imageModalUrl, photo, keyRefresh, isPullingMessages, isLock, isViewing, members, data, isUpdate } = this.state;
+    const { isLoading, isImageModal, imageModalUrl, photo, keyRefresh, isPullingMessages, isLock, isViewing, members, data, isUpdate, updatingText } = this.state;
     const { requestMessage, theme, updateActivity, user } = this.props.state;
     console.log('[MESSEGER GROUP]', data);
     return (
@@ -1061,7 +1079,23 @@ class MessagesV3 extends Component {
                 {this._flatList()}
               </View>
             </ScrollView>
-
+            {updatingText != null ? <TouchableOpacity onPress={() => {
+              this.setState({
+                updatingMessage: null,
+                updatingText: null
+              })
+            }}
+              style={{
+                position: 'absolute',
+                bottom: 55,
+                right: 5
+              }}>
+              <Text style={{
+                color: Color.danger
+              }}>
+                Cancel Edit
+              </Text>
+            </TouchableOpacity> : null}
             {!isLoading && <View style={{
               position: 'absolute',
               bottom: 0,
