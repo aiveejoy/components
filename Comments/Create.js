@@ -31,7 +31,7 @@ class Create extends Component {
   }
 
   post = async () => {
-    const { status } = this.state;
+    const { status, list } = this.state;
     if (status === '' || status === null) {
       this.setState({ errorMessage: 'Empty Status!' })
       return
@@ -39,8 +39,8 @@ class Create extends Component {
     const { user } = this.props.state;
     let parameter = {
       account_id: user.id,
-      payload: 'account_id',
-      payload_value: user.id,
+      payload: this.props.pageId ? 'page_id' : 'account_id',
+      payload_value: this.props.pageId ? this.props.pageId : user.id,
       text: this.state.status,
       to: user.id,
       from: user.id,
@@ -66,7 +66,13 @@ class Create extends Component {
     Api.request(Routes.commentsCreate, parameter, response => {
       this.setState({ loading: false })
       if (response.data !== null) {
-        this.addPhotos(response.data, data);
+        if(list.length > 0) {
+          this.addPhotos(response.data, data);
+        } else {
+          this.props.close()
+          data['images'] = []
+          this.props.setComments([data, ...this.props.state.comments])
+        }
         data['id'] = response.data;
         this.setState({
           status: null,

@@ -30,16 +30,42 @@ class Comments extends Component {
   }
 
   componentDidMount() {
+    this.props.setComments([])
     this.retrieve(false);
   }
 
   retrieve = (flag) => {
     const { setComments, withImages } = this.props;
-    let parameter = {
-      limit: this.state.limit,
-      offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
-      sort: {
-        created_at: "desc"
+    let parameter = null
+    if(this.props.pageId) {
+      parameter = {
+        condition: [{
+          clause: '=',
+          column: 'payload',
+          value:  'page_id'
+        }, {
+          clause: '=',
+          column: 'payload_value',
+          value: this.props.pageId
+        }],
+        limit: this.state.limit,
+        offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
+        sort: {
+          created_at: "desc"
+        }
+      }
+    } else {
+      parameter = {
+        condition: [{
+          clause: '!=',
+          column: 'payload',
+          value: 'page_id'
+        }],
+        limit: this.state.limit,
+        offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
+        sort: {
+          created_at: "desc"
+        }
       }
     }
     this.setState({ isLoading: true });
@@ -255,6 +281,7 @@ class Comments extends Component {
           }
         {/* </ScrollView> */}
         <CreatePost
+          pageId={this.props.pageId}
           visible={createStatus}
           close={() => this.setState({ createStatus: false })}
           title={'Create Post'}
