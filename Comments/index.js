@@ -37,16 +37,16 @@ class Comments extends Component {
   retrieve = (flag) => {
     const { setComments, withImages } = this.props;
     let parameter = null
-    if(this.props.pageId) {
+    if(this.props.payload) {
       parameter = {
         condition: [{
           clause: '=',
           column: 'payload',
-          value:  'page_id'
+          value:  this.props.payload?.payload
         }, {
           clause: '=',
           column: 'payload_value',
-          value: this.props.pageId
+          value: this.props.payload?.payload_value
         }],
         limit: this.state.limit,
         offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
@@ -59,7 +59,7 @@ class Comments extends Component {
         condition: [{
           clause: '!=',
           column: 'payload',
-          value: 'page_id'
+          value: 'page'
         }],
         limit: this.state.limit,
         offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
@@ -281,7 +281,7 @@ class Comments extends Component {
           }
         {/* </ScrollView> */}
         <CreatePost
-          pageId={this.props.pageId}
+          payload={this.props.payload}
           visible={createStatus}
           close={() => this.setState({ createStatus: false })}
           title={'Create Post'}
