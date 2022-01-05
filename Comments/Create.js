@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, Image, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Modal, ScrollView, Image, Alert, Dimensions } from 'react-native';
 import { Routes, Color, BasicStyles } from 'common';
 import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
@@ -12,7 +12,9 @@ import moment from 'moment';
 import ImagePicker from 'react-native-image-crop-picker';
 import Config from 'src/config';
 import ImageModal from 'components/Modal/ImageModal.js';
-
+import RBSheet from 'react-native-raw-bottom-sheet';
+const height = Math.round(Dimensions.get('window').height);
+const width = Math.round(Dimensions.get('window').width);
 class Create extends Component {
   constructor(props) {
     super(props);
@@ -23,6 +25,14 @@ class Create extends Component {
       list: [],
       imageModalUrl: null,
       isImageModal: false
+    }
+  }
+
+  componentDidUpdate() {
+    const { visible } = this.props
+    if (visible) {
+      this.RBSheet.open()
+      return;
     }
   }
 
@@ -66,10 +76,11 @@ class Create extends Component {
     Api.request(Routes.commentsCreate, parameter, response => {
       this.setState({ loading: false })
       if (response.data !== null) {
-        if(list.length > 0) {
+        if (list.length > 0) {
           this.addPhotos(response.data, data);
         } else {
           this.props.close()
+          this.RBSheet.close()
           data['images'] = []
           this.props.setComments([data, ...this.props.state.comments])
         }
@@ -114,7 +125,7 @@ class Create extends Component {
     console.log(parameter)
     Api.request(Routes.imageUploadArray, parameter, imageResponse => {
       this.setState({ loading: false })
-      if(imageResponse.data.length > 0) {
+      if (imageResponse.data.length > 0) {
         let images = []
         imageResponse.data.map(item => {
           images.push(item.category)
@@ -122,6 +133,7 @@ class Create extends Component {
         data['images'] = images
         this.props.setComments([data, ...this.props.state.comments])
         this.props.close()
+        this.RBSheet.close()
       }
     }, error => {
       this.setState({ loading: false })
@@ -140,61 +152,68 @@ class Create extends Component {
     const { theme } = this.props.state;
     const { loading, errorMessage, list, isImageModal, imageModalUrl } = this.state;
     return (
-      <View style={Style.centeredView}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={this.props.visible}
+      <View>
+        <RBSheet
+          ref={ref => {
+            this.RBSheet = ref;
+          }}
+          closeOnDragDown={true}
+          dragFromTopOnly={true}
+          closeOnPressMask={false}
+          height={height/2 + (height/4)}
+          onClose={() => {
+            this.props.close()
+          }}
         >
           <View style={Style.centeredView}>
-            <View style={Style.modalView}>
-              <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={Style.container}>
-                  <Text style={{
-                    fontFamily: 'Poppins-SemiBold',
-                    fontSize: BasicStyles.standardTitleFontSize
-                  }}>{this.props.title}</Text>
-                  <Text style={{
-                    color: Color.danger
-                  }}>{errorMessage}</Text>
-                  {loading ? <Spinner mode="overlay" /> : null}
-                  <TextInput
-                    style={Style.textInput}
-                    multiline={true}
-                    numberOfLines={1}
-                    onChangeText={text => this.statusHandler(text)}
-                    value={this.state.status}
-                    placeholder="   Express what's on your mind!"
-                    placeholderTextColor={Color.darkGray}
-                  />
-                  <TouchableOpacity style={{
-                    flexDirection: 'row',
-                    width: '100%',
-                    padding: 20,
-                    alignItems: 'center'
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={Style.container}>
+                <Text style={{
+                  fontFamily: 'Poppins-SemiBold',
+                  fontSize: BasicStyles.standardTitleFontSize
+                }}>{this.props.title}</Text>
+                <Text style={{
+                  color: Color.danger
+                }}>{errorMessage}</Text>
+                <TextInput
+                  style={Style.textInput}
+                  multiline={true}
+                  numberOfLines={7}
+                  onChangeText={text => this.statusHandler(text)}
+                  value={this.state.status}
+                  placeholder="   Express what's on your mind!"
+                  placeholderTextColor={Color.darkGray}
+                />
+                <TouchableOpacity style={{
+                  flexDirection: 'row',
+                  width: '100%',
+                  padding: 20,
+                  alignItems: 'center'
+                }}
+                  onPress={() => {
+                    this.handleChoosePhoto();
                   }}
-                    onPress={() => {
-                      this.handleChoosePhoto();
+                >
+                  <FontAwesomeIcon
+                    size={30}
+                    icon={faImages}
+                    style={{
+                      color: Color.darkGray,
+                      marginRight: 10
                     }}
-                  >
-                    <FontAwesomeIcon
-                      size={30}
-                      icon={faImages}
-                      style={{
-                        color: Color.darkGray,
-                        marginRight: 10
-                      }}
-                    />
-                    <Text style={{ color: Color.darkGray }}>Add Photos</Text>
-                  </TouchableOpacity>
-                  <View style={{
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    width: '100%'
-                  }}>
-                    {list.length > 0 && list.map((item, index) => {
-                      return (
-                        <TouchableOpacity
+                  />
+                  <Text style={{ color: Color.darkGray }}>Add Photos</Text>
+                </TouchableOpacity>
+                <View style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  width: '100%',
+                  padding: 20,
+                  marginBottom: 150
+                }}>
+                  {list.length > 0 && list.map((item, index) => {
+                    return (
+                      <TouchableOpacity
                         onPress={() => {
                           // this.setImage(item.path)
                         }}
@@ -208,7 +227,7 @@ class Create extends Component {
                                 text: 'Remove', onPress: () => {
                                   let images = list;
                                   images.splice(index, 1);
-                                  this.setState({list: images});
+                                  this.setState({ list: images });
                                 }
                               },
                             ],
@@ -219,50 +238,54 @@ class Create extends Component {
                           width: '25%',
                           height: 50
                         }}>
-                          <Image
-                            source={{ uri: `data:image/jpeg;base64,${item.file_base64}` }}
-                            style={{
-                              width: '100%',
-                              height: '100%'
-                            }}
-                          />
-                        </TouchableOpacity>
-                      )
-                    })}
-                  </View>
-                  <View style={{
-                    flexDirection: 'row-reverse',
-                    padding: 30
-                  }}>
-                    <TouchableOpacity style={[Style.button, {
-                      borderColor: theme ? theme.primary : Color.primary,
-                      backgroundColor: theme ? theme.primary : Color.primary
-                    }]}
-                      onPress={() => { this.post() }}
-                    >
-                      <Text style={{ color: 'white' }}>Post</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[Style.button, {
-                      borderColor: Color.secondary,
-                      backgroundColor: Color.secondary,
-                      marginRight: 5,
-                    }]}
-                      onPress={() => {
-                        this.props.close();
-                        this.setState({
-                          status: null,
-                          list: []
-                        });
-                      }}
-                    >
-                      <Text style={{ color: 'white' }}>Cancel</Text>
-                    </TouchableOpacity>
-                  </View>
+                        <Image
+                          source={{ uri: `data:image/jpeg;base64,${item.file_base64}` }}
+                          style={{
+                            width: '100%',
+                            height: '100%'
+                          }}
+                        />
+                      </TouchableOpacity>
+                    )
+                  })}
                 </View>
-              </ScrollView>
+              </View>
+            </ScrollView>
+            {loading ? <Spinner mode="overlay" /> : null}
+            <View style={{
+              flexDirection: 'row-reverse',
+              padding: 20,
+              position: 'absolute',
+              bottom: 5,
+              width: width
+            }}>
+              <TouchableOpacity style={[Style.button, {
+                borderColor: theme ? theme.primary : Color.primary,
+                backgroundColor: theme ? theme.primary : Color.primary
+              }]}
+                onPress={() => { this.post() }}
+              >
+                <Text style={{ color: 'white' }}>Post</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[Style.button, {
+                borderColor: Color.secondary,
+                backgroundColor: Color.secondary,
+                marginRight: 5,
+              }]}
+                onPress={() => {
+                  this.props.close();
+                  this.RBSheet.close()
+                  this.setState({
+                    status: null,
+                    list: []
+                  });
+                }}
+              >
+                <Text style={{ color: 'white' }}>Cancel</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
+        </RBSheet>
         <ImageModal
           visible={isImageModal}
           url={imageModalUrl}
