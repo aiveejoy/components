@@ -160,7 +160,7 @@ class Create extends Component {
           closeOnDragDown={true}
           dragFromTopOnly={true}
           closeOnPressMask={false}
-          height={height}
+          height={height/2 + (height/4)}
           onClose={() => {
             this.props.close()
           }}
