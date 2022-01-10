@@ -48,7 +48,8 @@ class MessagesV3 extends Component {
       data: null,
       updatingMessage: null,
       isUpdate: false,
-      updatingText: null
+      updatingText: null,
+      nowUpdatingMessage: false
     }
   }
 
@@ -431,8 +432,9 @@ class MessagesV3 extends Component {
       id: updatingMessage?.id,
       message: updatingText
     }
-    console.log(Routes.messengerMessagesUpdateMessage, parameter, '--')
+    this.setState({nowUpdatingMessage: true})
     Api.request(Routes.messengerMessagesUpdateMessage, parameter, response => {
+      this.setState({nowUpdatingMessage: false})
       if (response.data != null) {
         let temp = messagesOnGroup;
         temp.messages?.length > 0 && temp.messages.map((item, index) => {
@@ -448,6 +450,7 @@ class MessagesV3 extends Component {
       }
     }, error => {
       console.log(error, '--')
+      this.setState({nowUpdatingMessage: false})
     })
   }
 
@@ -472,7 +475,9 @@ class MessagesV3 extends Component {
             let parameter = {
               id: updatingMessage?.id
             }
+            this.setState({nowUpdatingMessage: true})
             Api.request(Routes.messengerMessagesDeleteMessage, parameter, response => {
+              this.setState({nowUpdatingMessage: false})
               if (response.data != null) {
                 let temp = messagesOnGroup;
                 temp.messages?.length > 0 && temp.messages.map((item, index) => {
@@ -488,6 +493,7 @@ class MessagesV3 extends Component {
               }
             }, error => {
               console.log(error, '--')
+              this.setState({nowUpdatingMessage: false})
             })
           }
         },
@@ -690,6 +696,7 @@ class MessagesV3 extends Component {
 
   _leftTemplate = (item, index) => {
     const { theme, messagesOnGroup, requestMessage } = this.props.state;
+    const { updatingMessage, nowUpdatingMessage } = this.state;
     return (
       <TouchableOpacity onLongPress={() => {
         if (item.payload == 'text' && requestMessage?.status == 1) {
@@ -703,18 +710,26 @@ class MessagesV3 extends Component {
         {
           index == 0 && (this._headerLeft(item, index))
         }
-        <Text style={[Style.dateText, {
-          textAlign: 'right'
-        }]}>{item.created_at_human}</Text>
         {
-          item.message != null && Platform.OS == 'android' && (
+          item.message != null && Platform.OS == 'android' && item.id != updatingMessage?.id && (<Text style={[Style.dateText, {
+          textAlign: 'right'
+        }]}>{item.created_at_human}</Text>)}
+        {
+          item.message != null && Platform.OS == 'android' && item.id != updatingMessage?.id && (
             <Text style={[Style.messageTextLeft, {
               backgroundColor: theme ? theme.primary : Color.primary
             }]}>{item.message}</Text>
           )
         }
+        {item.id == updatingMessage?.id && nowUpdatingMessage && (
+          <View style={{
+            width: DeviceWidth/2
+          }}>
+            <Skeleton size={1} template={'block'} height={45}/>
+          </View>
+        )}
         {
-          item.message != null && Platform.OS == 'ios' && (
+          item.message != null && Platform.OS == 'ios' && item.id != updatingMessage?.id && (
             <View style={[Style.messageTextLeft, {
               backgroundColor: theme ? theme.primary : Color.primary
             }]}>
@@ -909,7 +924,10 @@ class MessagesV3 extends Component {
             </TouchableOpacity>
             <TouchableOpacity style={styles.modalButtons}
               onPress={() => {
-                this.setState({ isUpdate: false })
+                this.setState({
+                  isUpdate: false,
+                  updatingMessage: null
+                })
               }}>
               <Text style={{
                 color: Color.danger

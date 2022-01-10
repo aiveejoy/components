@@ -29,10 +29,21 @@ class ImageModal extends Component {
           'Message',
           'Image successfully deleted',
           [
-            { text: 'Ok', onPress: () => (this.props.successDel(), this.props.action()), style: 'cancel' }
+            { text: 'Ok', onPress: () => {this.props.successDel(), this.props.action()}, style: 'cancel' }
           ],
           { cancelable: false }
         )
+        return
+      }else{
+        Alert.alert(
+          'Error',
+          'Please Try Again',
+          [
+            { text: 'Ok', onPress: () => {this.props.successDel(), this.props.action()}, style: 'cancel' }
+          ],
+          { cancelable: false }
+        )
+        return
       }
     })
   }
