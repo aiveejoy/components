@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { View, Text, Image, TouchableHighlight} from 'react-native';
+import { View, Text, Image, TouchableHighlight, Dimensions} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { Color, BasicStyles } from 'common';
+const width = Math.round(Dimensions.get('window').width);
 class Stack extends Component{
   
   constructor(props){
@@ -53,7 +54,9 @@ class Stack extends Component{
                     <Image 
                       source={item.logo}
                       style={{
-                        height: 30
+                        height: 30,
+                        width: width / 3,
+                        resizeMode: 'stretch',
                       }}
                       />
                   </View>
