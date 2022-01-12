@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, TouchableHighlight} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { Color, BasicStyles } from 'common';
@@ -12,32 +12,34 @@ class SelectWithArrow extends Component{
   render () {
     const { value } = this.props;
     return (
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
-        position: 'relative',
-        backgroundColor: 'white',
-        borderRadius: 50,
-        marginBottom: 10,
-        }}>
-        <Text>{value ? value : 'Select'}</Text>
-        <TouchableHighlight
-          onPress={() => {
-
-          }}
-          style={{
-            position: 'absolute',
-            right: 10,
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-          underlayColor={Color.white}
-          >
-          <FontAwesomeIcon icon={faChevronRight} size={20} color={Color.primary}/>
-        </TouchableHighlight>
-      </View>
+      <TouchableOpacity
+        onPress={() => {
+            this.props.onPress()
+        }}
+        >
+            <View
+                style={{
+                    flexDirection: 'row',
+                    width: '100%',
+                    marginBottom: 10,
+                    ...BasicStyles.formControl,
+                    alignItems: 'center'
+                }}>
+                    <Text>{value ? value : 'Select'}</Text>
+                    <View
+                    style={{
+                        position: 'absolute',
+                        right: 10,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                    underlayColor={Color.white}
+                    >
+                    <FontAwesomeIcon icon={faChevronRight} size={20} color={Color.primary}/>
+                    </View>
+            </View>
+        
+      </TouchableOpacity>
     );
   }
 }
