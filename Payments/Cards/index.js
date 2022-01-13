@@ -20,6 +20,7 @@ class Stack extends Component{
           data && data.map((item, index) => (
             <TouchableHighlight
               onPress={() => {
+                if(this.props.press == false) return
                 this.props.onSelect(item)
               }}
               style={{
