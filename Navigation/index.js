@@ -25,6 +25,13 @@ class Navigation extends Component {
         longitudeDelta: 0.12,
         formatted_address: null,
       },
+      location: {
+        latitude: 0,
+        longitude: 0,
+        latitudeDelta: 0.12,
+        longitudeDelta: 0.12,
+        formatted_address: null,
+      },
       mapType: 'standard',
       streetView: false
     }
@@ -56,17 +63,25 @@ class Navigation extends Component {
       error => console.log("ERROR", error),
       config,
     );
+    this.setState({
+      location: {
+        latitude: parseFloat(this.props.navigation.state?.params?.location?.latitude),
+        latitudeDelta: 0.12,
+        longitude: parseFloat(this.props.navigation.state?.params?.location?.longitude),
+        longitudeDelta: 0.12
+      }
+    })
   }
 
   renderMap = () => {
-    const { region, mapType, streetView } = this.state;
+    const { region, mapType, streetView, location } = this.state;
     const { theme } = this.props.state;
     return (
       <View>
         <MapView
           style={{
             minWidth: width - 50,
-            minHeight: height - 72,
+            minHeight: height - 67,
             flex: 1,
             borderRadius: BasicStyles.standardBorderRadius
           }}
@@ -82,7 +97,23 @@ class Navigation extends Component {
             <Marker
               key={0}
               coordinate={region}
-              title={'Title route'}
+              title={'My Location'}
+            >
+              <Image
+                source={require('src/assets/userPosition.png')}
+                style={{
+                  width: 50,
+                  height: 50
+                }}
+              />
+            </Marker>
+          }
+          {
+            this.state.isMapReady && location &&
+            <Marker
+              key={0}
+              coordinate={location}
+              title={"User's Location"}
             >
               <Image
                 source={require('src/assets/userPosition.png')}
@@ -103,21 +134,13 @@ class Navigation extends Component {
     const { isLoading, region, streetView, mapType } = this.state;
     return (
       <View style={{
-        backgroundColor: Color.containerBackground
+        backgroundColor: Color.containerBackground,
+        height: '100%'
       }}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          onScroll={(event) => {
-            let scrollingHeight = event.nativeEvent.layoutMeasurement.height + event.nativeEvent.contentOffset.y
-            let totalHeight = event.nativeEvent.contentSize.height
-            if (scrollingHeight >= (totalHeight)) {
-              if (isLoading == false) {
-                this.retrieveChurches(true)
-              }
-            }
-          }}
         >
-          <View style={{ marginBottom: height / 2 }}>
+          <View>
             <View>
               <TouchableOpacity
                 style={{
@@ -158,7 +181,7 @@ class Navigation extends Component {
                   <StreetView
                     style={{
                       minWidth: width - 50,
-                      minHeight: height - 300,
+                      minHeight: height - 67,
                       margin: 0
                     }}
                     allGesturesEnabled={true}

@@ -110,17 +110,16 @@ class Options extends Component {
   }
 
   showNavigationMap = () => {
-    let menu = [
-      ...Helper.MessengerMenu,
-      {
-        title: 'Navigation',
-        payload: 'redirect',
-        payload_value: 'navigationStack',
-        color: Color.black,
-        type: 'callback',
-        icon: faFileAlt
-      }
-    ]
+    let index = Helper.MessengerMenu.length - 1;
+    let menu = Helper.MessengerMenu;
+    menu.splice(index, 0, {
+      title: 'Navigation',
+      payload: 'redirect',
+      payload_value: 'navigationStack',
+      color: Color.black,
+      type: 'callback',
+      icon: faFileAlt
+    });
     this.setState({
       current: {
         title: 'Settings',
@@ -224,9 +223,9 @@ class Options extends Component {
   close = () => {
     this.props.navigation.setParams({
       data: {
-        ...this.props.data,
+        ...this.props.navigation.state?.params?.data,
         title: this.props.navigation.state?.params?.data?.title,
-        menuFlag: !this.props.navigation.state?.params?.data?.menuFlag
+        menuFlag: false
       }
     })
   }
@@ -659,7 +658,7 @@ class Options extends Component {
         break
       case 'navigationStack': {
         this.close()
-        this.props.navigation.navigate(item.payload_value)
+        this.props.navigation.navigate(item.payload_value, {location: data.location})
       }
         break
       case 'back':
