@@ -71,27 +71,61 @@ class Options extends Component {
 
   paypalDirect = () => {
     const { setPaypalUrl } = this.props;
-    let parameter = {
-      amount: this.props.amount,
-      currency: 'USD',
-      reference_id: 1
-    }
-    this.setState({ isLoading: true });
-    console.log(Routes.paypalCreateOrder, parameter)
-    Api.request(Routes.paypalCreateOrder, parameter, orderResponse => {
-      if (orderResponse && (orderResponse.links || (orderResponse.links && orderResponse.links.length > 0))) {
-        orderResponse.links.map((item) => {
-          if (item.rel == 'approve') {
-            setPaypalUrl(item.href)
+    // let parameter = {
+    //   amount: this.props.amount,
+    //   currency: 'USD',
+    //   reference_id: 1
+    // }
+    // this.setState({ isLoading: true });
+    // console.log(Routes.paypalCreateOrder, parameter)
+    // Api.request(Routes.paypalCreateOrder, parameter, orderResponse => {
+    //   if (orderResponse && (orderResponse.links || (orderResponse.links && orderResponse.links.length > 0))) {
+    //     orderResponse.links.map((item) => {
+    //       if (item.rel == 'approve') {
+    //         setPaypalUrl(item.href)
+    //       }
+    //     })
+    //   }
+    // },
+    //   (error) => {
+    //     console.log('API ERROR', error);
+    //     this.setState({ isLoading: false });
+    //   },
+    // );
+    Paypal.paypalPostRequest(response => {
+      if (response && response.access_token != null) {
+        Paypal.paypalCreateOrderRequest({
+          intent: 'CAPTURE',
+          purchase_units: [{
+            amount: {
+              currency_code: 'USD',
+              value: this.props.amount
+            }
+          }],
+          application_context: {
+            brand_name: 'Header for payment page',
+            locale: 'en-US',
+            landing_page: 'LOGIN', // can be NO_PREFERENCE, LOGIN, BILLING
+            shipping_preference: 'NO_SHIPPING', // because I didn't want shipping info on the page,
+            user_action: 'PAY_NOW',  // Button name, can be PAY_NOW or CONTINUE
+            return_url: 'https://app.gladtithings.com',
+            cancel_url: 'https://example.com/paypalpay/order/cancelled'
           }
+        }, response.access_token, orderResponse => {
+          if (orderResponse?.links?.length > 0) {
+            orderResponse.links.map((item) => {
+              if (item.rel == 'approve') {
+                setPaypalUrl(item.href)
+              }
+            })
+          }
+        }, errorOrderResponse => {
+          console.log('error', errorOrderResponse.message)
         })
       }
-    },
-      (error) => {
-        console.log('API ERROR', error);
-        this.setState({ isLoading: false });
-      },
-    );
+    }, error => {
+      console.log(error)
+    })
   }
 
   render() {
