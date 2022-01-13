@@ -14,8 +14,9 @@ import Api from 'services/api/index.js';
 import Routes from 'common/Routes'
 import {WebView} from 'react-native-webview';
 const height = Math.round(Dimensions.get('window').height);
-import { encode as btoa } from 'base-64';
-import Config from 'src/config';
+import {NavigationActions, StackActions} from 'react-navigation';
+import { faLeaf } from '@fortawesome/free-solid-svg-icons';
+
 class Stack extends Component {
   
 
@@ -53,17 +54,48 @@ class Stack extends Component {
     })
   }
 
-  handleChange(e){
+  navigate = (flag) => {
+    console.log({
+      flag
+    })
+    const navigateAction = NavigationActions.navigate({
+      routeName: 'drawerStack',
+      action: StackActions.reset({
+        index: 0,
+        key: null,
+        actions: [
+            NavigationActions.navigate({routeName: 'Dashboard', params: {
+              initialRouteName: 'Dashboard',
+              index: 0
+            }}),
+        ]
+      })
+    });
+    this.props.navigation.dispatch(navigateAction);
+  }
+
+  navigateError(e){
+
+  }
+
+  handleChange = (e) => {
     console.log({
       change: e
     })
     if(e.url.includes('payhiram.ph')){
       Api.getRequest(e.url, response => {
-        if(response.data){
-          console.log('It should work')
-          this.props.navigation.navigate('drawerStack')
-        }
-      }, error => {
+        this.setState({
+          paypalUrl: null,
+          success: true,
+          error: null
+        })
+        this.navigate(true)
+      }, e => {
+        this.setState({
+          paypalUrl: null,
+          success: null,
+          error: true
+        })
       })
       return false
     }
@@ -95,7 +127,6 @@ class Stack extends Component {
                   height: height
                 }}>
                   <WebView
-                    ref={(ref) => (this.webview = ref)}
                     source={{
                       uri: paypalUrl
                     }}
