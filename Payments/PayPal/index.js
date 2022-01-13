@@ -11,13 +11,17 @@ import {
 import { connect } from 'react-redux';
 import { Spinner } from 'components';
 import Api from 'services/api/index.js';
+import Routes from 'common/Routes'
 import {WebView} from 'react-native-webview';
 const height = Math.round(Dimensions.get('window').height);
 import { encode as btoa } from 'base-64';
 import Config from 'src/config';
 class Stack extends Component {
+  
+
   constructor(props) {
     super(props);
+    this.webview = null;
     this.state = {
         isLoading: false,
         paypalUrl: null
@@ -25,58 +29,44 @@ class Stack extends Component {
   }
 
   componentDidMount(){
-    this.authenticate()
+    this.authorized()
   }
 
-
-  authenticate () {
-    let username = null
-    let password = null
-    let paypalCrendentials = Config.paypal.sandbox.clientId + ":" + Config.paypal.sandbox.secret
-    // global.Buffer = global.Buffer || require('buffer').Buffer
-    const fetchOptions = {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Basic ' + btoa(paypalCrendentials),
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: 'grant_type=client_credentials'
-    }
-    fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', fetchOptions).then(response => response.json()).then(json => {
-      //
-      this.paypalCreateOrderRequest(json.access_token)
-    }).catch(error => {
-    })
-  }
-
-  paypalCreateOrderRequest (token) {
+  authorized(){
+    const { user } = this.props.state;
     const { params } = this.props.navigation.state;
-    const fetchOptions = {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        intent: 'CAPTURE',
-        purchase_units: [{
-            amount: {
-              currency_code: params?.data?.currency,
-              value: params?.data?.amount
-            }
-        }]
-      })
-    }
-    fetch('https://api-m.sandbox.paypal.com/v2/checkout/orders', fetchOptions).then(response => response.json()).then(json => {
-      json.links.map((item) => {
-        if(item.method == 'GET'){
+    if(user == null) return false
+    Api.request(Routes.paypalAuthorized, {
+      account_id: user.id,
+      amount: params?.data?.amount,
+      currency: params?.data?.currency
+    }, response => {
+      response.data.links.map((item) => {
+        if(item.rel == 'approve' && item.method == 'GET'){
           this.setState({
             paypalUrl: item.href
           })
         }
       })
-    }).catch(error => {
+    }, error => {
+
     })
+  }
+
+  handleChange(e){
+    console.log({
+      change: e
+    })
+    if(e.url.includes('payhiram.ph')){
+      Api.getRequest(e.uri, response => {
+        if(response.data){
+          this.props.navigation.navigate('drawerStack')
+        }
+      }, error => {
+      })
+      return false
+    }
+    return true
   }
 
   render() {
@@ -104,6 +94,7 @@ class Stack extends Component {
                   height: height
                 }}>
                   <WebView
+                    ref={(ref) => (this.webview = ref)}
                     source={{
                       uri: paypalUrl
                     }}
@@ -113,6 +104,7 @@ class Stack extends Component {
                     startInLoadingState={true}
                     javaScriptEnabled={true}
                     thirdPartyCookiesEnabled={true}
+                    onShouldStartLoadWithRequest={this.handleChange}
                   />
                 </View>
               )
