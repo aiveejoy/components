@@ -104,7 +104,29 @@ class Options extends Component {
         }
       })
     }
+    if(data?.account?.code == this.props.state.user.code){
+      this.showNavigationMap()
+    }
+  }
 
+  showNavigationMap = () => {
+    let menu = [
+      ...Helper.MessengerMenu,
+      {
+        title: 'Navigation',
+        payload: 'redirect',
+        payload_value: 'navigationStack',
+        color: Color.black,
+        type: 'callback',
+        icon: faFileAlt
+      }
+    ]
+    this.setState({
+      current: {
+        title: 'Settings',
+        menu: menu
+      }
+    })
   }
 
   onRegister = () => {
@@ -572,9 +594,9 @@ class Options extends Component {
             } else {
               this.setState({ userOwner: false })
               let result = this.checkValidation(menu.payload_value);
-              if(!result.result && menu.payload_value !== 'back') {
+              if (!result.result && menu.payload_value !== 'back') {
                 menu['hide'] = 'hide'
-              } else{
+              } else {
                 delete menu.hide
               }
             }
@@ -601,7 +623,7 @@ class Options extends Component {
         break
       case 'transferFundStack': {
         this.setState({ images: false })
-        if(requestMessage?.status < 2) {
+        if (requestMessage?.status < 2) {
           Alert.alert(
             '',
             'Are you sure you want to proceed?',
@@ -633,6 +655,11 @@ class Options extends Component {
       case 'enableSupport': {
         this.setState({ images: false })
         this.enableSupport();
+      }
+        break
+      case 'navigationStack': {
+        this.close()
+        this.props.navigation.navigate(item.payload_value)
       }
         break
       case 'back':

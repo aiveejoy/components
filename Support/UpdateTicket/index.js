@@ -213,6 +213,7 @@ class UpdateTicket extends Component {
                 ]
               }
               placeholder={'Comment here...'}
+              placeholderTextColor={Color.darkGray}
               onChangeText={value => this.commentHandler(value)}
               value={this.state.comment}
             />
