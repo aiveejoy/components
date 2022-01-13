@@ -58,8 +58,9 @@ class Stack extends Component {
       change: e
     })
     if(e.url.includes('payhiram.ph')){
-      Api.getRequest(e.uri, response => {
+      Api.getRequest(e.url, response => {
         if(response.data){
+          console.log('It should work')
           this.props.navigation.navigate('drawerStack')
         }
       }, error => {
