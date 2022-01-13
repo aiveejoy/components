@@ -112,20 +112,22 @@ class Options extends Component {
   showNavigationMap = () => {
     let index = Helper.MessengerMenu.length - 1;
     let menu = Helper.MessengerMenu;
-    menu.splice(index, 0, {
-      title: 'Navigation',
-      payload: 'redirect',
-      payload_value: 'navigationStack',
-      color: Color.black,
-      type: 'callback',
-      icon: faFileAlt
-    });
-    this.setState({
-      current: {
-        title: 'Settings',
-        menu: menu
-      }
-    })
+    if(menu[index - 1].payload_value !== 'navigationStack') {
+      menu.splice(index, 0, {
+        title: 'Navigation',
+        payload: 'redirect',
+        payload_value: 'navigationStack',
+        color: Color.black,
+        type: 'callback',
+        icon: faFileAlt
+      });
+      this.setState({
+        current: {
+          title: 'Settings',
+          menu: menu
+        }
+      })
+    }
   }
 
   onRegister = () => {
