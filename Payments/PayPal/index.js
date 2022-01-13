@@ -50,6 +50,7 @@ class Stack extends Component {
   }
 
   paypalCreateOrderRequest (token) {
+    const { params } = this.props.navigation.state;
     const fetchOptions = {
       method: 'POST',
       headers: {
@@ -60,8 +61,8 @@ class Stack extends Component {
         intent: 'CAPTURE',
         purchase_units: [{
             amount: {
-                currency_code: 'USD',
-                value: '200.00'
+              currency_code: params?.data?.currency,
+              value: params?.data?.amount
             }
         }]
       })
@@ -98,23 +99,23 @@ class Stack extends Component {
             minHeight: height * 1.5
           }}>
             {
-                paypalUrl && (
-                  <View style={{
-                    height: height
-                  }}>
-                    <WebView
-                      source={{
-                        uri: paypalUrl
-                      }}
-                      style={{
-                        height: '100%',
-                      }}
-                      startInLoadingState={true}
-                      javaScriptEnabled={true}
-                      thirdPartyCookiesEnabled={true}
-                    />
-                  </View>
-                )
+              paypalUrl && (
+                <View style={{
+                  height: height
+                }}>
+                  <WebView
+                    source={{
+                      uri: paypalUrl
+                    }}
+                    style={{
+                      height: '100%',
+                    }}
+                    startInLoadingState={true}
+                    javaScriptEnabled={true}
+                    thirdPartyCookiesEnabled={true}
+                  />
+                </View>
+              )
             }
           </View>
         </ScrollView>
