@@ -15,7 +15,6 @@ import Routes from 'common/Routes'
 import {WebView} from 'react-native-webview';
 const height = Math.round(Dimensions.get('window').height);
 import {NavigationActions, StackActions} from 'react-navigation';
-import { faLeaf } from '@fortawesome/free-solid-svg-icons';
 
 class Stack extends Component {
   
@@ -37,11 +36,17 @@ class Stack extends Component {
     const { user } = this.props.state;
     const { params } = this.props.navigation.state;
     if(user == null) return false
+    this.setState({
+      isLoading: true
+    })
     Api.request(Routes.paypalAuthorized, {
       account_id: user.id,
       amount: params?.data?.amount,
       currency: params?.data?.currency
     }, response => {
+      this.setState({
+        isLoading: false
+      })
       response.data.links.map((item) => {
         if(item.rel == 'approve' && item.method == 'GET'){
           this.setState({
@@ -50,7 +55,9 @@ class Stack extends Component {
         }
       })
     }, error => {
-
+      this.setState({
+        isLoading: false
+      })
     })
   }
 
@@ -113,16 +120,13 @@ class Stack extends Component {
       }}>
         <ScrollView
           showsVerticalScrollIndicator={false}>
-          {isLoading ? <Spinner mode="overlay" /> : null}
           <View style={{
-            paddingLeft: 20,
-            paddingRight: 20,
             paddingTop: this.props.paddingTop ? this.props.paddingTop : 0,
             width: '100%',
             minHeight: height * 1.5
           }}>
             {
-              paypalUrl && (
+              (paypalUrl && !isLoading) && (
                 <View style={{
                   height: height
                 }}>
@@ -138,6 +142,19 @@ class Stack extends Component {
                     thirdPartyCookiesEnabled={true}
                     onShouldStartLoadWithRequest={this.handleChange}
                   />
+                </View>
+              )
+            }
+            {
+              isLoading && (
+                <View style={{
+                  height: height,
+                  flex: 1,
+                  alignContent: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Spinner />
                 </View>
               )
             }
