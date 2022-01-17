@@ -375,7 +375,7 @@ class ImageModal extends Component {
             this.setState({ imageModal: false })
           }}
           route={Routes.uploadImageDelete}
-          successDel={() => { this.retrieveReceiverPhoto(currentValidation?.id) }}
+          successDel={() => { this.props.retrieveReceiverPhoto(currentValidation?.id) }}
         ></ImageModals>
         <ScrollView
           showsVerticalScrollIndicator={false}>
