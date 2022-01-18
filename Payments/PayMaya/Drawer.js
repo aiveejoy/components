@@ -47,7 +47,7 @@ const Drawer = createStackNavigator({
    directCashInScreen: {
     screen: Stack,
     navigationOptions: ({navigation}) => ({
-      title: 'PayPal Checkout',
+      title: 'PayMaya Checkout',
       headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
       ...BasicStyles.headerDrawerStyle
     }),

@@ -6,7 +6,7 @@ import Api from 'services/api/index.js';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faImage, faPaperPlane, faLock, faChevronDown, faTruckMoving } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faPaperPlane, faLock, faChevronDown, faTruckMoving, faEdit, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 import ImageModal from 'components/Modal/ImageModal.js';
 import ImagePicker from 'react-native-image-picker';
 import Style from 'modules/messenger/Style.js'
@@ -49,7 +49,8 @@ class MessagesV3 extends Component {
       updatingMessage: null,
       isUpdate: false,
       updatingText: null,
-      nowUpdatingMessage: false
+      nowUpdatingMessage: false,
+      imageToDelete: null
     }
   }
 
@@ -432,9 +433,9 @@ class MessagesV3 extends Component {
       id: updatingMessage?.id,
       message: updatingText
     }
-    this.setState({nowUpdatingMessage: true})
+    this.setState({ nowUpdatingMessage: true })
     Api.request(Routes.messengerMessagesUpdateMessage, parameter, response => {
-      this.setState({nowUpdatingMessage: false})
+      this.setState({ nowUpdatingMessage: false })
       if (response.data != null) {
         let temp = messagesOnGroup;
         temp.messages?.length > 0 && temp.messages.map((item, index) => {
@@ -450,12 +451,15 @@ class MessagesV3 extends Component {
       }
     }, error => {
       console.log(error, '--')
-      this.setState({nowUpdatingMessage: false})
+      this.setState({ nowUpdatingMessage: false })
     })
   }
 
-  setImage = (url) => {
-    this.setState({ imageModalUrl: url })
+  setImage = (url, item) => {
+    this.setState({
+      imageModalUrl: url,
+      imageToDelete: item
+    })
     setTimeout(() => {
       this.setState({ isImageModal: true })
     }, 500)
@@ -475,9 +479,9 @@ class MessagesV3 extends Component {
             let parameter = {
               id: updatingMessage?.id
             }
-            this.setState({nowUpdatingMessage: true})
+            this.setState({ nowUpdatingMessage: true })
             Api.request(Routes.messengerMessagesDeleteMessage, parameter, response => {
-              this.setState({nowUpdatingMessage: false})
+              this.setState({ nowUpdatingMessage: false })
               if (response.data != null) {
                 let temp = messagesOnGroup;
                 temp.messages?.length > 0 && temp.messages.map((item, index) => {
@@ -493,7 +497,7 @@ class MessagesV3 extends Component {
               }
             }, error => {
               console.log(error, '--')
-              this.setState({nowUpdatingMessage: false})
+              this.setState({ nowUpdatingMessage: false })
             })
           }
         },
@@ -532,7 +536,7 @@ class MessagesV3 extends Component {
             item.files.map((imageItem, imageIndex) => {
               return (
                 <TouchableOpacity
-                  onPress={() => this.setImage(Config.BACKEND_URL + imageItem.url)}
+                  onPress={() => this.setImage(Config.BACKEND_URL + imageItem.url, item)}
                   style={Style.messageImage}
                   key={imageIndex}
                 >
@@ -614,7 +618,7 @@ class MessagesV3 extends Component {
         flexDirection: 'row'
       }}>
         <TouchableOpacity
-          onPress={() => this.setImage(item.uri)}
+          onPress={() => this.setImage(item.uri, item)}
           style={Style.messageImage}
         >
           <Image source={{ uri: item.uri }} style={Style.messageImage} />
@@ -712,20 +716,34 @@ class MessagesV3 extends Component {
         }
         {
           item.message != null && Platform.OS == 'android' && item.id != updatingMessage?.id && (<Text style={[Style.dateText, {
-          textAlign: 'right'
-        }]}>{item.created_at_human}</Text>)}
+            textAlign: 'right'
+          }]}>{item.created_at_human}</Text>)}
         {
           item.message != null && Platform.OS == 'android' && item.id != updatingMessage?.id && (
-            <Text style={[Style.messageTextLeft, {
-              backgroundColor: theme ? theme.primary : Color.primary
-            }]}>{item.message}</Text>
+            <View style={{
+              flexDirection: 'row',
+              marginLeft: '30%'
+            }}>
+              {item.updated_at != item.created_at && <FontAwesomeIcon
+                icon={faPencilAlt}
+                size={15}
+                style={{
+                  color: Color.lightGray,
+                  marginTop: 5
+                }}
+              />}
+              <Text style={[Style.messageTextLeft, {
+                backgroundColor: theme ? theme.primary : Color.primary,
+                marginLeft: 0,
+              }]}>{item.message}</Text>
+            </View>
           )
         }
         {item.id == updatingMessage?.id && nowUpdatingMessage && (
           <View style={{
-            width: DeviceWidth/2
+            width: DeviceWidth / 2
           }}>
-            <Skeleton size={1} template={'block'} height={45}/>
+            <Skeleton size={1} template={'block'} height={45} />
           </View>
         )}
         {
@@ -940,7 +958,7 @@ class MessagesV3 extends Component {
   }
 
   render() {
-    const { isLoading, isImageModal, imageModalUrl, photo, keyRefresh, isPullingMessages, isLock, isViewing, members, data, isUpdate, updatingText } = this.state;
+    const { isLoading, isImageModal, imageModalUrl, keyRefresh, isPullingMessages, isLock, members, data, updatingText, imageToDelete } = this.state;
     const { requestMessage, theme, updateActivity, user } = this.props.state;
     console.log('[MESSEGER GROUP]', data);
     return (
@@ -1091,7 +1109,8 @@ class MessagesV3 extends Component {
               <View style={{
                 flexDirection: 'row',
                 width: '100%',
-                marginTop: 70
+                marginTop: 70,
+                marginBottom: 100
               }}>
                 {this._flatList()}
               </View>
@@ -1174,9 +1193,23 @@ class MessagesV3 extends Component {
             </View>}
             {this.updatingOptions()}
             <ImageModal
+              deleteID={imageToDelete?.account_id == user.id ? imageToDelete?.id : null}
               visible={isImageModal}
               url={imageModalUrl}
               action={() => this.setState({ isImageModal: false })}
+              successDel={() => {
+                const { messagesOnGroup } = this.props.state;
+                const { setMessagesOnGroup } = this.props;
+                let temp = messagesOnGroup;
+                temp.messages?.length > 0 && temp.messages.map((item, index) => {
+                  if(item.id == imageToDelete?.id) {
+                    console.log(item.id == imageToDelete?.id, item.id, imageToDelete?.id)
+                    temp.messages.splice(index, 1)
+                  }
+                })
+                setMessagesOnGroup(temp);
+              }}
+              route={Routes.messengerMessagesDeleteMessage}
             ></ImageModal>
             <Modals send={this.sendSketch} close={this.closeSketch} visible={this.state.visible} />
           </View>

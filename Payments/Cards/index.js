@@ -50,7 +50,8 @@ class Stack extends Component{
                     justifyContent: 'space-between'
                   }}>
                     <Text style={{
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      color: Color.white
                     }}>{item.fees}</Text>
                     <Image 
                       source={item.logo}

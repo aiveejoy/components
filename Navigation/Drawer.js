@@ -1,17 +1,16 @@
 import React, {Component} from 'react';
-import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {createStackNavigator} from 'react-navigation-stack';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faArrowLeft, faChevronLeft} from '@fortawesome/free-solid-svg-icons';
-import {Color, BasicStyles} from 'common';
+import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
+import Screen from './index.js';
+import {BasicStyles, Color} from 'common';
 import {connect} from 'react-redux';
-import Stack from './index.js';
 
 class HeaderOptions extends Component {
   constructor(props) {
     super(props);
   }
-
   back = () => {
     this.props.navigationProps.pop()
   };
@@ -36,29 +35,22 @@ const mapStateToProps = (state) => ({state: state});
 
 const mapDispatchToProps = (dispatch) => {
   const {actions} = require('@redux');
-  return {
-    logout: () => dispatch(actions.logout()),
-  };
+  return {};
 };
-
 let HeaderOptionsConnect  = connect(mapStateToProps, mapDispatchToProps)(HeaderOptions);
 
-const Drawer = createStackNavigator({
-   directCashInScreen: {
-    screen: Stack,
+const Stack = createStackNavigator({
+  proposalScreen: {
+    screen: Screen,
     navigationOptions: ({navigation}) => ({
-      title: 'PayPal Checkout',
+      title: 'Map Navigation',
       headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
       ...BasicStyles.headerDrawerStyle
     }),
   },
 });
 
-const styles = StyleSheet.create({
-  iconStyle: {
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Drawer);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Stack);
