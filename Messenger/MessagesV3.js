@@ -314,6 +314,7 @@ class MessagesV3 extends Component {
         if (messagesOnGroup && messagesOnGroup.messages.length > 0) {
           let temp = messagesOnGroup.messages;
           temp[messagesOnGroup.messages.length - 1].sending_flag = false
+          temp[messagesOnGroup.messages.length - 1].id = response.data
           setMessagesOnGroup({
             groupId: messengerGroup.id,
             messages: temp
@@ -441,6 +442,7 @@ class MessagesV3 extends Component {
         temp.messages?.length > 0 && temp.messages.map((item, index) => {
           if (item.id == updatingMessage.id) {
             item.message = updatingText
+            item.updated_at = new Date()
           }
         })
         setMessagesOnGroup(temp);
@@ -726,10 +728,11 @@ class MessagesV3 extends Component {
             }}>
               {item.updated_at != item.created_at && <FontAwesomeIcon
                 icon={faPencilAlt}
-                size={15}
+                size={12}
                 style={{
-                  color: Color.lightGray,
-                  marginTop: 5
+                  color: Color.gray,
+                  marginTop: 8,
+                  marginRight: 5
                 }}
               />}
               <Text style={[Style.messageTextLeft, {
@@ -758,6 +761,13 @@ class MessagesV3 extends Component {
         {
           item.payload == 'image' && (this._image(item))
         }
+        {
+          item.sending_flag == true &&
+          <Text style={[Style.messageTextLeft, {
+            backgroundColor: theme ? theme.primary : Color.primary,
+            marginTop: 10
+          }]}>{item.message}
+          </Text>}
         {
           item.sending_flag == true && (
             <Text style={{
@@ -846,6 +856,7 @@ class MessagesV3 extends Component {
 
   _flatList = () => {
     const { user, messagesOnGroup } = this.props.state;
+    console.log(messagesOnGroup);
     return (
       <View style={{
         width: '100%',
@@ -1202,7 +1213,7 @@ class MessagesV3 extends Component {
                 const { setMessagesOnGroup } = this.props;
                 let temp = messagesOnGroup;
                 temp.messages?.length > 0 && temp.messages.map((item, index) => {
-                  if(item.id == imageToDelete?.id) {
+                  if (item.id == imageToDelete?.id) {
                     console.log(item.id == imageToDelete?.id, item.id, imageToDelete?.id)
                     temp.messages.splice(index, 1)
                   }
