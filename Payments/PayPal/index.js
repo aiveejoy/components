@@ -15,6 +15,7 @@ import Routes from 'common/Routes'
 import {WebView} from 'react-native-webview';
 const height = Math.round(Dimensions.get('window').height);
 import {NavigationActions, StackActions} from 'react-navigation';
+import Helper from 'common/Helper';
 
 class Stack extends Component {
   
@@ -89,7 +90,7 @@ class Stack extends Component {
     console.log({
       change: e
     })
-    if(e.url.includes('payhiram.ph')){
+    if(e.url.includes('capture_order')){
       Api.getRequest(e.url, response => {
         this.setState({
           paypalUrl: null,
