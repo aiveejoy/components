@@ -67,7 +67,7 @@ class Stack extends Component {
       flag
     })
     const navigateAction = NavigationActions.navigate({
-      routeName: Helper.wallet ? Helper.wallet : 'drawerStack',
+      routeName: 'drawerStack',
       action: StackActions.reset({
         index: 0,
         key: null,
