@@ -215,7 +215,8 @@ class Support extends Component {
           {this.state.isLoading == false && this.state.data.length == 0 && (
             <View style={{
               minHeight: height * 1.5,
-              padding: 10
+              padding: 10,
+              marginTop: height * .05
             }}>
               <EmptyMessage navigation={this.props.navigation} message={'No existing tickets'}/>
             </View>
