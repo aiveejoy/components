@@ -96,6 +96,7 @@ class DateTime extends Component{
           display="default"
           date={new Date()}
           minimumDate={this.props.minimumDate}
+          maximumDate={this.props.maximumDate}
           onCancel={() => this.setState({showDatePicker: false})}
           onConfirm={this.dateHandler} 
           onChange={this.dateHandler} />
@@ -111,6 +112,7 @@ class DateTime extends Component{
           display="default"
           date={new Date()}
           minimumDate={this.props.minimumDate}
+          maximumDate={this.props.maximumDate}
           onCancel={() => this.setState({showDatePicker: false})}
           onConfirm={this.setDate} 
           onChange={this.setDate} />

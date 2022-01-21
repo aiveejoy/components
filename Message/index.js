@@ -55,7 +55,7 @@ class Message extends Component{
                 {this.props.message}
               </Text>
               {
-                (this.props.page != 'onNegotiation') &&
+                (this.props.page != 'onNegotiation' && this.props.page != 'subscription') &&
                 (<TouchableOpacity
                   onPress={() => {(Helper.checkStatus(user) < Helper.accountVerified) ?  this.validate() : this.redirect('createRequestStack')}}
                   style={{
