@@ -104,22 +104,33 @@ class Options extends Component {
         }
       })
     }
-    if(data?.account?.code == this.props.state.user.code){
-      this.showNavigationMap()
-    }
+    this.showNavigationMap()
   }
 
   showNavigationMap = () => {
+    const { data } = this.props;
     let index = Helper.MessengerMenu.length - 1;
     let menu = Helper.MessengerMenu;
-    if(menu[index - 1].payload_value !== 'navigationStack') {
-      menu.splice(index, 0, {
-        title: 'Navigation',
-        payload: 'redirect',
-        payload_value: 'navigationStack',
-        color: Color.black,
-        type: 'callback',
-        icon: faFileAlt
+    if(data?.account?.code == this.props.state.user.code){
+      if(menu[index - 1].payload_value !== 'navigationStack') {
+        menu.splice(index, 0, {
+          title: 'Navigation',
+          payload: 'redirect',
+          payload_value: 'navigationStack',
+          color: Color.black,
+          type: 'callback',
+          icon: faFileAlt
+        });
+        this.setState({
+          current: {
+            title: 'Settings',
+            menu: menu
+          }
+        })
+      }
+    } else {
+      menu = menu.filter(function( obj ) {
+        return obj.payload_value !== 'navigationStack';
       });
       this.setState({
         current: {

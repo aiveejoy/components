@@ -47,8 +47,9 @@ class Stripe extends Component {
           currency: data.currency
         };
         this.setState({isLoading: true})
+        console.log(Routes.createPaymentIntent, parameter);
         Api.request(Routes.createPaymentIntent, parameter, response => {
-          this.setState({isLoading: true})
+          this.setState({isLoading: false})
           this.handlePayment(response.data, res.token);
         });
       });
@@ -58,7 +59,7 @@ class Stripe extends Component {
   }
 
   handlePayment = async (data, source) => {
-    console.log(data, '----');
+    console.log(data);
     const {user} = this.props.state;
     const {error, paymentIntent} = await confirmPayment(data.client_secret, {
       type: 'Card',
@@ -93,8 +94,9 @@ class Stripe extends Component {
       details: tempDetails,
       description: tempDesc,
     };
+    this.setState({isLoading: true})
     Api.request(Routes.ledgerCreate, parameter, response => {
-      this.setState({isLoading: true})
+      this.setState({isLoading: false})
       if (response.data) {
         this.props.navigation.navigate('pageMessageStack', {payload: 'success', title: 'Success'});
       } else {
