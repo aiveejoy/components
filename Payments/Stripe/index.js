@@ -95,12 +95,13 @@ class Stripe extends Component {
       description: tempDesc,
     };
     this.setState({isLoading: true})
+    console.log(Routes.ledgerCreate, parameter);
     Api.request(Routes.ledgerCreate, parameter, response => {
       this.setState({isLoading: false})
       if (response.data) {
-        this.props.navigation.navigate('pageMessageStack', {payload: 'success', title: 'Success'});
+        this.props.navigation.navigate('dashboardStack');
       } else {
-        this.props.navigation.navigate('pageMessageStack', {payload: 'error', title: 'Error'});
+        this.props.navigation.navigate('dashboardStack');
       }
     });
   };
