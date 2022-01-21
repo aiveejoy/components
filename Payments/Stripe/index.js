@@ -1,6 +1,6 @@
 import { StripeProvider } from '@stripe/stripe-react-native';
 import React, { Component } from 'react';
-import { View, Dimensions, Text, Alert, ScrollView } from 'react-native';
+import { View, Dimensions, Text, Alert, ScrollView, Image } from 'react-native';
 import { CardField } from '@stripe/stripe-react-native';
 import { connect } from 'react-redux';
 import Button from 'components/Form/Button';
@@ -11,7 +11,7 @@ import Config from 'src/config.js';
 import {
   confirmPayment,
   createToken,
-  initStripe 
+  initStripe
 } from '@stripe/stripe-react-native';
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').height);
@@ -24,16 +24,23 @@ class Stripe extends Component {
     this.state = {
       isLoading: false,
       paypalUrl: null,
-      cardDetails: null
+      cardDetails: null,
+      logos: [
+        require('assets/VisaColored.png'),
+        require('assets/MastercardColored.jpg'),
+        require('assets/AmericanExpressColored.png'),
+        require('assets/dinersClub.png'),
+        require('assets/discoverColored.png'),
+        require('assets/jcb.png'),
+        require('assets/unionpay.png')
+      ]
     };
   }
 
   componentDidMount() {
-    this.props.navigation.addListener('didFocus', () => {
-      initStripe({
-        publishableKey: Config.stripe.dev_pk,
-        merchantIdentifier: 'merchant.identifier',
-      })
+    initStripe({
+      publishableKey: Config.stripe.dev_pk,
+      merchantIdentifier: 'merchant.identifier',
     })
   }
 
@@ -41,14 +48,15 @@ class Stripe extends Component {
     const { cardDetails } = this.state;
     const { data } = this.props.navigation.state.params;
     if (cardDetails?.complete) {
-      await createToken({type: 'Card'}).then(res => {
+      await createToken({ type: 'Card' }).then(res => {
         let parameter = {
           amount: data.amount,
           currency: data.currency
         };
-        this.setState({isLoading: true})
+        this.setState({ isLoading: true })
+        console.log(Routes.createPaymentIntent, parameter);
         Api.request(Routes.createPaymentIntent, parameter, response => {
-          this.setState({isLoading: true})
+          this.setState({ isLoading: false })
           this.handlePayment(response.data, res.token);
         });
       });
@@ -58,20 +66,20 @@ class Stripe extends Component {
   }
 
   handlePayment = async (data, source) => {
-    console.log(data, '----');
-    const {user} = this.props.state;
-    const {error, paymentIntent} = await confirmPayment(data.client_secret, {
+    console.log(data);
+    const { user } = this.props.state;
+    const { error, paymentIntent } = await confirmPayment(data.client_secret, {
       type: 'Card',
-      billingDetails: {name: user.username, email: user.email, phone: ' '},
+      billingDetails: { name: user.username, email: user.email, phone: ' ' },
     });
     if (error) {
       Alert.alert('Payment Failed', error.message, [
         {
           text: 'Cancel',
-          onPress: () => this.setState({isLoading: false}),
+          onPress: () => this.setState({ isLoading: false }),
           style: 'cancel',
         },
-        {text: 'OK', onPress: () => this.setState({isLoading: false})},
+        { text: 'OK', onPress: () => this.setState({ isLoading: false }) },
       ]);
       console.log('[ERROR]', error);
     }
@@ -81,10 +89,10 @@ class Stripe extends Component {
   };
 
   createLedger = () => {
-    const {data} = this.props.navigation.state.params;
+    const { data } = this.props.navigation.state.params;
     tempDetails = 'deposit'
     tempDesc = 'Deposit'
-    const {user} = this.props.state;
+    const { user } = this.props.state;
     let parameter = {
       account_id: user.id,
       account_code: user.code,
@@ -93,12 +101,14 @@ class Stripe extends Component {
       details: tempDetails,
       description: tempDesc,
     };
+    this.setState({ isLoading: true })
+    console.log(Routes.ledgerCreate, parameter);
     Api.request(Routes.ledgerCreate, parameter, response => {
-      this.setState({isLoading: true})
+      this.setState({ isLoading: false })
       if (response.data) {
-        this.props.navigation.navigate('pageMessageStack', {payload: 'success', title: 'Success'});
+        this.props.navigation.navigate('dashboardStack');
       } else {
-        this.props.navigation.navigate('pageMessageStack', {payload: 'error', title: 'Error'});
+        this.props.navigation.navigate('dashboardStack');
       }
     });
   };
@@ -106,6 +116,7 @@ class Stripe extends Component {
   render() {
     const { theme } = this.props.state;
     const { isLoading } = this.state;
+    const { data } = this.props.navigation?.state?.params;
     return (
       <View style={{
         height: '100%'
@@ -116,36 +127,75 @@ class Stripe extends Component {
           width: '100%'
         }}>
           <Text style={{
-             marginTop: '30%',
-             marginBottom: 20,
-             fontStyle: 'italic',
-             textAlign: 'center'
+            marginTop: 20,
+            textAlign: 'center',
+            fontSize: 55,
+            color: Color.darkGray
           }}>
-            Please input your complete card details to proceed.
+            {data?.amount}
           </Text>
+          <Text style={{
+            marginBottom: 20,
+            textAlign: 'center',
+            color: Color.darkGray
+          }}>
+            {data?.currency}
+          </Text>
+          <Text style={{
+            marginTop: 20,
+            marginBottom: 20,
+            fontStyle: 'italic',
+            textAlign: 'center'
+          }}>
+            Input complete card details:
+          </Text>
+          <View style={{
+            marginBottom: 20,
+            flexDirection: 'row',
+            justifyContent: 'center'
+          }}>
+            {this.state.logos.map(item => {
+              return (
+                <Image
+                  source={item}
+                  style={{
+                    height: 30,
+                    width: 30,
+                    resizeMode: 'contain'
+                  }}
+                />
+              )
+            })}
+          </View>
           <View style={{
             borderWidth: 1,
             borderColor: Color.lightGray,
             padding: 15,
             borderRadius: 10
           }}>
-            <CardField
-              postalCodeEnabled={false}
-              placeholder={{
-                number: '4242 4242 4242 4242',
-              }}
-              cardStyle={{
-                backgroundColor: '#ededed',
-                borderRadius: 50
-              }}
-              style={{
-                height: 50,
-                marginVertical: 20,
-              }}
-              onCardChange={(cardDetails) => {
-                this.setState({ cardDetails: cardDetails })
-              }}
-            />
+            <StripeProvider
+              publishableKey={Config.stripe.dev_pk}
+              merchantIdentifier={'merchant.identifier'}
+            >
+              <CardField
+                postalCodeEnabled={false}
+                placeholder={{
+                  number: '4242 4242 4242 4242',
+                }}
+                cardStyle={{
+                  backgroundColor: '#ededed',
+                  borderRadius: 50
+                }}
+                style={{
+                  height: 50,
+                  marginVertical: 20,
+                }}
+                onCardChange={(cardDetails) => {
+                  console.log(cardDetails);
+                  this.setState({ cardDetails: cardDetails })
+                }}
+              />
+            </StripeProvider>
           </View>
         </ScrollView>
         <View style={{

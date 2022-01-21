@@ -136,18 +136,37 @@ class Comments extends Component {
   }
 
   reply = (comment) => {
-    const { user } = this.props.state;
+    const { user, comments } = this.props.state;
     let parameter = {
       account_id: user.id,
       comment_id: comment.id,
       text: this.state.reply
     }
+    let newReply = {
+      account: {
+        information: user.account_information,
+        profile: user.account_profile,
+        ...user
+      },
+      ...parameter
+    }
     this.setState({ smallLoading: true });
     Api.request(Routes.commentRepliesCreate, parameter, response => {
       this.setState({ smallLoading: false });
       if (response.data) {
-        this.retrieve(false);
-        this.setState({ reply: null })
+        let com = comments;
+        com.length > 0 && com.map((item, index) => {
+          if(item.id == comment.id) {
+            if(item.comment_replies == null) {
+              item.comment_replies = [];
+              item.comment_replies.push(newReply);
+            } else {
+              item.comment_replies.push(newReply);
+            }
+          }
+        })
+        this.setState({ reply: null });
+        this.props.setComments(com);
       }
     })
   }
@@ -238,11 +257,11 @@ class Comments extends Component {
               </TouchableOpacity>
             </View>
           </View>
-          {
+          {/* {
             (smallLoading) && (
               <Skeleton size={1} template={'block'} height={10} />
             )
-          }
+          } */}
           {/* <View style={{
             paddingLeft: 20,
             paddingRight: 20
@@ -252,19 +271,12 @@ class Comments extends Component {
                 <PostCard
                   navigation={this.props.navigation}
                   loader={this.loader}
-                  data={{
-                    user: item.account,
-                    comments: item.comment_replies,
-                    message: item.text,
-                    date: item.created_at_human,
-                    id: item.id,
-                    members: item.members,
-                    index: index
-                  }}
+                  data={item}
                   showImages={(images) => {this.setState({images: images}, () => {
                     this.myRef.current.openBottomSheet()
                   })}}
                   images={item.images}
+                  smallLoader={smallLoading}
                   postReply={() => { this.reply(item) }}
                   reply={(value) => this.replyHandler(value)}
                   style={{
