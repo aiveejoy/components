@@ -90,7 +90,7 @@ class Navigation extends Component {
           onMapReady={this.onMapLayout}
           provider={PROVIDER_GOOGLE}
           region={region} // without this the map won't move. but layo kaayo ang map
-          onRegionChangeComplete={(e) => this.onRegionChange(e)} // without this dili momove ang map but dili machange ang current loc as you move the map
+          // onRegionChangeComplete={(e) => this.onRegionChange(e)} // without this dili momove ang map but dili machange ang current loc as you move the map
         >
           {
             this.state.isMapReady &&
