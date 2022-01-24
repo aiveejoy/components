@@ -43,7 +43,9 @@ class Stack extends Component {
     Api.request(Routes.paypalAuthorized, {
       account_id: user.id,
       amount: params?.data?.amount,
-      currency: params?.data?.currency
+      currency: params?.data?.currency,
+      charge: params?.data?.charge,
+      total: params?.data?.total
     }, response => {
       this.setState({
         isLoading: false
@@ -91,7 +93,10 @@ class Stack extends Component {
       change: e
     })
     if(e.url.includes('capture_order')){
-      Api.getRequest(e.url, response => {
+      let url = e.url.replace('token', 'paypal_token')
+      const { token } = this.props.state;
+      url += '&token=' + token
+      Api.getRequest(url, response => {
         this.setState({
           paypalUrl: null,
           success: true,
