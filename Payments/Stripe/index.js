@@ -68,6 +68,40 @@ class Stripe extends Component {
     })
   }
 
+  
+  onConfirmPayment(){
+    const {params} = this.props.navigation.state;
+    const { user } = this.props.state;
+    const { paymentIntent } = this.state;
+    if(params && params.data == null) return null
+    if(user == null) return null
+    if(paymentIntent == null) return null
+    this.setState({
+      isLoading: true
+    })
+    Api.request(Routes.confirmPaymentIntent, {
+      payment_intent_id: paymentIntent.id,
+      account_id: user.id,
+      email: user.email,
+      currency: params.data.currency,
+      charge: params.data.charge,
+      total: params.data.total,
+      amount: params.data.amount
+    }, response => {
+      this.setState({
+        isLoading: false
+      })
+      this.navigate()
+    }, error => {
+      this.setState({
+        isLoading: false
+      })
+      console.log({
+        error
+      })
+    })
+  }
+
   navigate = () => {
     const navigateAction = NavigationActions.navigate({
       routeName: 'drawerStack',
@@ -107,6 +141,7 @@ class Stripe extends Component {
                 theme={theme}
                 params={params}
                 paymentIntent={paymentIntent}
+                onConfirmPayment={() => this.onConfirmPayment()}
                 onComplete ={(cardDetails) => {
                   this.setState({
                     cardDetails

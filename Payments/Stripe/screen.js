@@ -26,7 +26,7 @@ export default function App(props) {
       // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
       //methods that complete payment after a delay, like SEPA Debit and Sofort.
       allowsDelayedPaymentMethods: true,
-      merchantDisplayName: 'Payhiram'
+      merchantDisplayName: Helper.APP_NAME_BASIC
     });
     if (!error) {
     }
@@ -40,7 +40,7 @@ export default function App(props) {
     if (error) {
       Alert.alert(`Error code: ${error.code}`, error.message);
     } else {
-      Alert.alert('Success', 'Your order is confirmed!');
+      props.onConfirmPayment()
     }
   };
 

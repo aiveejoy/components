@@ -38,8 +38,26 @@ class Stack extends Component {
     this.setState({currency: this.props.state.ledger?.currency || 'PHP'})
   }
 
-  manageCharges(){
-    
+  manageCharges(item){
+    let fee = item.feeConfiguration
+    const { amount } = this.state;
+    let charge = 0
+    let total = 0
+    if(fee.type == 'percentage'){
+      charge = (amount * (fee.amount / 100)).toFixed(2)
+      total = (amount - charge).toFixed(2)
+      this.setState({
+        charge,
+        total
+      })
+    }else{
+      charge = (amount - fee.amount).toFixed(2)
+      total = (amount - charge).toFixed(2)
+      this.setState({
+        charge,
+        total
+      })
+    }
   }
 
   openBottomSheet = () => {
@@ -55,7 +73,9 @@ class Stack extends Component {
           this.props.navigation.navigate('paypalStack', {
             data: {
               amount: this.state.amount,
-              currency: cur
+              currency: cur,
+              charge: this.state.charge,
+              total: this.state.total
             }
           })
           break
@@ -63,7 +83,9 @@ class Stack extends Component {
           this.props.navigation.navigate('visaStack', {
             data: {
               amount: this.state.amount,
-              currency: cur
+              currency: cur,
+              charge: this.state.charge,
+              total: this.state.total
             }
           })
           break
@@ -71,7 +93,9 @@ class Stack extends Component {
           this.props.navigation.navigate('unioBankStack', {
             data: {
               amount: this.state.amount,
-              currency: cur
+              currency: cur,
+              charge: this.state.charge,
+              total: this.state.total
             }
           })
           break
@@ -79,14 +103,18 @@ class Stack extends Component {
           this.props.navigation.navigate('payMayaStack', {
             data: {
               amount: this.state.amount,
-              currency: cur
+              currency: cur,
+              charge: this.state.charge,
+              total: this.state.total
             }
           })
         case 'STRIPE':
             this.props.navigation.navigate('stripeStack', {
               data: {
                 amount: this.state.amount,
-                currency: cur
+                currency: cur,
+                charge: this.state.charge,
+                total: this.state.total
               }
             })
       }
@@ -231,6 +259,7 @@ class Stack extends Component {
                       selected: newSelected
                     })
                     this.RBSheet.close()
+                    this.manageCharges(item)
                   }}
                   press={true}
                 />
