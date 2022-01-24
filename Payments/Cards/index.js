@@ -14,7 +14,9 @@ class Stack extends Component{
     const { data } = this.props;
     return (
       <View style={{
-        width: '100%'
+        width: '100%',
+        borderBottomColor: Color.lightGray,
+        borderBottomWidth: 1
       }}>
         {
           data && data.map((item, index) => (
@@ -26,7 +28,6 @@ class Stack extends Component{
               style={{
                 width: '100%',
                 borderRadius: 15,
-                backgroundColor: item.color,
                 marginBottom: 20,
                 padding: 20
               }}
