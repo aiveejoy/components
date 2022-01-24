@@ -219,7 +219,7 @@ class PostCard extends Component {
           <Text style={{
             marginLeft: 5,
             fontSize: 13,
-          }}>Amen</Text>
+          }}>{data?.amen?.length}</Text>
         </TouchableOpacity>
 
 
@@ -243,7 +243,7 @@ class PostCard extends Component {
           <Text style={{
             marginLeft: 5,
             fontSize: 13
-          }}>Love</Text>
+          }}>{data?.love?.length}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={{
