@@ -75,7 +75,7 @@ export default function App(props) {
     return (
       <View style={{
         width: '100%',
-        // padding: 20,
+        padding: 20,
         alignItems: 'center',
         position: 'absolute',
         bottom: 100
