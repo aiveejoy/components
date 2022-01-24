@@ -44,14 +44,6 @@ class Stripe extends Component {
     this.setState({
       isLoading: true
     })
-    console.log(Routes.createPaymentIntent, {
-      account_id: user.id,
-      amount: params.data.amount,
-      currency: params.data.currency,
-      charge: params.data.charge,
-      total: params.data.total,
-      email: user.email
-    });
     Api.request(Routes.createPaymentIntent, {
       account_id: user.id,
       amount: params.data.amount,
