@@ -35,6 +35,7 @@ class Stack extends Component {
   }
 
   componentDidMount = () => {
+    this.setState({currency: this.props.state.ledger?.currency || 'PHP'})
   }
 
   manageCharges(){
@@ -46,15 +47,15 @@ class Stack extends Component {
   }
 
   manageRedirect(){
-    const { selected } = this.state;
-
+    const { selected, currency } = this.state;
+    let cur = this.props.state.ledger?.currency || currency
     if(selected.length > 0){
       switch(selected[0].code){
         case 'PAYPAL': 
           this.props.navigation.navigate('paypalStack', {
             data: {
               amount: this.state.amount,
-              currency: this.state.currency
+              currency: cur
             }
           })
           break
@@ -62,7 +63,7 @@ class Stack extends Component {
           this.props.navigation.navigate('visaStack', {
             data: {
               amount: this.state.amount,
-              currency: this.state.currency
+              currency: cur
             }
           })
           break
@@ -70,7 +71,7 @@ class Stack extends Component {
           this.props.navigation.navigate('unioBankStack', {
             data: {
               amount: this.state.amount,
-              currency: this.state.currency
+              currency: cur
             }
           })
           break
@@ -78,14 +79,14 @@ class Stack extends Component {
           this.props.navigation.navigate('payMayaStack', {
             data: {
               amount: this.state.amount,
-              currency: this.state.currency
+              currency: cur
             }
           })
         case 'STRIPE':
             this.props.navigation.navigate('stripeStack', {
               data: {
                 amount: this.state.amount,
-                currency: this.state.currency
+                currency: cur
               }
             })
       }
@@ -125,9 +126,14 @@ class Stack extends Component {
   }
 
   render() {
-    const { isLoading, selected } = this.state
+    const { isLoading, selected, currency } = this.state
     const { theme } = this.props.state;
     const { ledger, user } = this.props.state;
+    let cur = ledger ? ledger?.currency : currency;
+    let cards = Helper.cashInMethods;
+    cards = cards.filter((item) => {
+      return item.currency == cur
+    })
     return (
       <SafeAreaView style={{
         flex: 1
@@ -217,7 +223,7 @@ class Stack extends Component {
                 padding: 20
               }}>
                 <PaymentCard
-                  data={Helper.cashInMethods}
+                  data={cards}
                   onSelect={(item) => {
                     let newSelected = []
                     newSelected.push(item)
@@ -250,4 +256,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Stack);
-
