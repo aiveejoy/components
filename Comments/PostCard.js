@@ -8,8 +8,10 @@ import Config from 'src/config.js';
 import UserImage from 'components/User/Image';
 import CommentImages from './Images';
 import Api from 'services/api/index.js';
+import Skeleton from 'components/Loading/Skeleton';
 
 const height = Math.round(Dimensions.get('window').height);
+const width = Math.round(Dimensions.get('window').width);
 const options = [
   { title: 'Post Actions', action: null, icon: faCog },
   { title: 'Edit', action: 'edit', icon: faPencilAlt },
@@ -21,8 +23,76 @@ class PostCard extends Component {
     super(props);
     this.state = {
       reply: null,
-      options: false
+      options: false,
+      loading: false
     }
+  }
+
+  react = (react) => {
+    const { data } = this.props;
+    const { user, comments } = this.props.state;
+    let list = []
+    if(react === 'amen') {
+      list = data.amen
+    } else {
+      list = data.love
+    }
+    if(list.includes(user.id) === false) {
+      let parameter = {
+        reaction: react,
+        comment_id: data.id,
+        account_id: user.id
+      }
+      this.setState({loading: true});
+      Api.request(Routes.reactionCreate, parameter, response => {
+        this.setState({loading: false});
+        if(response.data > 0) {
+          
+          let com = comments;
+          com.length > 0 && com.map((item, index) => {
+            if(item.id == data.id) {
+              if(react === 'amen') {
+                item.amen.push(user.id)
+              } else {
+                item.love.push(user.id)
+              }
+            }
+          })
+          this.props.setComments(com);
+        }
+      })
+    } else {
+      this.removeReaction(react)
+    }
+  }
+
+  removeReaction = (react) => {
+    const { data } = this.props;
+    const { user, comments } = this.props.state;
+    let parameter = {
+      account_id: user.id,
+      comment_id: data.id,
+      reaction: react
+    }
+    this.setState({loading: true});
+    Api.request(Routes.reactionDelete, parameter, response => {
+      this.setState({loading: false});
+      if(response.data) {
+        let com = comments;
+        com.length > 0 && com.map((item, index) => {
+          if(item.id == data.id) {
+            if(react === 'amen') {
+              let i = data.amen.indexOf( user.id)
+              item.amen.splice(i, 1)
+            } else {
+              let i = data.love.indexOf( user.id)
+              item.love.splice(i, 1)
+            }
+          }
+        })
+        this.props.setComments(com);
+      }
+    })
   }
 
   optionClick = (id, action) => {
@@ -61,13 +131,16 @@ class PostCard extends Component {
   }
 
   renderHeader = (data, top) => {
+    if(!top) {
+      console.log(data)
+    }
     return (
       <View style={{
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10
       }}>
-        <UserImage user={data.user} size={30} />
+        <UserImage user={data.account} size={30} />
         <View style={{
           paddingLeft: 5,
           justifyContent: 'space-between',
@@ -79,11 +152,11 @@ class PostCard extends Component {
             <Text style={{
               fontSize: BasicStyles.standardTitleFontSize,
               fontWeight: 'bold'
-            }}>{data?.user?.username}</Text>
+            }}>{data?.account?.username}</Text>
             <Text style={{
               fontSize: BasicStyles.standardFontSize
             }}>
-              {data.date}
+              {data.created_at_human}
             </Text>
           </View>
           {top && <TouchableOpacity
@@ -110,13 +183,13 @@ class PostCard extends Component {
       }}>
         <Text style={{
           fontSize: BasicStyles.standardFontSize
-        }}>{data.message}</Text>
+        }}>{data.text}</Text>
       </View>
     )
   }
 
   renderActions = (data) => {
-    const { theme } = this.props.state
+    const { theme, user } = this.props.state
     return (
       <View style={{
         ...BasicStyles.standardWidth,
@@ -133,19 +206,20 @@ class PostCard extends Component {
           flexDirection: 'row'
         }}
           onPress={() => {
-            // this.props.onLike(data)
+            this.react('amen')
           }}
         >
           <FontAwesomeIcon
             icon={faPrayingHands}
             size={15}
             style={{
+              color: data?.amen?.includes(user.id) ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)
             }}
           />
           <Text style={{
             marginLeft: 5,
             fontSize: 13,
-          }}>Amen</Text>
+          }}>{data?.amen?.length}</Text>
         </TouchableOpacity>
 
 
@@ -156,20 +230,20 @@ class PostCard extends Component {
           flexDirection: 'row'
         }}
           onPress={() => {
-            // this.props.onLike(data)
+            this.react('love')
           }}
         >
           <FontAwesomeIcon
             icon={faHeart}
             size={15}
             style={{
-              color: Color.black
+              color: data?.love?.includes(user.id) ? (theme ? theme.primary : Color.primary) : (theme ? theme.secondary : Color.secondary)
             }}
           />
           <Text style={{
             marginLeft: 5,
             fontSize: 13
-          }}>Love</Text>
+          }}>{data?.love?.length}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={{
@@ -215,8 +289,8 @@ class PostCard extends Component {
               style={{
                 ...BasicStyles.standardWidth
               }}>
-              {this.renderHeader({ user: item.account, date: item.created_at}, false )}
-              {this.renderBody({ message: item.text })}
+              {this.renderHeader(item, false )}
+              {this.renderBody(item)}
             </View>
           ))
         }
@@ -254,7 +328,11 @@ class PostCard extends Component {
             height: 50,
             marginTop: -10
           }}
-            onSubmitEditing={() => this.props.postReply(comments)}
+            onSubmitEditing={() => {
+              this.props.postReply(comments);
+              this.setState({reply: null})
+            }}
+            value={this.state.reply}
             onChangeText={(value) => this.replyHandler(value)}
             placeholder={'Type reply here ...'}
           />
@@ -280,7 +358,19 @@ class PostCard extends Component {
           <CommentImages images={images} />
         </TouchableOpacity>
         {this.renderActions(data)}
-        {this.renderComments(data.comments)}
+        {this.state.loading && <View style={{
+          width: width + 43,
+          marginLeft: -23
+        }}>
+          <Skeleton size={1} template={'block'} height={10} />
+        </View>}
+        {this.renderComments(data.comment_replies)}
+        {this.props.smallLoader && <View style={{
+          width: width + 43,
+          marginLeft: -23
+        }}>
+          <Skeleton size={1} template={'block'} height={10} />
+        </View>}
         {this.state.options === true &&
           <View style={{
             position: 'absolute',
@@ -297,7 +387,7 @@ class PostCard extends Component {
               {options.map((item, index) => {
                 return (
                   <View>
-                    {item.title !== 'Report' && data.user.id === user.id && <TouchableOpacity
+                    {item.title !== 'Report' && data.account.id === user.id && <TouchableOpacity
                     onPress={() => {
                       this.optionClick(data.id, item.action)
                     }}
@@ -310,7 +400,7 @@ class PostCard extends Component {
                       <FontAwesomeIcon icon={item.icon} style={{ color: item.action === 'delete' ? Color.danger : null }} />
                       <Text style={{ paddingLeft: 10 }}>{item.title}</Text>
                     </TouchableOpacity>}
-                    {(item.title === 'Report' || item.action === null) && data.user.id !== user.id && <TouchableOpacity
+                    {(item.title === 'Report' || item.action === null) && data.account.id !== user.id && <TouchableOpacity
                      onPress={() => {
                       this.optionClick(data.id, item.action)
                     }}

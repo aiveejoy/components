@@ -25,7 +25,9 @@ class SelectWithArrow extends Component{
                     ...BasicStyles.formControl,
                     alignItems: 'center'
                 }}>
-                    <Text>{value ? value : 'Select'}</Text>
+                    <Text style={{
+                      paddingLeft: 20
+                    }}>{value ? value : 'Select'}</Text>
                     <View
                     style={{
                         position: 'absolute',

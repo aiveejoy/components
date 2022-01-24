@@ -227,10 +227,9 @@ class MessagesV3 extends Component {
     }
     console.log(Routes.messengerMessagesRetrieve, parameter)
     Api.request(Routes.messengerMessagesRetrieve, parameter, response => {
-      const newMessages = _.uniqBy([...response.data.reverse(), ...messagesOnGroup.messages], 'id')
       this.setState({ isLoading: false, offset: offset + limit });
       setMessagesOnGroup({
-        messages: newMessages,
+        messages: _.uniqBy([...response.data.reverse(), ...messagesOnGroup.messages], 'id'),
         groupId: messengerGroup.id
       })
     }, error => {
