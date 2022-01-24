@@ -35,6 +35,7 @@ class Stack extends Component {
   }
 
   componentDidMount = () => {
+    this.setState({currency: this.props.state.ledger?.currency || 'PHP'})
   }
 
   manageCharges(){
@@ -46,15 +47,15 @@ class Stack extends Component {
   }
 
   manageRedirect(){
-    const { selected } = this.state;
-
+    const { selected, currency } = this.state;
+    let cur = this.props.state.ledger?.currency || currency
     if(selected.length > 0){
       switch(selected[0].code){
         case 'PAYPAL': 
           this.props.navigation.navigate('paypalStack', {
             data: {
               amount: this.state.amount,
-              currency: this.state.currency
+              currency: cur
             }
           })
           break
@@ -62,7 +63,7 @@ class Stack extends Component {
           this.props.navigation.navigate('visaStack', {
             data: {
               amount: this.state.amount,
-              currency: this.state.currency
+              currency: cur
             }
           })
           break
@@ -70,7 +71,7 @@ class Stack extends Component {
           this.props.navigation.navigate('unioBankStack', {
             data: {
               amount: this.state.amount,
-              currency: this.state.currency
+              currency: cur
             }
           })
           break
@@ -78,14 +79,14 @@ class Stack extends Component {
           this.props.navigation.navigate('payMayaStack', {
             data: {
               amount: this.state.amount,
-              currency: this.state.currency
+              currency: cur
             }
           })
         case 'STRIPE':
             this.props.navigation.navigate('stripeStack', {
               data: {
                 amount: this.state.amount,
-                currency: this.state.currency
+                currency: cur
               }
             })
       }
