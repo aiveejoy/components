@@ -125,9 +125,14 @@ class Stack extends Component {
   }
 
   render() {
-    const { isLoading, selected } = this.state
+    const { isLoading, selected, currency } = this.state
     const { theme } = this.props.state;
     const { ledger, user } = this.props.state;
+    let cur = ledger ? ledger?.currency : currency;
+    let cards = Helper.cashInMethods;
+    cards = cards.filter((item) => {
+      return item.currency == cur
+    })
     return (
       <SafeAreaView style={{
         flex: 1
@@ -217,7 +222,7 @@ class Stack extends Component {
                 padding: 20
               }}>
                 <PaymentCard
-                  data={Helper.cashInMethods}
+                  data={cards}
                   onSelect={(item) => {
                     let newSelected = []
                     newSelected.push(item)
@@ -250,4 +255,3 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Stack);
-
