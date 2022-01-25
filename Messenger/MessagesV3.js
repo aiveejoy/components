@@ -478,7 +478,8 @@ class MessagesV3 extends Component {
             const { messagesOnGroup } = this.props.state;
             const { setMessagesOnGroup } = this.props;
             let parameter = {
-              id: updatingMessage?.id
+              id: updatingMessage?.id,
+              messenger_group_id: messagesOnGroup?.groupId
             }
             this.setState({ nowUpdatingMessage: true })
             Api.request(Routes.messengerMessagesDeleteMessage, parameter, response => {
