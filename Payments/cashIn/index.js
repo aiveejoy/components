@@ -19,7 +19,6 @@ const height = Math.round(Dimensions.get('window').height);
 import AmountInput from 'modules/generic/AmountInput'
 import PaymentCard from 'components/Payments/Cards'
 import Button from 'components/Form/Button';
-import RBSheet from 'react-native-raw-bottom-sheet';
 
 class Stack extends Component {
   constructor(props) {
@@ -60,13 +59,23 @@ class Stack extends Component {
     }
   }
 
-  openBottomSheet = () => {
-    this.RBSheet.open()
+  navigate(route, data){
+    this.props.navigation.navigate(route, {
+      data: {
+        data
+      }
+    })
   }
 
+
   manageRedirect(){
-    const { selected, currency } = this.state;
+    const { selected, currency, amount } = this.state;
     let cur = this.props.state.ledger?.currency || currency
+    if(amount > 0) {
+    } else {
+      Alert.alert('Cannot proceed', 'Input your desired amount to contiue.')
+      return
+    }
     if(selected.length > 0){
       switch(selected[0].code){
         case 'PAYPAL': 
@@ -193,7 +202,9 @@ class Stack extends Component {
             <SelectWithArrow
               value={selected.length > 0 ? selected[0].title: 'Select available method'}
               onPress={() => {
-                this.openBottomSheet()
+                this.navigate(paymentCardsStack, {
+                  data: cards
+                })
               }}
               />
 
@@ -228,7 +239,7 @@ class Stack extends Component {
         }
         
 
-        <RBSheet
+        {/*<RBSheet
           ref={ref => {
             this.RBSheet = ref;
           }}
@@ -242,14 +253,6 @@ class Stack extends Component {
             }
           }}
         >
-          <View style={{
-          }}>
-            <ScrollView
-              showsVerticalScrollIndicator={false}>
-              <View style={{
-                minHeight: height * 0.75,
-                padding: 20
-              }}>
                 <PaymentCard
                   data={cards}
                   onSelect={(item) => {
@@ -263,11 +266,7 @@ class Stack extends Component {
                   }}
                   press={true}
                 />
-              </View>
-              
-            </ScrollView>
-          </View>
-        </RBSheet>
+        </RBSheet>*/}
       </SafeAreaView>
     );
   }
