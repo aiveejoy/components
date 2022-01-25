@@ -12,31 +12,31 @@ import { connect } from 'react-redux';
 import { Spinner } from 'components';
 import Api from 'services/api/index.js';
 import Routes from 'common/Routes'
-import {WebView} from 'react-native-webview';
+import { WebView } from 'react-native-webview';
 const height = Math.round(Dimensions.get('window').height);
-import {NavigationActions, StackActions} from 'react-navigation';
+import { NavigationActions, StackActions } from 'react-navigation';
 import Helper from 'common/Helper';
 
 class Stack extends Component {
-  
+
 
   constructor(props) {
     super(props);
     this.webview = null;
     this.state = {
-        isLoading: false,
-        paypalUrl: null
+      isLoading: false,
+      paypalUrl: null
     };
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.authorized()
   }
 
-  authorized(){
+  authorized() {
     const { user } = this.props.state;
     const { params } = this.props.navigation.state;
-    if(user == null) return false
+    if (user == null) return false
     this.setState({
       isLoading: true
     })
@@ -51,7 +51,7 @@ class Stack extends Component {
         isLoading: false
       })
       response.data.links.map((item) => {
-        if(item.rel == 'approve' && item.method == 'GET'){
+        if (item.rel == 'approve' && item.method == 'GET') {
           this.setState({
             paypalUrl: item.href
           })
@@ -74,17 +74,19 @@ class Stack extends Component {
         index: 0,
         key: null,
         actions: [
-            NavigationActions.navigate({routeName: 'Dashboard', params: {
+          NavigationActions.navigate({
+            routeName: 'Dashboard', params: {
               initialRouteName: 'Dashboard',
               index: 0
-            }}),
+            }
+          }),
         ]
       })
     });
     this.props.navigation.dispatch(navigateAction);
   }
 
-  navigateError(e){
+  navigateError(e) {
 
   }
 
@@ -92,7 +94,7 @@ class Stack extends Component {
     console.log({
       change: e
     })
-    if(e.url.includes('capture_order')){
+    if (e.url.includes('capture_order')) {
       let url = e.url.replace('token', 'paypal_token')
       const { token } = this.props.state;
       url += '&token=' + token
@@ -151,21 +153,12 @@ class Stack extends Component {
                 </View>
               )
             }
-            {
-              isLoading && (
-                <View style={{
-                  height: height,
-                  flex: 1,
-                  alignContent: 'center',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <Spinner />
-                </View>
-              )
-            }
           </View>
         </ScrollView>
+        {
+          isLoading ?
+            <Spinner mode="overlay" /> : null
+        }
       </SafeAreaView>
     );
   }

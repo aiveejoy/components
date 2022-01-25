@@ -69,8 +69,13 @@ class Stack extends Component {
 
 
   manageRedirect(){
-    const { selected, currency } = this.state;
+    const { selected, currency, amount } = this.state;
     let cur = this.props.state.ledger?.currency || currency
+    if(amount > 0) {
+    } else {
+      Alert.alert('Cannot proceed', 'Input your desired amount to contiue.')
+      return
+    }
     if(selected.length > 0){
       switch(selected[0].code){
         case 'PAYPAL': 
