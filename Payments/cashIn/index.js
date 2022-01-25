@@ -17,7 +17,7 @@ import Api from 'services/api/index.js';
 import SelectWithArrow from 'components/InputField/SelectWithArrow'
 const height = Math.round(Dimensions.get('window').height);
 import AmountInput from 'modules/generic/AmountInput'
-import PaymentCard from 'components/Payments/Cards'
+// import PaymentCard from 'components/Payments/Cards'
 import Button from 'components/Form/Button';
 
 class Stack extends Component {
@@ -35,6 +35,12 @@ class Stack extends Component {
 
   componentDidMount = () => {
     this.setState({currency: this.props.state.ledger?.currency || 'PHP'})
+  }
+
+  managePayment = (item) => {
+    let temp = [];
+    temp.push(item);
+    this.setState({selected: temp})
   }
 
   manageCharges(item){
@@ -198,17 +204,53 @@ class Stack extends Component {
               disableRedirect={false}
               navigation={this.props.navigation}
             />
-          
+            {selected.length > 0 && (
+              <View style={{
+                padding: 20,
+                backgroundColor: '#00B89F',
+                height: 160,
+                borderRadius: 10,
+                marginBottom: 20
+              }}>
+                <Text style={{
+                  color: Color.white,
+                  fontWeight: 'bold'
+                }}>
+                  {selected[0].title}
+                </Text>
+                <Text style={{
+                  color: Color.white,
+                  fontWeight: 'bold'
+                }}>
+                  ************
+                </Text>
+                <Text style={{
+                  fontWeight: 'bold',
+                  position: 'absolute',
+                  bottom: 20,
+                  left: 20
+                }}>
+                  {selected[0].fees}
+                </Text>
+                <Image style={{
+                  position: 'absolute',
+                  bottom: 20,
+                  right: 20,
+                  height: 50,
+                  width: '50%',
+                  resizeMode: 'contain'
+                }}
+                source={selected[0].logo}/>
+              </View>
+            )}
             <SelectWithArrow
               value={selected.length > 0 ? selected[0].title: 'Select available method'}
               onPress={() => {
-                this.navigate(paymentCardsStack, {
-                  data: cards
-                })
+                this.props.navigation.navigate('paymentCardsStack', {data: cards, setPaymentMethod: this.managePayment})
               }}
               />
 
-              <PaymentCard data={selected} press={false}/>
+              {/* <PaymentCard data={selected} press={false}/> */}
             
             {
               (selected.length > 0) && this.renderFees(selected[0].feeConfiguration)
