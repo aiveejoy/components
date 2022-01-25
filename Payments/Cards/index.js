@@ -12,24 +12,23 @@ class Stack extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      buttons: [
-        {
-          title: 'Banks',
-          value: 'bank'
-        },
-        {
-          title: 'E-wallets',
-          value: 'ewallet'
-        }
-      ],
-      selected: 'bank'
+      data: []
     }
   }
 
-  render() {
+  componentDidMount() {
     const { params } = this.props.navigation.state;
+    let temp = params.data?.length > 0 && params.data.sort(function(a, b) {
+      if (a.title < b.title) return -1;
+      if (a.title > b.title) return 1;
+      return 0;
+    });
+    this.setState({data: temp})
+  }
+
+  render() {
     const { theme } = this.props.state;
-    const { buttons, selected } = this.state;
+    const { buttons, selected, data } = this.state;
     return (
 
       <View style={{
@@ -42,79 +41,54 @@ class Stack extends Component {
             <View style={{
               width: '100%'
             }}>
-              <View style={{
-                padding: 20,
-                flexDirection: 'row'
-              }}>
-                {buttons.map(item => (<TouchableOpacity style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: selected == item.value ? (theme ? theme.primary : Color.primary) : Color.white,
-                  height: 40,
-                  width: 70,
-                  borderRadius: 10,
-                  marginRight: 10,
-                  borderWidth: 1,
-                  borderColor: selected == item.value ? (theme ? theme.primary : Color.primary) : Color.lightGray
-                }}
-                  onPress={() => {
-                    this.setState({ selected: item.value });
-                  }}>
-                  <Text style={{
-                    color: selected == item.value ? Color.white : Color.black,
-                    fontWeight: 'bold'
-                  }}>{item.title}</Text>
-                </TouchableOpacity>))}
-              </View>
               {
-                params && params.data && params.data.map((item, index) => {
-                  if (item.type == selected) {
-                    return (
-                      <TouchableHighlight
-                        onPress={() => {
-                          if (this.props.press == false) return
-                          this.props.navigation?.state?.params?.setPaymentMethod(item);
-                          this.props.navigation.navigate('directCashInStack', {paymentMethod: item});
-                        }}
-                        style={{
-                          width: '100%',
-                          borderRadius: 15,
-                          marginBottom: 20,
-                          borderBottomColor: Color.lightGray,
-                          borderBottomWidth: 1,
-                          padding: 20
-                        }}
-                        underlayColor={Color.white}
-                      >
+                data.length > 0 && data.map((item, index) => {
+                  return (
+                    <TouchableHighlight
+                      onPress={() => {
+                        if (this.props.press == false) return
+                        this.props.navigation?.state?.params?.setPaymentMethod(item);
+                        this.props.navigation.navigate('directCashInStack', { paymentMethod: item });
+                      }}
+                      style={{
+                        width: '100%',
+                        borderRadius: 15,
+                        marginBottom: 20,
+                        borderBottomColor: Color.lightGray,
+                        borderBottomWidth: 1,
+                        padding: 20
+                      }}
+                      underlayColor={Color.white}
+                    >
+                      <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                      }}>
                         <View style={{
-                          flexDirection: 'row',
-                          alignItems: 'center'
+                          borderWidth: 1,
+                          borderColor: Color.lightGray,
+                          borderRadius: 5,
+                          height: 50,
+                          width: 50,
                         }}>
-                          <View style={{
-                            borderWidth: 1,
-                            borderColor: Color.lightGray,
-                            borderRadius: 5,
-                            height: 50,
-                            width: 50,
-                          }}>
-                            <Image source={item.logo} style={{
-                              height: '100%',
-                              width: '100%',
-                              resizeMode: 'contain'
-                            }} />
-                          </View>
-                          <View style={{
-                            padding: 10
-                          }}>
-                            <Text style={{
-                              fontWeight: 'bold',
-                              fontSize: BasicStyles.standardTitleFontSize
-                            }}>{item.title}</Text>
-                            <Text style={{
-                              fontSize: 12
-                            }}>{item.fees}</Text>
-                          </View>
-                          {/*<View style={{
+                          <Image source={item.logo} style={{
+                            height: '100%',
+                            width: '100%',
+                            resizeMode: 'contain'
+                          }} />
+                        </View>
+                        <View style={{
+                          padding: 10
+                        }}>
+                          <Text style={{
+                            fontWeight: 'bold',
+                            fontSize: BasicStyles.standardTitleFontSize
+                          }}>{item.title}</Text>
+                          <Text style={{
+                            fontSize: 12
+                          }}>{item.fees}</Text>
+                        </View>
+                        {/*<View style={{
                             flexDirection: 'row',
                             marginTop: 20,
                             alignItems: 'center',
@@ -129,11 +103,10 @@ class Stack extends Component {
                               }}
                               />
                           </View>*/}
-                        </View>
+                      </View>
 
-                      </TouchableHighlight>
-                    )
-                  }
+                    </TouchableHighlight>
+                  )
                 })
               }
 
