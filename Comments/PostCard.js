@@ -304,9 +304,9 @@ class PostCard extends Component {
           marginBottom: -10
         }}>
           {
-            user?.profile?.url ? (
+            user?.account_profile?.url ? (
               <Image
-                source={user?.profile?.url ? { uri: Config.BACKEND_URL + user.profile?.url } : require('assets/logo.png')}
+                source={user?.account_profile?.url ? { uri: Config.BACKEND_URL + user.account_profile?.url } : require('assets/logo.png')}
                 style={[BasicStyles.profileImageSize, {
                   height: 30,
                   width: 30,

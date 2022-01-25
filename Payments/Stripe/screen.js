@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { StripeProvider } from '@stripe/stripe-react-native';
-import { View, Text } from 'react-native'
+import { View, Text, Alert, Dimensions } from 'react-native'
 import { CardField, useStripe } from '@stripe/stripe-react-native';
 import { initStripe } from '@stripe/stripe-react-native';
 import Config from 'src/config.js';
 import Helper from 'common/Helper'
 import Color from 'common/Color';
 import Button from 'components/Form/Button';
-
+const height = Math.round(Dimensions.get('window').height);
 export default function App(props) {
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const { theme, params } = props;
@@ -26,22 +26,22 @@ export default function App(props) {
       // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
       //methods that complete payment after a delay, like SEPA Debit and Sofort.
       allowsDelayedPaymentMethods: true,
+      merchantDisplayName: Helper.APP_NAME_BASIC
     });
     if (!error) {
-      setLoading(true);
     }
   }
 
   const openPaymentSheet = async () => {
-    const response = await presentPaymentSheet();
-    console.log({
-      response
-    })
-    // if (error) {
-    //   Alert.alert(`Error code: ${error.code}`, error.message);
-    // } else {
-    //   Alert.alert('Success', 'Your order is confirmed!');
-    // }
+    const {error} = await presentPaymentSheet();
+    // console.log({
+    //   response
+    // })
+    if (error) {
+      Alert.alert(`Error code: ${error.code}`, error.message);
+    } else {
+      props.onConfirmPayment()
+    }
   };
 
 
@@ -78,7 +78,7 @@ export default function App(props) {
         padding: 20,
         alignItems: 'center',
         position: 'absolute',
-        bottom: 0
+        bottom: 100
       }}>
         <Button
           style={{
@@ -102,7 +102,8 @@ export default function App(props) {
     >
       <View style={{
         width: '100%',
-        flex: 1
+        flex: 1,
+        height: height
       }}>
       {/*
       <CardField

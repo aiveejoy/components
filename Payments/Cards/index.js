@@ -14,7 +14,9 @@ class Stack extends Component{
     const { data } = this.props;
     return (
       <View style={{
-        width: '100%'
+        width: '100%',
+        borderBottomColor: Color.gray,
+        borderBottomWidth: 1
       }}>
         {
           data && data.map((item, index) => (
@@ -26,7 +28,6 @@ class Stack extends Component{
               style={{
                 width: '100%',
                 borderRadius: 15,
-                backgroundColor: item.color,
                 marginBottom: 20,
                 padding: 20
               }}
@@ -34,25 +35,19 @@ class Stack extends Component{
               >
                 <View>
                   <Text style={{
-                    color: Color.white,
                     fontWeight: 'bold',
                     fontSize: BasicStyles.standardTitleFontSize
                   }}>{item.title}</Text>
                   <Text style={{
-                    color: Color.white,
                     paddingTop: 10
-                  }}>{item.description}</Text>
+                  }}>{item.fees}</Text>
                 
-                  <View style={{
+                  {/*<View style={{
                     flexDirection: 'row',
                     marginTop: 20,
                     alignItems: 'center',
                     justifyContent: 'space-between'
                   }}>
-                    <Text style={{
-                      fontWeight: 'bold',
-                      color: Color.white
-                    }}>{item.fees}</Text>
                     <Image 
                       source={item.logo}
                       style={{
@@ -61,7 +56,7 @@ class Stack extends Component{
                         resizeMode: 'stretch',
                       }}
                       />
-                  </View>
+                  </View>*/}
                 </View>
                 
             </TouchableHighlight>
