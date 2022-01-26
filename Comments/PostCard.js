@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Image, Dimensions, Text, TextInput } from 'react-native'
+import { View, TouchableOpacity, Image, Dimensions, Text, TextInput, ScrollView, Alert } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faTrashAlt, faPrayingHands, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { BasicStyles, Color, Routes } from 'common';
@@ -9,6 +9,7 @@ import UserImage from 'components/User/Image';
 import CommentImages from './Images';
 import Api from 'services/api/index.js';
 import Skeleton from 'components/Loading/Skeleton';
+import RBSheet from "react-native-raw-bottom-sheet";
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -24,7 +25,10 @@ class PostCard extends Component {
     this.state = {
       reply: null,
       options: false,
-      loading: false
+      loading: false,
+      errorMessage: null,
+      toEdit: null,
+      isLoading: false
     }
   }
 
@@ -32,26 +36,26 @@ class PostCard extends Component {
     const { data } = this.props;
     const { user, comments } = this.props.state;
     let list = []
-    if(react === 'amen') {
+    if (react === 'amen') {
       list = data.amen
     } else {
       list = data.love
     }
-    if(list.includes(user.id) === false) {
+    if (list.includes(user.id) === false) {
       let parameter = {
         reaction: react,
         comment_id: data.id,
         account_id: user.id
       }
-      this.setState({loading: true});
+      this.setState({ loading: true });
       Api.request(Routes.reactionCreate, parameter, response => {
-        this.setState({loading: false});
-        if(response.data > 0) {
-          
+        this.setState({ loading: false });
+        if (response.data > 0) {
+
           let com = comments;
           com.length > 0 && com.map((item, index) => {
-            if(item.id == data.id) {
-              if(react === 'amen') {
+            if (item.id == data.id) {
+              if (react === 'amen') {
                 item.amen.push(user.id)
               } else {
                 item.love.push(user.id)
@@ -74,18 +78,18 @@ class PostCard extends Component {
       comment_id: data.id,
       reaction: react
     }
-    this.setState({loading: true});
+    this.setState({ loading: true });
     Api.request(Routes.reactionDelete, parameter, response => {
-      this.setState({loading: false});
-      if(response.data) {
+      this.setState({ loading: false });
+      if (response.data) {
         let com = comments;
         com.length > 0 && com.map((item, index) => {
-          if(item.id == data.id) {
-            if(react === 'amen') {
-              let i = data.amen.indexOf( user.id)
+          if (item.id == data.id) {
+            if (react === 'amen') {
+              let i = data.amen.indexOf(user.id)
               item.amen.splice(i, 1)
             } else {
-              let i = data.love.indexOf( user.id)
+              let i = data.love.indexOf(user.id)
               item.love.splice(i, 1)
             }
           }
@@ -96,28 +100,44 @@ class PostCard extends Component {
   }
 
   optionClick = (id, action) => {
-    this.setState({options: false});
-    switch(action) {
+    const { data } = this.props;
+    this.setState({ options: false });
+    switch (action) {
       case 'edit':
+        this.setState({ toEdit: data.text })
+        this.RBSheet.open();
         break;
       case 'report':
+        this.clickReport();
         break;
       case 'delete':
-          let parameter = {
-            id: id
-          }
-          Api.request(Routes.commentsDelete, parameter, response => {
-            if (response.data) {
-              let comments = this.props.state.comments;
-              comments.length > 0 && comments.map((item, index) => {
-                if(item.id == id) {
-                  comments.splice(index, 1);
-                  return
+        Alert.alert('Confirmation', 'Are you sure you want to delete this post?', [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              let parameter = {
+                id: id
+              }
+              Api.request(Routes.commentsDelete, parameter, response => {
+                if (response.data) {
+                  let comments = this.props.state.comments;
+                  comments.length > 0 && comments.map((item, index) => {
+                    if (item.id == id) {
+                      comments.splice(index, 1);
+                      return
+                    }
+                  })
+                  this.props.setComments(comments);
                 }
               })
-              this.props.setComments(comments);
-            }
-          })
+            },
+          },
+        ]);
         break;
       default:
         return;
@@ -125,13 +145,130 @@ class PostCard extends Component {
     }
   }
 
+  updatePost = () => {
+    const { toEdit } = this.state;
+    const { data } = this.props;
+    if (toEdit == null || toEdit == '') {
+      this.setState({ errorMessage: `Can't update post to empty caption.` })
+      return
+    }
+    let parameter = {
+      id: data.id,
+      text: toEdit
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.commentsUpdate, parameter, response => {
+      this.setState({ isLoading: false })
+      if (response.data) {
+        let comments = this.props.state.comments;
+        comments.length > 0 && comments.map((item, index) => {
+          if (item.id == data.id) {
+            item.text = toEdit;
+            return
+          }
+        })
+        this.props.setComments(comments);
+        this.RBSheet.close()
+      }
+    }, error => {
+      console.log(error)
+      this.setState({ isLoading: false })
+    })
+  }
+
+  clickReport = () => {
+    const { data } = this.props;
+    let parameter = {
+      account_id: this.props.state.user.id,
+      payload: 'comment_id',
+      payload_value: data.id,
+      status: 'ongoing'
+    }
+    this.setState({ loading: true })
+    console.log(Routes.reportCreate, parameter);
+    Api.request(Routes.reportCreate, parameter, response => {
+      this.setState({ loading: false })
+    }, error => {
+      console.log(error)
+      this.setState({ loading: false })
+    })
+  }
+
   replyHandler = (value) => {
     this.setState({ reply: value });
     this.props.reply(value);
   }
 
+  editPost = () => {
+    const { errorMessage, toEdit, isLoading } = this.state;
+    const { theme } = this.props.state;
+    return (
+      <RBSheet
+        ref={ref => {
+          this.RBSheet = ref;
+        }}
+        closeOnDragDown={true}
+        dragFromTopOnly={true}
+        closeOnPressMask={false}
+        height={height / 2}
+        openDuration={250}
+        customStyles={{
+          container: {
+            marginTop: 10,
+            alignItems: "center"
+          }
+        }}
+      >
+        <ScrollView>
+          <View style={{
+            width: width,
+            marginTop: 10,
+            alignItems: 'center'
+          }}>
+            <Text>Edit Post</Text>
+            {isLoading && <Skeleton size={1} template={'block'} height={10} />}
+            <Text style={{
+              color: Color.danger
+            }}>{errorMessage}</Text>
+            <TextInput
+              style={{
+                borderColor: Color.gray,
+                borderWidth: .5,
+                borderRadius: 15,
+                width: '90%',
+                marginTop: 10,
+                textAlignVertical: 'top'
+              }}
+              multiline={true}
+              numberOfLines={7}
+              onChangeText={text => this.setState({ toEdit: text })}
+              value={toEdit}
+              placeholder={toEdit}
+              placeholderTextColor={Color.darkGray}
+            />
+            <TouchableOpacity style={{
+              borderColor: theme ? theme.primary : Color.primary,
+              backgroundColor: theme ? theme.primary : Color.primary,
+              width: '50%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+              borderWidth: 1,
+              height: 40,
+              marginTop: 20
+            }}
+              onPress={() => { this.updatePost() }}
+            >
+              <Text style={{ color: 'white' }}>Update</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </RBSheet>
+    )
+  }
+
   renderHeader = (data, top) => {
-    if(!top) {
+    if (!top) {
       console.log(data)
     }
     return (
@@ -289,7 +426,7 @@ class PostCard extends Component {
               style={{
                 ...BasicStyles.standardWidth
               }}>
-              {this.renderHeader(item, false )}
+              {this.renderHeader(item, false)}
               {this.renderBody(item)}
             </View>
           ))
@@ -330,7 +467,7 @@ class PostCard extends Component {
           }}
             onSubmitEditing={() => {
               this.props.postReply(comments);
-              this.setState({reply: null})
+              this.setState({ reply: null })
             }}
             value={this.state.reply}
             onChangeText={(value) => this.replyHandler(value)}
@@ -343,7 +480,7 @@ class PostCard extends Component {
 
   render() {
     const { data, images } = this.props;
-    const {user} = this.props.state;
+    const { user } = this.props.state;
     return (
       <View style={{
         // borderRadius: BasicStyles.standardBorderRadius,
@@ -388,9 +525,9 @@ class PostCard extends Component {
                 return (
                   <View>
                     {item.title !== 'Report' && data.account.id === user.id && <TouchableOpacity
-                    onPress={() => {
-                      this.optionClick(data.id, item.action)
-                    }}
+                      onPress={() => {
+                        this.optionClick(data.id, item.action)
+                      }}
                       style={{
                         paddingLeft: item.action !== null ? 15 : 5,
                         flexDirection: 'row',
@@ -401,9 +538,9 @@ class PostCard extends Component {
                       <Text style={{ paddingLeft: 10 }}>{item.title}</Text>
                     </TouchableOpacity>}
                     {(item.title === 'Report' || item.action === null) && data.account.id !== user.id && <TouchableOpacity
-                     onPress={() => {
-                      this.optionClick(data.id, item.action)
-                    }}
+                      onPress={() => {
+                        this.optionClick(data.id, item.action)
+                      }}
                       style={{
                         paddingLeft: item.action !== null ? 15 : 5,
                         flexDirection: 'row',
@@ -418,6 +555,7 @@ class PostCard extends Component {
               })}
             </View>
           </View>}
+        {this.editPost()}
       </View>
     )
   }
