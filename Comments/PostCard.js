@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Image, Dimensions, Text, TextInput, ScrollView } from 'react-native'
+import { View, TouchableOpacity, Image, Dimensions, Text, TextInput, ScrollView, Alert } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faTrashAlt, faPrayingHands, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { BasicStyles, Color, Routes } from 'common';
