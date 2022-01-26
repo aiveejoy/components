@@ -111,21 +111,33 @@ class PostCard extends Component {
         this.clickReport();
         break;
       case 'delete':
-        let parameter = {
-          id: id
-        }
-        Api.request(Routes.commentsDelete, parameter, response => {
-          if (response.data) {
-            let comments = this.props.state.comments;
-            comments.length > 0 && comments.map((item, index) => {
-              if (item.id == id) {
-                comments.splice(index, 1);
-                return
+        Alert.alert('Confirmation', 'Are you sure you want to delete this post?', [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              let parameter = {
+                id: id
               }
-            })
-            this.props.setComments(comments);
-          }
-        })
+              Api.request(Routes.commentsDelete, parameter, response => {
+                if (response.data) {
+                  let comments = this.props.state.comments;
+                  comments.length > 0 && comments.map((item, index) => {
+                    if (item.id == id) {
+                      comments.splice(index, 1);
+                      return
+                    }
+                  })
+                  this.props.setComments(comments);
+                }
+              })
+            },
+          },
+        ]);
         break;
       default:
         return;
@@ -136,17 +148,17 @@ class PostCard extends Component {
   updatePost = () => {
     const { toEdit } = this.state;
     const { data } = this.props;
-    if(toEdit == null || toEdit == '') {
-      this.setState({errorMessage: `Can't update post to empty caption.`})
+    if (toEdit == null || toEdit == '') {
+      this.setState({ errorMessage: `Can't update post to empty caption.` })
       return
     }
     let parameter = {
       id: data.id,
       text: toEdit
     }
-    this.setState({isLoading: true})
+    this.setState({ isLoading: true })
     Api.request(Routes.commentsUpdate, parameter, response => {
-      this.setState({isLoading: false})
+      this.setState({ isLoading: false })
       if (response.data) {
         let comments = this.props.state.comments;
         comments.length > 0 && comments.map((item, index) => {
@@ -160,7 +172,7 @@ class PostCard extends Component {
       }
     }, error => {
       console.log(error)
-      this.setState({isLoading: false})
+      this.setState({ isLoading: false })
     })
   }
 
@@ -172,13 +184,13 @@ class PostCard extends Component {
       payload_value: data.id,
       status: 'ongoing'
     }
-    this.setState({loading: true})
+    this.setState({ loading: true })
     console.log(Routes.reportCreate, parameter);
     Api.request(Routes.reportCreate, parameter, response => {
-      this.setState({loading: false})
+      this.setState({ loading: false })
     }, error => {
       console.log(error)
-      this.setState({loading: false})
+      this.setState({ loading: false })
     })
   }
 
