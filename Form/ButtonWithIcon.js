@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, Image } from 'react-native';
 import { BasicStyles, Color } from 'common';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import Config from 'src/config.js';
 class ButtonWithIcon extends Component {
   render() {
     return (
@@ -18,7 +19,14 @@ class ButtonWithIcon extends Component {
         onPress={() => {
           this.props.onClick();
         }}>
-        <FontAwesomeIcon icon={this.props.icon} size={30} color={Color.white}/>
+          <Image
+          style={{
+            height: 30,
+            width: 30}}
+          resizeMode={'cover'}
+          source={this.props.image}
+        />
+        {/* <FontAwesomeIcon icon={this.props.icon} size={30} color={Color.white}/> */}
         <Text style={{
           color: Color.white,
           textAlign: 'center',
