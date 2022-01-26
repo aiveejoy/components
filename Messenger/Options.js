@@ -111,6 +111,7 @@ class Options extends Component {
     const { data } = this.props;
     let index = Helper.MessengerMenu.length - 1;
     let menu = Helper.MessengerMenu;
+    console.log(data?.account?.code, this.props.state.user.code, '---------------------------');
     if(data?.account?.code == this.props.state.user.code){
       if(menu[index - 1].payload_value !== 'navigationStack') {
         menu.splice(index, 0, {
