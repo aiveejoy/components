@@ -41,6 +41,7 @@ class Stack extends Component {
     let temp = [];
     temp.push(item);
     this.setState({selected: temp})
+    this.manageCharges(item)
   }
 
   manageCharges(item){
