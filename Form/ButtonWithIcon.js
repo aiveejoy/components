@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import { TouchableOpacity, Text, Image } from 'react-native';
 import { BasicStyles, Color } from 'common';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import Config from 'src/config.js';
 class ButtonWithIcon extends Component {
   render() {
     return (
@@ -11,8 +9,8 @@ class ButtonWithIcon extends Component {
           ...BasicStyles.standardButton,
           height: 100,
           ...this.props.style,
-          paddingTop: 20,
-          paddingBottom: 20,
+          paddingTop: 5,
+          paddingBottom: 30,
           paddingLeft: 5,
           paddingRight: 5,
         }}
@@ -21,8 +19,9 @@ class ButtonWithIcon extends Component {
         }}>
           <Image
           style={{
-            height: 30,
-            width: 30}}
+            marginTop: 25,
+            height: 45,
+            width: 45}}
           resizeMode={'cover'}
           source={this.props.image}
         />
@@ -31,7 +30,7 @@ class ButtonWithIcon extends Component {
           color: Color.white,
           textAlign: 'center',
           ...this.props.textStyle,
-          paddingTop: 10,
+          paddingTop: 1,
         }}>{this.props.title}</Text>
         {
           this.props.description && (
