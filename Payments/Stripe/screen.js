@@ -47,6 +47,7 @@ export default function App(props) {
 
   useEffect(() => {
     inititiate()
+    openPaymentSheet()
   }, []);
 
   const renderAmount = (data) => {
@@ -137,9 +138,9 @@ export default function App(props) {
         (params && params.data) && renderAmount(params.data)
       }
 
-      {
+      {/* {
         renderFooter()
-      }
+      } */}
       </View>
     </StripeProvider>
   );
