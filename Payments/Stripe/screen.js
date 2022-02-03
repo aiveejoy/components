@@ -29,6 +29,10 @@ export default function App(props) {
       merchantDisplayName: Helper.APP_NAME_BASIC
     });
     if (!error) {
+      console.log('opening...');
+      openPaymentSheet()
+    } else {
+      props.navigation.pop();
     }
   }
 
@@ -39,6 +43,7 @@ export default function App(props) {
     // })
     if (error) {
       Alert.alert(`Error code: ${error.code}`, error.message);
+      props.navigation.pop();
     } else {
       props.onConfirmPayment()
     }
@@ -47,7 +52,6 @@ export default function App(props) {
 
   useEffect(() => {
     inititiate()
-    openPaymentSheet()
   }, []);
 
   const renderAmount = (data) => {
