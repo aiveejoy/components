@@ -431,7 +431,8 @@ class MessagesV3 extends Component {
     const { setMessagesOnGroup } = this.props;
     let parameter = {
       id: updatingMessage?.id,
-      message: updatingText
+      message: updatingText,
+      messenger_group_id: messagesOnGroup?.groupId
     }
     this.setState({ nowUpdatingMessage: true })
     Api.request(Routes.messengerMessagesUpdateMessage, parameter, response => {
@@ -482,6 +483,7 @@ class MessagesV3 extends Component {
               messenger_group_id: messagesOnGroup?.groupId
             }
             this.setState({ nowUpdatingMessage: true })
+            console.log(Routes.messengerMessagesDeleteMessage, parameter, '--------');
             Api.request(Routes.messengerMessagesDeleteMessage, parameter, response => {
               this.setState({ nowUpdatingMessage: false })
               if (response.data != null) {
@@ -705,7 +707,15 @@ class MessagesV3 extends Component {
     const { updatingMessage, nowUpdatingMessage } = this.state;
     return (
       <TouchableOpacity onLongPress={() => {
-        if (item.payload == 'text' && requestMessage?.status == 1) {
+        let time = item.created_at?.split(' ')[1];
+        let date = new Date(item.created_at?.split(' ')[0]);
+        time = time?.split(':');
+        date.setHours(time[0]);
+        date.setMinutes(time[1]);
+        date.setSeconds(time[2]);
+        let total = Math.round((((new Date() - date) % 86400000) % 3600000) / 60000)
+        console.log(total, date, new Date(), '----');
+        if (item.payload == 'text' && requestMessage?.status == 1 && total <= 5) {
           this.setState({
             isUpdate: true,
             updatingMessage: item
@@ -762,7 +772,7 @@ class MessagesV3 extends Component {
           item.payload == 'image' && (this._image(item))
         }
         {
-          item.sending_flag == true &&
+          item.sending_flag == true && item.payload !== 'image' &&
           <Text style={[Style.messageTextLeft, {
             backgroundColor: theme ? theme.primary : Color.primary,
             marginTop: 10

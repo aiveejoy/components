@@ -147,6 +147,7 @@ class Stripe extends Component {
                     cardDetails
                   })
                 }}
+                navigation={this.props.navigation}
               />
             )}
           </View>
