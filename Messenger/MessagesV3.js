@@ -772,7 +772,7 @@ class MessagesV3 extends Component {
           item.payload == 'image' && (this._image(item))
         }
         {
-          item.sending_flag == true &&
+          item.sending_flag == true && item.payload !== 'image' &&
           <Text style={[Style.messageTextLeft, {
             backgroundColor: theme ? theme.primary : Color.primary,
             marginTop: 10
