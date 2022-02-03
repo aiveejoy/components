@@ -713,9 +713,9 @@ class MessagesV3 extends Component {
         date.setHours(time[0]);
         date.setMinutes(time[1]);
         date.setSeconds(time[2]);
-        let total = (date - new Date())/60000;;
-        console.log(new Date() - date, total,date, new Date(), '----');
-        if (item.payload == 'text' && requestMessage?.status == 1 && new Date(item.created_at).getMinutes() <= 5) {
+        let total = Math.round((((new Date() - date) % 86400000) % 3600000) / 60000)
+        console.log(total, date, new Date(), '----');
+        if (item.payload == 'text' && requestMessage?.status == 1 && total <= 5) {
           this.setState({
             isUpdate: true,
             updatingMessage: item
