@@ -7,7 +7,7 @@ class ButtonWithIcon extends Component {
       <TouchableOpacity
         style={{
           ...BasicStyles.standardButton,
-          height: 100,
+          height: '100%',
           ...this.props.style,
           paddingTop: 5,
           paddingBottom: 30,
@@ -20,8 +20,8 @@ class ButtonWithIcon extends Component {
           <Image
           style={{
             marginTop: 25,
-            height: 45,
-            width: 45}}
+            height: 35,
+            width: 35}}
           resizeMode={'cover'}
           source={this.props.image}
         />
@@ -29,6 +29,7 @@ class ButtonWithIcon extends Component {
         <Text style={{
           color: Color.white,
           textAlign: 'center',
+          fontSize: 12,
           ...this.props.textStyle,
           paddingTop: 1,
         }}>{this.props.title}</Text>
