@@ -10,11 +10,11 @@ import CommentImages from './Images';
 import Api from 'services/api/index.js';
 import Skeleton from 'components/Loading/Skeleton';
 import RBSheet from "react-native-raw-bottom-sheet";
+import Share from './Share';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
 const options = [
-  { title: 'Post Actions', action: null, icon: faCog },
   { title: 'Edit', action: 'edit', icon: faPencilAlt },
   { title: 'Report', action: 'report', icon: faFileAlt },
   { title: 'Delete', action: 'delete', icon: faTrashAlt }
@@ -28,7 +28,8 @@ class PostCard extends Component {
       loading: false,
       errorMessage: null,
       toEdit: null,
-      isLoading: false
+      isLoading: false,
+      share: false
     }
   }
 
@@ -296,7 +297,7 @@ class PostCard extends Component {
               {data.created_at_human}
             </Text>
           </View>
-          {top && <TouchableOpacity
+          {data.shared == null && this.props.share !== false && top && <TouchableOpacity
             style={{
               position: 'absolute',
               right: 5,
@@ -309,6 +310,8 @@ class PostCard extends Component {
       </View>
     )
   }
+
+
 
   renderBody = (data) => {
     return (
@@ -390,7 +393,7 @@ class PostCard extends Component {
           flexDirection: 'row'
         }}
           onPress={() => {
-            // this.props.onLike(data)
+            this.setState({ share: true });
           }}
         >
           <FontAwesomeIcon
@@ -479,7 +482,7 @@ class PostCard extends Component {
   }
 
   render() {
-    const { data, images } = this.props;
+    const { data, images, share } = this.props;
     const { user } = this.props.state;
     return (
       <View style={{
@@ -489,19 +492,32 @@ class PostCard extends Component {
         marginBottom: 10,
         ...this.props.style
       }}>
+        {data.shared && <View style={{
+          borderBottomColor: Color.lightGray,
+          borderBottomWidth: 1
+        }}>
+          {this.renderHeader(data.shared, true)}
+          <Text style={{
+            paddingLeft: 10,
+            paddingBottom: 10
+          }}>
+            {data.shared.text}
+          </Text>
+        </View>
+        }
         {this.renderHeader(data, true)}
         {this.renderBody(data)}
         <TouchableOpacity onPress={() => { this.props.showImages(images) }}>
           <CommentImages images={images} />
         </TouchableOpacity>
-        {this.renderActions(data)}
+        {share !== false && this.renderActions(data)}
         {this.state.loading && <View style={{
           width: width + 43,
           marginLeft: -23
         }}>
           <Skeleton size={1} template={'block'} height={10} />
         </View>}
-        {this.renderComments(data.comment_replies)}
+        {share !== false && this.renderComments(data.comment_replies)}
         {this.props.smallLoader && <View style={{
           width: width + 43,
           marginLeft: -23
@@ -524,7 +540,7 @@ class PostCard extends Component {
               {options.map((item, index) => {
                 return (
                   <View>
-                    {item.title !== 'Report' && data.account.id === user.id && <TouchableOpacity
+                    {item.title !== 'Report' && (data.account.id === user.id || data.shared?.account_id === user.id) && <TouchableOpacity
                       onPress={() => {
                         this.optionClick(data.id, item.action)
                       }}
@@ -537,7 +553,7 @@ class PostCard extends Component {
                       <FontAwesomeIcon icon={item.icon} style={{ color: item.action === 'delete' ? Color.danger : null }} />
                       <Text style={{ paddingLeft: 10 }}>{item.title}</Text>
                     </TouchableOpacity>}
-                    {(item.title === 'Report' || item.action === null) && data.account.id !== user.id && <TouchableOpacity
+                    {(item.title === 'Report' || item.action === null) && (data.account.id !== user.id || data.shared?.account_id !== user.id) && <TouchableOpacity
                       onPress={() => {
                         this.optionClick(data.id, item.action)
                       }}
@@ -556,6 +572,13 @@ class PostCard extends Component {
             </View>
           </View>}
         {this.editPost()}
+        <Share
+          visible={this.state.share}
+          data={data}
+          close={() => {
+            this.setState({ share: false })
+          }}
+        />
       </View>
     )
   }
