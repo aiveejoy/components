@@ -272,9 +272,15 @@ class Comments extends Component {
                   navigation={this.props.navigation}
                   loader={this.loader}
                   data={item}
-                  showImages={(images) => {this.setState({images: images}, () => {
-                    this.myRef.current.openBottomSheet()
-                  })}}
+                  showImages={(images) => {
+                    let temp = [];
+                    images.map(item => {
+                      temp.push(item.category)
+                    })
+                    this.setState({images: temp}, () => {
+                      this.myRef.current.openBottomSheet()
+                    })
+                }}
                   images={item.images}
                   smallLoader={smallLoading}
                   postReply={() => { this.reply(item) }}

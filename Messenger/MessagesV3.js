@@ -20,6 +20,7 @@ import ScreenshotHandler from 'services/ScreenshotHandler';
 import _ from 'lodash';
 import Ratings from 'components/Messenger/Ratings';
 import styles from 'components/Messenger/Style';
+import { Spinner } from 'components';
 
 const DeviceHeight = Math.round(Dimensions.get('window').height);
 const DeviceWidth = Math.round(Dimensions.get('window').width);
@@ -300,7 +301,9 @@ class MessagesV3 extends Component {
         username: user.username
       },
       created_at_human: moment(new Date()).fromNow(),
+      created_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       sending_flag: true,
+      updated_at: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
       error: null
     }
     updateMessagesOnGroup(newMessageTemp);
@@ -727,11 +730,11 @@ class MessagesV3 extends Component {
           index == 0 && (this._headerLeft(item, index))
         }
         {
-          item.message != null && Platform.OS == 'android' && item.id != updatingMessage?.id && (<Text style={[Style.dateText, {
+          item.message != null && Platform.OS == 'android' && (<Text style={[Style.dateText, {
             textAlign: 'right'
           }]}>{item.created_at_human}</Text>)}
         {
-          item.message != null && Platform.OS == 'android' && item.id != updatingMessage?.id && (
+          item.message != null && Platform.OS == 'android' && (
             <View style={{
               flexDirection: 'row',
               marginLeft: '30%'
@@ -752,15 +755,8 @@ class MessagesV3 extends Component {
             </View>
           )
         }
-        {item.id == updatingMessage?.id && nowUpdatingMessage && (
-          <View style={{
-            width: DeviceWidth / 2
-          }}>
-            <Skeleton size={1} template={'block'} height={45} />
-          </View>
-        )}
         {
-          item.message != null && Platform.OS == 'ios' && item.id != updatingMessage?.id && (
+          item.message != null && Platform.OS == 'ios' && (
             <View style={[Style.messageTextLeft, {
               backgroundColor: theme ? theme.primary : Color.primary
             }]}>
@@ -771,13 +767,13 @@ class MessagesV3 extends Component {
         {
           item.payload == 'image' && (this._image(item))
         }
-        {
+        {/* {
           item.sending_flag == true && item.payload !== 'image' &&
           <Text style={[Style.messageTextLeft, {
             backgroundColor: theme ? theme.primary : Color.primary,
             marginTop: 10
           }]}>{item.message}
-          </Text>}
+          </Text>} */}
         {
           item.sending_flag == true && (
             <Text style={{
@@ -946,7 +942,7 @@ class MessagesV3 extends Component {
               onPress={() => {
                 this.setState({
                   isUpdate: false,
-                  updatingText: updatingMessage?.message
+                  updatingText: updatingMessage?.message,
                 })
               }}>
               <Text>Edit</Text>
@@ -955,6 +951,9 @@ class MessagesV3 extends Component {
               borderBottomWidth: 1
             }]}
               onPress={() => {
+                this.setState({
+                  isUpdate: false
+                })
                 this.delete()
               }}>
               <Text style={{
@@ -979,7 +978,7 @@ class MessagesV3 extends Component {
   }
 
   render() {
-    const { isLoading, isImageModal, imageModalUrl, keyRefresh, isPullingMessages, isLock, members, data, updatingText, imageToDelete } = this.state;
+    const { isLoading, isImageModal, imageModalUrl, keyRefresh, isPullingMessages, isLock, members, data, updatingText, imageToDelete, nowUpdatingMessage } = this.state;
     const { requestMessage, theme, updateActivity, user } = this.props.state;
     console.log('[MESSEGER GROUP]', data);
     return (
@@ -1096,6 +1095,7 @@ class MessagesV3 extends Component {
               </TouchableOpacity>}
             </View>
             {isLoading ? <Skeleton size={1} template={'messages'} /> : null}
+            {nowUpdatingMessage && <Spinner mode="overlay" />}
             <ScrollView
               ref={ref => this.scrollView = ref}
               onContentSizeChange={(contentWidth, contentHeight) => {
