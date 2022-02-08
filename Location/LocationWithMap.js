@@ -1,5 +1,5 @@
-  
-import React, {Component} from 'react';
+
+import React, { Component } from 'react';
 import Style from './LocationWithMapStyles';
 import {
   View,
@@ -10,20 +10,20 @@ import {
   PermissionsAndroid,
   Keyboard
 } from 'react-native';
-import {Color} from 'common';
-import {connect} from 'react-redux';
-import {faMapMarkerAlt} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faTimes, faChevronLeft} from '@fortawesome/free-solid-svg-icons';
-import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
+import { Color } from 'common';
+import { connect } from 'react-redux';
+import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faTimes, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 // import Geolocation from 'react-native-geolocation-service';
 // import Geolocation from '@react-native-community/geolocation';
 import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import Config from 'src/config.js';
 import BasicStyles from '../../common/BasicStyles';
-import CustomGooglePlacesAutocomplete  from './GooglePlacesAutoComplete'
+import CustomGooglePlacesAutocomplete from './GooglePlacesAutoComplete'
 
 
 class LocationWithMap extends Component {
@@ -61,6 +61,10 @@ class LocationWithMap extends Component {
     Geolocation.clearWatch(this.state.watchID);
   }
 
+  onMapLayout = () => {
+    this.setState({ isMapReady: true });
+  };
+
   requestPermission = async () => {
     if (Platform.OS === 'ios') {
       Geolocation.requestAuthorization('always');
@@ -85,7 +89,7 @@ class LocationWithMap extends Component {
   };
 
   getCurrentLocationIOS = async () => {
-    const {user} = this.props.state;
+    const { user } = this.props.state;
     Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
     Geolocation.getCurrentPosition(
       (info) => {
@@ -100,7 +104,7 @@ class LocationWithMap extends Component {
       },
       (error) => console.log(error),
       {
-        enableHighAccuracy: true,
+        enableHighAccuracy: false,
         timeout: 2000,
       },
     ); //Transfer this to if(user!=null) when api available
@@ -168,7 +172,7 @@ class LocationWithMap extends Component {
     })
   }
 
-  UNSAFE_componentWillMount() {}
+  UNSAFE_componentWillMount() { }
 
   setMapDragging = () => {
     if (!this.state.isDraggingMap) {
@@ -182,23 +186,23 @@ class LocationWithMap extends Component {
   getLocationDetails = (latitude, longitude) => {
     Geocoder.from(latitude, longitude).then((json) => {
       var details = json.results[0].formatted_address.split(', ');
-        // latitude: latitude,
-        // longitude: longitude,
-        // route: details[0],
-        // locality: details[2],
-        // region: details[3],
-        // country: details[4],
-        // postal: null
+      // latitude: latitude,
+      // longitude: longitude,
+      // route: details[0],
+      // locality: details[2],
+      // region: details[3],
+      // country: details[4],
+      // postal: null
 
-        // route: this.state.route,
-        //   address: this.state.address,
-        //   province: this.state.province,
-        //   locality: this.state.locality,
-        //   region: this.state.address_region,
-        //   country: this.state.country,
-        //   postal: this.state.postal ? this.state.postal : null,
-        //   latitude: this.state.region.latitude,
-        //   longitude: this.state.region.longitude,
+      // route: this.state.route,
+      //   address: this.state.address,
+      //   province: this.state.province,
+      //   locality: this.state.locality,
+      //   region: this.state.address_region,
+      //   country: this.state.country,
+      //   postal: this.state.postal ? this.state.postal : null,
+      //   latitude: this.state.region.latitude,
+      //   longitude: this.state.region.longitude,
       this.setState({
         address: json.results[0].formatted_address,
         route: details[0],
@@ -234,39 +238,53 @@ class LocationWithMap extends Component {
       });
       this.getLocationDetails(info.coords.latitude, info.coords.longitude)
     },
-    (error) => {
-      console.log(error.message);
-    },
-    { enableHighAccuracy: false, timeout: 30000, maximumAge: 1000 }
+      (error) => {
+        console.log(error.message);
+      },
+      { enableHighAccuracy: false, timeout: 30000, maximumAge: 1000 }
     );
   };
 
   onRegionChange = (regionUpdate) => {
-    if (this.state.isDraggingMap) {
-      this.setState({
-        isDraggingMap: false,
-      });
-    }
-    
-    if (!this.state.isDraggingMap) {
-      return;
-    }
+    // if (this.state.isDraggingMap) {
+    //   this.setState({
+    //     isDraggingMap: false,
+    //   });
+    // }
 
-    this.setState({region: regionUpdate, pinnedLocation: true});
+    // if (!this.state.isDraggingMap) {
+    //   return;
+    // }
+    console.log(regionUpdate, '-------');
+    this.setState({ region: regionUpdate, pinnedLocation: true });
     Geocoder.from(regionUpdate.latitude, regionUpdate.longitude)
-    .then((json) => {
-      var addressComponent = json.results[0].formatted_address.split(', ');
-      this.setState({
-        address:
-        addressComponent[0] != 'Unnamed Road'
-        ? addressComponent[0]
-        : 'Pinned Location',
-        locality: addressComponent[1],
-        area: addressComponent[2],
-        country: addressComponent[3],
-      });
+      .then((json) => {
+        var addressComponent = json.results[0].formatted_address.split(', ');
+        if (addressComponent.length == 5 || addressComponent.length > 5) {
+          this.setState({
+            address: addressComponent[0] + ', ' + addressComponent[1],
+            locality: addressComponent[addressComponent.length - 3],
+            area: addressComponent[addressComponent.length - 2],
+            country: addressComponent[addressComponent.length - 1],
+          });
+        } else {
+          this.setState({
+            address:
+              addressComponent[0] != 'Unnamed Road'
+                ? addressComponent[0]
+                : 'Pinned Location',
+            locality: addressComponent[1],
+            area: addressComponent[2],
+            country: addressComponent[3],
+          });
+        }
+        console.log(addressComponent)
       })
-      .catch((error) => console.warn(error));
+      .catch((error) => { console.warn(error) }, {
+        enableHighAccuracy: true, // Whether to use high accuracy mode or not
+        timeout: 15000, // Request timeout
+        maximumAge: 10000 // How long previous location will be cached
+      });
   };
 
   manageLocation = (location) => {
@@ -281,7 +299,7 @@ class LocationWithMap extends Component {
     let longitude = null;
     let postal = null;
 
-    if(Platform.OS == 'ios'){
+    if (Platform.OS == 'ios') {
       console.log('selection location', JSON.stringify(location))
       this.setState(
         {
@@ -301,20 +319,20 @@ class LocationWithMap extends Component {
           route: location.route
         }
       );
-    }else{
+    } else {
       address = location.formatted_address;
       location.address_components.forEach(el => {
-        if(el.types.includes('route')) {
+        if (el.types.includes('route')) {
           route = el.long_name;
-        }else if(el.types.includes('locality')){
+        } else if (el.types.includes('locality')) {
           locality = el.long_name;
-        }else if(el.types.includes('administrative_area_level_2')){
+        } else if (el.types.includes('administrative_area_level_2')) {
           province = el.long_name;
-        }else if(el.types.includes('administrative_area_level_1')){
+        } else if (el.types.includes('administrative_area_level_1')) {
           region = el.long_name;
-        }else if(el.types.includes('country')){
+        } else if (el.types.includes('country')) {
           country = el.long_name;
-        }else if(el.types.includes('postal_code')){
+        } else if (el.types.includes('postal_code')) {
           postal = el.long_name;
         }
       })
@@ -349,25 +367,25 @@ class LocationWithMap extends Component {
     if (this.state.address == null) {
       alert('Please Input an Address or Use the Pin');
     } else
-      this.setState({locationPicked: true}, () => {
-      const location = {
-        route: this.state.route,
-        address: this.state.address,
-        province: this.state.province,
-        locality: this.state.locality,
-        region: this.state.address_region,
-        country: this.state.country,
-        postal: this.state.postal ? this.state.postal : null,
-        latitude: this.state.region.latitude,
-        longitude: this.state.region.longitude,
-      };
-      console.log({
-        newLocation: location
-      })
-      console.log('LOCATION IN COMPONENT', location);
-      setLocation(location);
-      this.props.navigation.pop();
-    });
+      this.setState({ locationPicked: true }, () => {
+        const location = {
+          route: this.state.route,
+          address: this.state.address,
+          province: this.state.province,
+          locality: this.state.locality,
+          region: this.state.address_region,
+          country: this.state.country,
+          postal: this.state.postal ? this.state.postal : null,
+          latitude: this.state.region.latitude,
+          longitude: this.state.region.longitude,
+        };
+        console.log({
+          newLocation: location
+        })
+        console.log('LOCATION IN COMPONENT', location);
+        setLocation(location);
+        this.props.navigation.pop();
+      });
   };
 
   clearLocation = () => {
@@ -376,7 +394,7 @@ class LocationWithMap extends Component {
         onPress={() => {
           Keyboard.dismiss()
           this.GooglePlacesRef.setAddressText('');
-          this.setState({errorMessage: null});
+          this.setState({ errorMessage: null });
         }}>
         <FontAwesomeIcon
           icon={faTimes}
@@ -418,7 +436,7 @@ class LocationWithMap extends Component {
             })
             this.manageLocation(location)
           }}
-          />
+        />
       </View>
     )
   }
@@ -545,6 +563,7 @@ class LocationWithMap extends Component {
 
   renderMap = () => {
     const { theme } = this.props.state
+    const { region, isMapReady, address } = this.state;
     return (
       <View style={Style.container}>
         <View
@@ -560,33 +579,35 @@ class LocationWithMap extends Component {
           style={Style.map}
           ref={(ref) => (this.mapView = ref)}
           provider={PROVIDER_GOOGLE}
-          region={this.state.region}
+          region={region}
+          onMapReady={this.onMapLayout}
           // onPanDrag={this.setMapDragging}
-          // onRegionChangeComplete={(e) => this.onRegionChange(e)}
-          // onDragEnd={(e) => {
-          //   console.log('onDragEnd', e)
-          // }}
-          //onPress={()=>this.animate()}
+          onRegionChangeComplete={(e) => this.onRegionChange(e)}
+        // onDragEnd={(e) => {
+        //   console.log('onDragEnd', e)
+        // }}
+        //onPress={()=>this.animate()}
         >
-          <Marker.Animated
-              draggable
-              coordinate={this.state.region}
-              onDragEnd={(e) => {
-                const coords = e.nativeEvent.coordinate;
-                console.log('test', coords)
-                this.getLocationDetails(coords.latitude, coords.longitude)
+          {isMapReady && <Marker.Animated
+            draggable
+            coordinate={region}
+            onDragEnd={(e) => {
+              const coords = e.nativeEvent.coordinate;
+              console.log('test', coords)
+              this.getLocationDetails(coords.latitude, coords.longitude)
+            }}
+            title={address}
+          >
+            <Image
+              source={require('src/assets/userPosition.png')}
+              style={{
+                width: 80,
+                height: 80
               }}
-            >
-              <Image
-                source={require('src/assets/userPosition.png')}
-                style={{
-                  width: 80,
-                  height: 80
-                }}
-                />
-            </Marker.Animated>
+            />
+          </Marker.Animated>}
 
-          </MapView>
+        </MapView>
 
         <TouchableOpacity
           onPress={() => this.returnToOriginal()}
@@ -602,22 +623,22 @@ class LocationWithMap extends Component {
             position: 'absolute',
           }}>
           <FontAwesomeIcon
-            style={{alignSelf: 'center'}}
+            style={{ alignSelf: 'center' }}
             icon={faMapMarkerAlt}
             color={'white'}
           />
         </TouchableOpacity>
-        
+
       </View>
     );
   };
   render() {
-    const {theme} = this.props.state;
+    const { theme } = this.props.state;
     return (
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         {this.renderMap()}
-        {Platform.OS  == 'android' && this.renderSearchBar()}
-        {Platform.OS  == 'ios' && this.renderSearchBarIOS()}
+        {Platform.OS == 'android' && this.renderSearchBar()}
+        {Platform.OS == 'ios' && this.renderSearchBarIOS()}
         <View
           style={{
             justifyContent: 'center',
@@ -661,10 +682,10 @@ class LocationWithMap extends Component {
     );
   }
 }
-const mapStateToProps = (state) => ({state: state});
+const mapStateToProps = (state) => ({ state: state });
 
 const mapDispatchToProps = (dispatch) => {
-  const {actions} = require('@redux');
+  const { actions } = require('@redux');
   return {
     // updateUser: (user) => dispatch(actions.updateUser(user)),
     setLocation: (location) => dispatch(actions.setLocation(location))

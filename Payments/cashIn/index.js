@@ -57,8 +57,9 @@ class Stack extends Component {
         total
       })
     }else{
-      charge = (amount - fee.amount).toFixed(2)
+      charge = fee.amount.toFixed(2)
       total = (amount - charge).toFixed(2)
+      console.log(charge, total);
       this.setState({
         charge,
         total
@@ -105,7 +106,7 @@ class Stack extends Component {
             }
           })
           break
-        case 'UNIONBANK':
+        case 'UBP':
           this.props.navigation.navigate('unioBankStack', {
             data: {
               amount: this.state.amount,
@@ -196,6 +197,10 @@ class Stack extends Component {
               onChange={(amount, currency) => this.setState({
                 amount: amount,
                 currency: currency
+              }, () => {
+                if(selected.length > 0) {
+                  this.manageCharges(selected[0])
+                }
               })
               }
               maximum={(user && Helper.checkStatus(user) >= Helper.accountVerified) ? Helper.MAX_VERIFIED : Helper.MAX_NOT_VERIFIED}
