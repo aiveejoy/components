@@ -44,7 +44,7 @@ class ImageModal extends Component {
                   borderWidth: 1
                 }}>
                   <Image
-                    source={{ uri: Config.BACKEND_URL + item.category }}
+                    source={{ uri: Config.BACKEND_URL + item }}
                     style={{
                       width: '100%',
                       height: '100%',
