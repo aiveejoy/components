@@ -34,29 +34,29 @@ class Stack extends Component {
   }
 
   componentDidMount = () => {
-    this.setState({currency: this.props.state.ledger?.currency || 'PHP'})
+    this.setState({ currency: this.props.state.ledger?.currency || 'PHP' })
   }
 
   managePayment = (item) => {
     let temp = [];
     temp.push(item);
-    this.setState({selected: temp})
+    this.setState({ selected: temp })
     this.manageCharges(item)
   }
 
-  manageCharges(item){
+  manageCharges(item) {
     let fee = item.feeConfiguration
     const { amount } = this.state;
     let charge = 0
     let total = 0
-    if(fee.type == 'percentage'){
+    if (fee.type == 'percentage') {
       charge = (amount * (fee.amount / 100)).toFixed(2)
       total = (amount - charge).toFixed(2)
       this.setState({
         charge,
         total
       })
-    }else{
+    } else {
       charge = fee.amount.toFixed(2)
       total = (amount - charge).toFixed(2)
       console.log(charge, total);
@@ -67,7 +67,7 @@ class Stack extends Component {
     }
   }
 
-  navigate(route, data){
+  navigate(route, data) {
     this.props.navigation.navigate(route, {
       data: {
         data
@@ -76,17 +76,17 @@ class Stack extends Component {
   }
 
 
-  manageRedirect(){
+  manageRedirect() {
     const { selected, currency, amount } = this.state;
     let cur = this.props.state.ledger?.currency || currency
-    if(amount > 0) {
+    if (amount > 0) {
     } else {
       Alert.alert('Cannot proceed', 'Input your desired amount to contiue.')
       return
     }
-    if(selected.length > 0){
-      switch(selected[0].code){
-        case 'PAYPAL': 
+    if (selected.length > 0) {
+      switch (selected[0].code) {
+        case 'PAYPAL':
           this.props.navigation.navigate('paypalStack', {
             data: {
               amount: this.state.amount,
@@ -96,7 +96,7 @@ class Stack extends Component {
             }
           })
           break
-        case 'VISA': 
+        case 'VISA':
           this.props.navigation.navigate('visaStack', {
             data: {
               amount: this.state.amount,
@@ -125,15 +125,17 @@ class Stack extends Component {
               total: this.state.total
             }
           })
+          break
         case 'STRIPE':
-            this.props.navigation.navigate('stripeStack', {
-              data: {
-                amount: this.state.amount,
-                currency: cur,
-                charge: this.state.charge,
-                total: this.state.total
-              }
-            })
+          this.props.navigation.navigate('stripeStack', {
+            data: {
+              amount: this.state.amount,
+              currency: cur,
+              charge: this.state.charge,
+              total: this.state.total
+            }
+          })
+          break
       }
     }
   }
@@ -198,7 +200,7 @@ class Stack extends Component {
                 amount: amount,
                 currency: currency
               }, () => {
-                if(selected.length > 0) {
+                if (selected.length > 0) {
                   this.manageCharges(selected[0])
                 }
               })
@@ -246,18 +248,18 @@ class Stack extends Component {
                   width: '50%',
                   resizeMode: 'contain'
                 }}
-                source={selected[0].logo}/>
+                  source={selected[0].logo} />
               </View>
             )}
             <SelectWithArrow
-              value={selected.length > 0 ? selected[0].title: 'Select available method'}
+              value={selected.length > 0 ? selected[0].title : 'Select available method'}
               onPress={() => {
-                this.props.navigation.navigate('paymentCardsStack', {data: cards, setPaymentMethod: this.managePayment})
+                this.props.navigation.navigate('paymentCardsStack', { data: cards, setPaymentMethod: this.managePayment })
               }}
-              />
+            />
 
-              {/* <PaymentCard data={selected} press={false}/> */}
-            
+            {/* <PaymentCard data={selected} press={false}/> */}
+
             {
               (selected.length > 0) && this.renderFees(selected[0].feeConfiguration)
             }
@@ -271,7 +273,7 @@ class Stack extends Component {
               padding: 20,
               alignItems: 'center'
             }}>
-              <Button 
+              <Button
                 style={{
                   backgroundColor: theme ? theme.secondary : Color.secondary,
                   position: 'absolute',
@@ -281,11 +283,11 @@ class Stack extends Component {
                 title={'Continue'}
                 onClick={() => {
                   this.manageRedirect()
-                }}/>
+                }} />
             </View>
-          ) 
+          )
         }
-        
+
 
         {/*<RBSheet
           ref={ref => {

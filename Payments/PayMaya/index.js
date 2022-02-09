@@ -12,49 +12,57 @@ import { connect } from 'react-redux';
 import { Spinner } from 'components';
 import Api from 'services/api/index.js';
 import Routes from 'common/Routes'
-import {WebView} from 'react-native-webview';
+import { WebView } from 'react-native-webview';
 const height = Math.round(Dimensions.get('window').height);
-import {NavigationActions, StackActions} from 'react-navigation';
+import { NavigationActions, StackActions } from 'react-navigation';
 
 class Stack extends Component {
-  
+
 
   constructor(props) {
     super(props);
     this.webview = null;
     this.state = {
-        isLoading: false,
-        paypalUrl: null
+      isLoading: false,
+      paymayaUrl: null
     };
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.authorized()
   }
 
-  authorized(){
+  authorized() {
     const { user } = this.props.state;
     const { params } = this.props.navigation.state;
-    if(user == null) return false
+    if (user == null) return false
     this.setState({
       isLoading: true
     })
-    Api.request(Routes.paypalAuthorized, {
+    console.log(Routes.paymayaAuthorize, {
       account_id: user.id,
       amount: params?.data?.amount,
-      currency: params?.data?.currency
+      currency: params?.data?.currency,
+      charge: params?.data?.charge,
+      total: params?.data?.total
+    })
+    Api.request(Routes.paymayaAuthorize, {
+      account_id: user.id,
+      amount: params?.data?.amount,
+      currency: params?.data?.currency,
+      charge: params?.data?.charge,
+      total: params?.data?.total
     }, response => {
       this.setState({
         isLoading: false
       })
-      response.data.links.map((item) => {
-        if(item.rel == 'approve' && item.method == 'GET'){
-          this.setState({
-            paypalUrl: item.href
-          })
-        }
-      })
+      if (response.data) {
+        this.setState({
+          paymayaUrl: response.data
+        })
+      }
     }, error => {
+      console.log(error);
       this.setState({
         isLoading: false
       })
@@ -71,37 +79,41 @@ class Stack extends Component {
         index: 0,
         key: null,
         actions: [
-            NavigationActions.navigate({routeName: 'Dashboard', params: {
+          NavigationActions.navigate({
+            routeName: 'Dashboard', params: {
               initialRouteName: 'Dashboard',
               index: 0
-            }}),
+            }
+          }),
         ]
       })
     });
     this.props.navigation.dispatch(navigateAction);
   }
 
-  navigateError(e){
+  navigateError(e) {
 
   }
 
   handleChange = (e) => {
+    const { token } = this.props.state;
     console.log({
       change: e
     })
-    if(e.url.includes('payhiram.ph')){
-      Api.getRequest(e.url, response => {
+    console.log(e.url.includes('paymaya/callback'), 'this is authorized access')
+    if(e.url.includes('paymaya/callback')){
+      let newUrl = e.url + '?token=' + token
+      console.log(newUrl, 'newUrl')
+      Api.getRequest(newUrl, response => {
+        console.log(response, 'RESPONSE')
         this.setState({
-          paypalUrl: null,
-          success: true,
-          error: null
+          paymayaUrl: null
         })
         this.navigate(true)
       }, e => {
+        console.log('callback error', e)
         this.setState({
-          paypalUrl: null,
-          success: null,
-          error: true
+          paymayaUrl: null
         })
       })
       return false
@@ -110,9 +122,9 @@ class Stack extends Component {
   }
 
   render() {
-    const { isLoading, paypalUrl } = this.state
+    const { isLoading, paymayaUrl } = this.state
     console.log({
-      paypalUrl
+      paymayaUrl
     })
     return (
       <SafeAreaView style={{
@@ -126,13 +138,13 @@ class Stack extends Component {
             minHeight: height * 1.5
           }}>
             {
-              (paypalUrl && !isLoading) && (
+              (paymayaUrl && !isLoading) && (
                 <View style={{
                   height: height
                 }}>
                   <WebView
                     source={{
-                      uri: paypalUrl
+                      uri: paymayaUrl
                     }}
                     style={{
                       height: '100%',
@@ -145,21 +157,13 @@ class Stack extends Component {
                 </View>
               )
             }
-            {
-              isLoading && (
-                <View style={{
-                  height: height,
-                  flex: 1,
-                  alignContent: 'center',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <Spinner />
-                </View>
-              )
-            }
           </View>
         </ScrollView>
+        {
+          isLoading && (
+            <Spinner mode={'overlay'}/>
+          )
+        }
       </SafeAreaView>
     );
   }
