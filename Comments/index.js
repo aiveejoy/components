@@ -252,21 +252,30 @@ class Comments extends Component {
           }}>
             {
               user?.account_profile?.url ? (
-                <Image
+                <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate('accountPostsStack', {data: user})
+                }}><Image
                   source={user?.account_profile?.url ? { uri: Config.BACKEND_URL + user.account_profile?.url } : require('assets/logo.png')}
                   style={[BasicStyles.profileImageSize, {
                     height: 30,
                     width: 30,
                     borderRadius: 100,
                     marginTop: 2
-                  }]} />
-              ) : <FontAwesomeIcon
+                  }]}
+                />
+                </TouchableOpacity>
+              ) : <TouchableOpacity
+              onPress={() => {
+                this.props.navigation.navigate('accountPostsStack', {data: user})
+              }}><FontAwesomeIcon
                 icon={faUserCircle}
                 size={30}
                 style={{
                   color: Color.darkGray
                 }}
               />
+              </TouchableOpacity>
             }
             <TouchableOpacity
               style={{

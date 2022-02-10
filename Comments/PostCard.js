@@ -278,7 +278,12 @@ class PostCard extends Component {
         alignItems: 'center',
         padding: 10
       }}>
-        <UserImage user={data.account} size={30} />
+        <TouchableOpacity
+          onPress={() => {
+            this.props.navigation.navigate('accountPostsStack', {data: data.account})
+          }}>
+          <UserImage user={data.account} size={30} />
+        </TouchableOpacity>
         <View style={{
           paddingLeft: 5,
           justifyContent: 'space-between',
