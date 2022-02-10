@@ -103,11 +103,16 @@ class Stack extends Component {
     console.log(e.url.includes('paymaya/callback'), 'this is authorized access')
     if(e.url.includes('paymaya/callback')){
       let newUrl = e.url + '?token=' + token
-      console.log(newUrl, 'newUrl')
+      console.log(newUrl,'newUrl')
+      this.setState({
+        isLoading: true,
+        paymayaUrl: null
+      })
       Api.getRequest(newUrl, response => {
         console.log(response, 'RESPONSE')
         this.setState({
-          paymayaUrl: null
+          paymayaUrl: null,
+          isLoading: false
         })
         this.navigate(true)
       }, e => {
@@ -117,6 +122,8 @@ class Stack extends Component {
         })
       })
       return false
+    } else if(e.url.includes('paymaya/fail_callback')) {
+      this.props.navigation.pop()
     }
     return true
   }
