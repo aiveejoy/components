@@ -13,6 +13,7 @@ class Create extends Component {
 
   render() {
     const { images } = this.props;
+    console.log(images)
     return (
       <View>
         {images?.length < 3 && images?.length != 0 &&
@@ -68,7 +69,7 @@ class Create extends Component {
                 }}>
                 {images[0].category.includes('/storage/file/') ?
                   <VideoPlayer
-                    video={{ uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }}
+                    video={{ uri: Config.BACKEND_URL + images[0].category }}
                     repeat={true}
                     style={{
                       width: '100%',
@@ -91,7 +92,7 @@ class Create extends Component {
                 }}>
                 {images[1].category.includes('/storage/file/') ?
                   <VideoPlayer
-                    video={{ uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }}
+                    video={{ uri: Config.BACKEND_URL + images[1].category }}
                     repeat={true}
                     style={{
                       width: '100%',
@@ -110,7 +111,7 @@ class Create extends Component {
                 }}>
                 {images[2].category.includes('/storage/file/') ?
                   <VideoPlayer
-                    video={{ uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }}
+                    video={{ uri: Config.BACKEND_URL + images[2].category }}
                     repeat={true}
                     style={{
                       width: '100%',
@@ -141,7 +142,7 @@ class Create extends Component {
                 }}>
                 {images[0].category.includes('/storage/file/') ?
                   <VideoPlayer
-                    video={{ uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }}
+                    video={{ uri: Config.BACKEND_URL + images[0].category }}
                     repeat={true}
                     style={{
                       width: '100%',
@@ -160,7 +161,7 @@ class Create extends Component {
                 }}>
                 {images[1].category.includes('/storage/file/') ?
                   <VideoPlayer
-                    video={{ uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }}
+                    video={{ uri: Config.BACKEND_URL + images[1].category }}
                     repeat={true}
                     style={{
                       width: '100%',
@@ -183,7 +184,7 @@ class Create extends Component {
                 }}>
                 {images[2].category.includes('/storage/file/') ?
                   <VideoPlayer
-                    video={{ uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }}
+                    video={{ uri: Config.BACKEND_URL + images[2].category }}
                     repeat={true}
                     style={{
                       width: '100%',
@@ -202,7 +203,7 @@ class Create extends Component {
                 }}>
                 {images[3].category.includes('/storage/file/') ?
                   <VideoPlayer
-                    video={{ uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }}
+                    video={{ uri: Config.BACKEND_URL + images[3].category }}
                     repeat={true}
                     style={{
                       width: '100%',

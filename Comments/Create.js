@@ -164,7 +164,7 @@ class Create extends Component {
       if (imageResponse.data.length > 0) {
         let images = []
         imageResponse.data.map(item => {
-          images.push(item.category)
+          images.push(item)
         })
         data['images'] = images
         if(vids.length === 0) {
@@ -209,7 +209,8 @@ class Create extends Component {
           this.setState({ loading: false })
           if(res.data) {
             let images = data.images
-            images.push(response.data)
+            images.push({
+              category: response.data})
             data['images'] = images
             this.props.setComments([data, ...this.props.state.comments])
             this.props.close()
