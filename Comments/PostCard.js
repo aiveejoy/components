@@ -540,7 +540,7 @@ class PostCard extends Component {
               {options.map((item, index) => {
                 return (
                   <View>
-                    {item.title !== 'Report' && (data.account.id === user.id || data.shared?.account_id === user.id) && <TouchableOpacity
+                    {item.title !== 'Report' && (data.shared === null ? data.account.id === user.id : data.shared?.account_id === user.id) && <TouchableOpacity
                       onPress={() => {
                         this.optionClick(data.id, item.action)
                       }}
@@ -553,7 +553,7 @@ class PostCard extends Component {
                       <FontAwesomeIcon icon={item.icon} style={{ color: item.action === 'delete' ? Color.danger : null }} />
                       <Text style={{ paddingLeft: 10 }}>{item.title}</Text>
                     </TouchableOpacity>}
-                    {(item.title === 'Report' || item.action === null) && (data.account.id !== user.id || data.shared?.account_id !== user.id) && <TouchableOpacity
+                    {(item.title === 'Report' || item.action === null) && (data.shared === null ? data.account.id !== user.id : data.shared?.account_id !== user.id) && <TouchableOpacity
                       onPress={() => {
                         this.optionClick(data.id, item.action)
                       }}

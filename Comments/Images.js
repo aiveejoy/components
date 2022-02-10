@@ -3,6 +3,8 @@ import { View, TouchableOpacity, Image, Text } from 'react-native';
 import { connect } from 'react-redux';
 import Styles from './ImagesStyle';
 import Config from 'src/config';
+import { Color } from 'common';
+import VideoPlayer from 'react-native-video-player';
 
 class Create extends Component {
   constructor(props) {
@@ -11,6 +13,7 @@ class Create extends Component {
 
   render() {
     const { images } = this.props;
+    console.log(images)
     return (
       <View>
         {images?.length < 3 && images?.length != 0 &&
@@ -27,13 +30,24 @@ class Create extends Component {
                     height: '100%',
                     width: images?.length == 1 ? '100%' : '50%',
                   }}>
-                  <Image
-                    source={{ uri: Config.BACKEND_URL + item.category }}
-                    style={{
-                      height: '100%',
-                      width: '100%',
-                      resizeMode: 'stretch'
-                    }} />
+                  {item.category.includes('/storage/file/') ?
+                    <VideoPlayer
+                      video={{ uri: Config.BACKEND_URL + item.category }}
+                      repeat={true}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: Color.lightGray
+                      }}
+                      thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
+                    /> :
+                    <Image
+                      source={{ uri: Config.BACKEND_URL + item.category }}
+                      style={{
+                        height: '100%',
+                        width: '100%',
+                        resizeMode: 'stretch'
+                      }} />}
                 </View>
               )
             })}
@@ -53,9 +67,19 @@ class Create extends Component {
                   height: '100%',
                   width: '100%',
                 }}>
-                <Image
-                  source={{ uri: Config.BACKEND_URL + images[0].category }}
-                  style={Styles.image} />
+                {images[0].category.includes('/storage/file/') ?
+                  <VideoPlayer
+                    video={{ uri: Config.BACKEND_URL + images[0].category }}
+                    repeat={true}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: Color.lightGray
+                    }}
+                    thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
+                  /> : <Image
+                    source={{ uri: Config.BACKEND_URL + images[0].category }}
+                    style={Styles.image} />}
               </View>
             </View>
             <View style={{
@@ -66,18 +90,38 @@ class Create extends Component {
                   height: '50%',
                   width: '100%',
                 }}>
-                <Image
-                  source={{ uri: Config.BACKEND_URL + images[1].category }}
-                  style={Styles.image} />
+                {images[1].category.includes('/storage/file/') ?
+                  <VideoPlayer
+                    video={{ uri: Config.BACKEND_URL + images[1].category }}
+                    repeat={true}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: Color.lightGray
+                    }}
+                    thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
+                  /> : <Image
+                    source={{ uri: Config.BACKEND_URL + images[1].category }}
+                    style={Styles.image} />}
               </View>
               <View
                 style={{
                   height: '50%',
                   width: '100%'
                 }}>
-                <Image
-                  source={{ uri: Config.BACKEND_URL + images[2].category }}
-                  style={Styles.image} />
+                {images[2].category.includes('/storage/file/') ?
+                  <VideoPlayer
+                    video={{ uri: Config.BACKEND_URL + images[2].category }}
+                    repeat={true}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: Color.lightGray
+                    }}
+                    thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
+                  /> : <Image
+                    source={{ uri: Config.BACKEND_URL + images[2].category }}
+                    style={Styles.image} />}
               </View>
             </View>
           </View>
@@ -96,18 +140,38 @@ class Create extends Component {
                   height: '50%',
                   width: '100%',
                 }}>
-                <Image
-                  source={{ uri: Config.BACKEND_URL + images[0].category }}
-                  style={Styles.image} />
+                {images[0].category.includes('/storage/file/') ?
+                  <VideoPlayer
+                    video={{ uri: Config.BACKEND_URL + images[0].category }}
+                    repeat={true}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: Color.lightGray
+                    }}
+                    thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
+                  /> : <Image
+                    source={{ uri: Config.BACKEND_URL + images[0].category }}
+                    style={Styles.image} />}
               </View>
               <View
                 style={{
                   height: '50%',
                   width: '100%'
                 }}>
-                <Image
-                  source={{ uri: Config.BACKEND_URL + images[1].category }}
-                  style={Styles.image} />
+                {images[1].category.includes('/storage/file/') ?
+                  <VideoPlayer
+                    video={{ uri: Config.BACKEND_URL + images[1].category }}
+                    repeat={true}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: Color.lightGray
+                    }}
+                    thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
+                  /> : <Image
+                    source={{ uri: Config.BACKEND_URL + images[1].category }}
+                    style={Styles.image} />}
               </View>
             </View>
             <View style={{
@@ -118,26 +182,46 @@ class Create extends Component {
                   height: '50%',
                   width: '100%',
                 }}>
-                <Image
-                  source={{ uri: Config.BACKEND_URL + images[2].category }}
-                  style={Styles.image} />
+                {images[2].category.includes('/storage/file/') ?
+                  <VideoPlayer
+                    video={{ uri: Config.BACKEND_URL + images[2].category }}
+                    repeat={true}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: Color.lightGray
+                    }}
+                    thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
+                  /> : <Image
+                    source={{ uri: Config.BACKEND_URL + images[2].category }}
+                    style={Styles.image} />}
               </View>
               <View
                 style={{
                   height: '50%',
                   width: '100%',
                 }}>
-                <Image
-                  source={{ uri: Config.BACKEND_URL + images[3].category }}
-                  style={[Styles.image, {
-                    opacity:images.length > 4 ? 0.2 : null
-                  }]} />
-                  {images.length > 4 && <Text style={{
-                    position: 'absolute',
-                    top: '40%',
-                    left: '40%',
-                    fontSize: 20
-                  }}>+{images.length - 4}</Text>}
+                {images[3].category.includes('/storage/file/') ?
+                  <VideoPlayer
+                    video={{ uri: Config.BACKEND_URL + images[3].category }}
+                    repeat={true}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      backgroundColor: Color.lightGray
+                    }}
+                    thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
+                  /> : <Image
+                    source={{ uri: Config.BACKEND_URL + images[3].category }}
+                    style={[Styles.image, {
+                      opacity: images.length > 4 ? 0.2 : null
+                    }]} />}
+                {images.length > 4 && <Text style={{
+                  position: 'absolute',
+                  top: '40%',
+                  left: '40%',
+                  fontSize: 20
+                }}>+{images.length - 4}</Text>}
               </View>
             </View>
           </View>
