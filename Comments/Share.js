@@ -55,7 +55,6 @@ class Share extends Component {
       this.setState({ loading: false })
       if (response.data > 0) {
         let par = {
-          created_at: data.created_at,
           account_id: data.account_id,
           payload: 'share_post_id',
           payload_value: response.data,
