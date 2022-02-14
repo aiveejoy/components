@@ -280,7 +280,13 @@ class PostCard extends Component {
       }}>
         <TouchableOpacity
           onPress={() => {
-            this.props.navigation.navigate('accountPostsStack', {data: data.account})
+            this.props.navigation.navigate('accountPostsStack', {
+              data: {
+                account_information: data.account.information,
+                account_profile: data.account.profile,
+                ...data.account
+              },
+            })
           }}>
           <UserImage user={data.account} size={30} />
         </TouchableOpacity>

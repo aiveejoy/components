@@ -34,8 +34,10 @@ class Comments extends Component {
   }
 
   componentDidMount() {
-    this.props.setComments([])
-    this.retrieve(false);
+    this.props.navigation.addListener('didFocus', () => {
+      this.props.setComments([])
+      this.retrieve(false);
+    })
   }
 
   retrieveByFilter = (by) => {
@@ -73,7 +75,20 @@ class Comments extends Component {
           created_at: selectedFilter === 'Date' ? 'desc' : 'asc'
         }
       }
-    } else {
+    } else if(this.props.account) {
+      parameter = {
+        condition: [{
+          clause: '=',
+          column: 'account_id',
+          value: this.props.account
+        }],
+        limit: this.state.limit,
+        offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
+        sort: {
+          created_at: selectedFilter === 'Date' ? 'desc' : 'asc'
+        }
+      }
+    }else {
       parameter = {
         condition: [{
           clause: '!=',
