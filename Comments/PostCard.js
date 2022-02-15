@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Image, Dimensions, Text, TextInput, ScrollView, Alert } from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faTrashAlt, faPrayingHands, faShare, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faUserCircle, faEllipsisH, faCog, faPencilAlt, faFileAlt, faTrashAlt, faPrayingHands, faShare, faHeart, faImages } from '@fortawesome/free-solid-svg-icons';
 import { BasicStyles, Color, Routes } from 'common';
 import { connect } from 'react-redux';
 import Config from 'src/config.js';
@@ -11,6 +11,8 @@ import Api from 'services/api/index.js';
 import Skeleton from 'components/Loading/Skeleton';
 import RBSheet from "react-native-raw-bottom-sheet";
 import Share from './Share';
+import VideoPlayer from 'react-native-video-player';
+import ImagePicker from 'react-native-image-crop-picker';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -29,7 +31,9 @@ class PostCard extends Component {
       errorMessage: null,
       toEdit: null,
       isLoading: false,
-      share: false
+      share: false,
+      images: [],
+      videos: []
     }
   }
 
@@ -105,8 +109,22 @@ class PostCard extends Component {
     this.setState({ options: false });
     switch (action) {
       case 'edit':
-        this.setState({ toEdit: data.text })
-        this.RBSheet.open();
+        let images = []
+        let videos = []
+        data.images.length > 0 && data.images.map(item => {
+          if (item.category.includes('/storage/file')) {
+            videos.push(item)
+          } else {
+            images.push(item)
+          }
+        })
+        this.setState({
+          toEdit: data.text,
+          images: images,
+          videos: videos
+        }, () => {
+          this.RBSheet.open();
+        })
         break;
       case 'report':
         this.clickReport();
@@ -200,8 +218,60 @@ class PostCard extends Component {
     this.props.reply(value);
   }
 
+  handleChoosePhoto = () => {
+    ImagePicker.openPicker({
+      multiple: true,
+      includeBase64: true,
+      compressImageMaxWidth: 700,
+      compressImageMaxHeight: 700,
+      mediaType: 'photo'
+    }).then(images => {
+      let list = this.state.images
+      if ((images.length + list.length) <= 4) {
+        images?.length > 0 && images.map((item, index) => {
+          let name = item.path.split('/')
+          let image = {
+            file_url: name[name.length - 1],
+            file_base64: item.data,
+            category: null
+          }
+          list.push(image)
+        })
+        this.setState({ images: list });
+      } else {
+        Alert.alert('Error', 'Cannot upload more than 4 images.')
+      }
+    });
+  }
+
+  handleChooseVideo = () => {
+    ImagePicker.openPicker({
+      multiple: true,
+      includeBase64: true,
+      mediaType: 'video'
+    }).then(images => {
+      console.log(images);
+      let list = this.state.videos
+      if ((images.length + list.length) <= 1) {
+        images?.length > 0 && images.map((item, index) => {
+          let name = item.path.split('/')
+          let image = {
+            ...item,
+            file_url: name[name.length - 1],
+            file_base64: item.data,
+            category: null
+          }
+          list.push(image)
+        })
+        this.setState({ videos: list });
+      } else {
+        Alert.alert('Error', 'Cannot upload more than 1 video.')
+      }
+    });
+  }
+
   editPost = () => {
-    const { errorMessage, toEdit, isLoading } = this.state;
+    const { errorMessage, toEdit, isLoading, images, videos } = this.state;
     const { theme } = this.props.state;
     return (
       <RBSheet
@@ -224,7 +294,8 @@ class PostCard extends Component {
           <View style={{
             width: width,
             marginTop: 10,
-            alignItems: 'center'
+            alignItems: 'center',
+            marginBottom: height/4
           }}>
             <Text>Edit Post</Text>
             {isLoading && <Skeleton size={1} template={'block'} height={10} />}
@@ -247,6 +318,137 @@ class PostCard extends Component {
               placeholder={toEdit}
               placeholderTextColor={Color.darkGray}
             />
+            <TouchableOpacity style={{
+              flexDirection: 'row',
+              width: '100%',
+              padding: 20,
+              alignItems: 'center'
+            }}
+              onPress={() => {
+                this.handleChoosePhoto();
+              }}
+            >
+              <FontAwesomeIcon
+                size={30}
+                icon={faImages}
+                style={{
+                  color: Color.darkGray,
+                  marginRight: 10
+                }}
+              />
+              <Text style={{ color: Color.darkGray }}>Add Photos</Text>
+            </TouchableOpacity>
+            {images.length > 0 && <View style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              width: '100%',
+              padding: 20,
+              paddingTop: 0
+            }}>
+              {images.map((item, index) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      // this.setImage(item.path)
+                    }}
+                    onLongPress={() => {
+                      Alert.alert(
+                        'Remove Photo',
+                        `Click 'Remove' to remove photo.`,
+                        [
+                          { text: 'Close', onPress: () => { return }, style: 'cancel' },
+                          {
+                            text: 'Remove', onPress: () => {
+                              let lis = images;
+                              lis.splice(index, 1);
+                              this.setState({ images: lis });
+                            }
+                          },
+                        ],
+                        { cancelable: false }
+                      )
+                    }}
+                    style={{
+                      width: '25%',
+                      height: 50
+                    }}>
+                    <Image
+                      source={{ uri: item.category ? Config.BACKEND_URL + item.category : `data:image/jpeg;base64,${item.file_base64}` }}
+                      style={{
+                        width: '100%',
+                        height: '100%'
+                      }}
+                    />
+                  </TouchableOpacity>
+                )
+              })}
+            </View>}
+            <TouchableOpacity style={{
+              flexDirection: 'row',
+              width: '100%',
+              padding: 20,
+              alignItems: 'center'
+            }}
+              onPress={() => {
+                this.handleChooseVideo();
+              }}
+            >
+              <FontAwesomeIcon
+                size={30}
+                icon={faImages}
+                style={{
+                  color: Color.darkGray,
+                  marginRight: 10
+                }}
+              />
+              <Text style={{ color: Color.darkGray }}>Add Video</Text>
+            </TouchableOpacity>
+            {videos.length > 0 && <View style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              width: '100%',
+              padding: 20,
+              paddingTop: 0
+            }}>
+              {videos.map((item, index) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => {
+                      // this.setImage(item.path)
+                    }}
+                    onLongPress={() => {
+                      Alert.alert(
+                        'Remove Photo',
+                        `Click 'Remove' to remove photo.`,
+                        [
+                          { text: 'Close', onPress: () => { return }, style: 'cancel' },
+                          {
+                            text: 'Remove', onPress: () => {
+                              let lis = videos;
+                              lis.splice(index, 1);
+                              this.setState({ videos: lis });
+                            }
+                          },
+                        ],
+                        { cancelable: false }
+                      )
+                    }}
+                    style={{
+                      width: '25%',
+                      height: 70,
+                      backgroundColor: Color.lightGray
+                    }}>
+                    <VideoPlayer
+                      source={{ uri: Config.BACKEND_URL + item.category }}
+                      style={{
+                        width: '100%',
+                        height: '100%'
+                      }}
+                    />
+                  </TouchableOpacity>
+                )
+              })}
+            </View>}
             <TouchableOpacity style={{
               borderColor: theme ? theme.primary : Color.primary,
               backgroundColor: theme ? theme.primary : Color.primary,
