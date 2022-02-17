@@ -13,6 +13,7 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import Share from './Share';
 import VideoPlayer from 'react-native-video-player';
 import ImagePicker from 'react-native-image-crop-picker';
+import { Spinner } from 'components';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -33,7 +34,8 @@ class PostCard extends Component {
       isLoading: false,
       share: false,
       images: [],
-      videos: []
+      videos: [],
+      removedImages: [],
     }
   }
 
@@ -187,11 +189,127 @@ class PostCard extends Component {
           }
         })
         this.props.setComments(comments);
-        this.RBSheet.close()
+        this.updateImages(comments);
       }
     }, error => {
       console.log(error)
       this.setState({ isLoading: false })
+    })
+  }
+
+  updateImages = (comments) => {
+    const { removedImages, images, videos } = this.state;
+    const { data } = this.props;
+    images.length > 0 && images.map((item, index) => {
+      if (item.category != null) {
+        images.splice(index, 1);
+      }
+    })
+    if (removedImages.length > 0) {
+      this.deletePayloads(comments, removedImages);
+    }
+    if (images.length > 0) {
+      this.addPhotos(comments, data.id)
+    }
+    if (videos.length > 0 && videos[0].category == null) {
+      this.addVid(comments, data.id)
+    }
+  }
+
+  deletePayloads = (comments, removedImages) => {
+    let parameter = {
+      ids: removedImages
+    }
+    if(removedImages.length == comments[0]?.images.length) {
+      comments[0]['images'] = [];
+    }
+    comments[0]?.images.length > 0 && comments[0]?.images.map((item, index) => {
+      console.log(removedImages, item.id, removedImages.includes(item.id), comments[0]?.images)
+      if (removedImages.includes(item.id)) {
+        comments[0]?.images.splice(index, 1)
+      }
+    })
+    this.props.setComments(comments);
+    this.setState({ isLoading: true })
+    Api.request(Routes.deleteIds, parameter, response => {
+      this.setState({ isLoading: false })
+      if (response.data) {
+        this.RBSheet.close()
+      }
+    }, error => {
+      this.setState({ isLoading: false })
+      console.log(error, 'upload image')
+    })
+  }
+
+  addPhotos = (comments, id) => {
+    const { images } = this.state;
+    const { user } = this.props.state;
+    let parameter = {
+      images: images,
+      account_id: user.id,
+      payload: 'comment_id',
+      payload_value: id
+    }
+    this.setState({ isLoading: true })
+    Api.request(Routes.imageUploadArray, parameter, imageResponse => {
+      this.setState({ isLoading: false })
+      if (imageResponse.data.length > 0) {
+        imageResponse.data.map(item => {
+          comments[0].images.push(item)
+        })
+        this.props.setComments(comments);
+        this.RBSheet.close()
+      }
+    }, error => {
+      this.setState({ isLoading: false })
+      console.log(error, 'upload image')
+    })
+  }
+
+  addVid = (comments, id) => {
+    const { videos } = this.state;
+    const { user } = this.props.state;
+    let formData = new FormData();
+    let uri = Platform.OS == "android" ? videos[0].path : videos[0].path.replace("file://", "");
+    formData.append("file", {
+      name: videos[0].file_url,
+      type: videos[0].mime,
+      uri: uri
+    });
+    formData.append('file_url', videos[0].file_url);
+    formData.append('account_id', user.id);
+    formData.append('category', 'video-from-comment');
+    this.setState({ isLoading: true })
+    Api.uploadByFetch(Routes.fileUpload, formData, response => {
+      this.setState({ isLoading: false })
+      console.log(response)
+      if (response.data != null) {
+        let par = {
+          account_id: user.id,
+          payload: 'comment_id',
+          payload_value: id,
+          category: response.data
+        }
+        this.setState({ isLoading: true })
+        console.log(Routes.uploadImage, par);
+        Api.request(Routes.uploadImage, par, res => {
+          this.setState({ isLoading: false })
+          if (res.data) {
+            comments[0].images.push({
+              category: response.data
+            })
+            this.props.setComments(comments);
+            this.RBSheet.close()
+          }
+        }, error => {
+          console.log(error, 'payloads')
+          this.setState({ isLoading: true })
+        })
+      }
+    }, error => {
+      this.setState({ isLoading: false })
+      console.log(error, 'upload file')
     })
   }
 
@@ -271,7 +389,7 @@ class PostCard extends Component {
   }
 
   editPost = () => {
-    const { errorMessage, toEdit, isLoading, images, videos } = this.state;
+    const { errorMessage, toEdit, isLoading, images, videos, removedImages } = this.state;
     const { theme } = this.props.state;
     return (
       <RBSheet
@@ -291,14 +409,14 @@ class PostCard extends Component {
         }}
       >
         <ScrollView>
+          {isLoading ? <Spinner mode="overlay" /> : null}
           <View style={{
             width: width,
             marginTop: 10,
             alignItems: 'center',
-            marginBottom: height/4
+            marginBottom: height / 4
           }}>
             <Text>Edit Post</Text>
-            {isLoading && <Skeleton size={1} template={'block'} height={10} />}
             <Text style={{
               color: Color.danger
             }}>{errorMessage}</Text>
@@ -361,7 +479,12 @@ class PostCard extends Component {
                             text: 'Remove', onPress: () => {
                               let lis = images;
                               lis.splice(index, 1);
-                              this.setState({ images: lis });
+                              let rm = removedImages
+                              rm.push(item.id)
+                              this.setState({
+                                images: lis,
+                                removedImages: rm
+                              });
                             }
                           },
                         ],
@@ -418,15 +541,20 @@ class PostCard extends Component {
                     }}
                     onLongPress={() => {
                       Alert.alert(
-                        'Remove Photo',
-                        `Click 'Remove' to remove photo.`,
+                        'Remove Video',
+                        `Click 'Remove' to remove Video.`,
                         [
                           { text: 'Close', onPress: () => { return }, style: 'cancel' },
                           {
                             text: 'Remove', onPress: () => {
                               let lis = videos;
                               lis.splice(index, 1);
-                              this.setState({ videos: lis });
+                              let rm = removedImages;
+                              rm.push(item.id)
+                              this.setState({
+                                videos: lis,
+                                removedImages: rm
+                              });
                             }
                           },
                         ],
@@ -434,17 +562,17 @@ class PostCard extends Component {
                       )
                     }}
                     style={{
-                      width: '25%',
-                      height: 70,
+                      width: item.category == null ? '100%' : '25%',
+                      height:  item.category == null ? 40 : 70,
                       backgroundColor: Color.lightGray
                     }}>
-                    <VideoPlayer
+                    {item.category == null ? <Text>{item.file_url}</Text> : <VideoPlayer
                       source={{ uri: Config.BACKEND_URL + item.category }}
                       style={{
                         width: '100%',
                         height: '100%'
                       }}
-                    />
+                    />}
                   </TouchableOpacity>
                 )
               })}
