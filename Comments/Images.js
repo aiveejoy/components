@@ -30,7 +30,7 @@ class Create extends Component {
                     height: '100%',
                     width: images?.length == 1 ? '100%' : '50%',
                   }}>
-                  {item.category.includes('/storage/file/') ?
+                  {item?.category?.includes('/storage/file/') ?
                     <VideoPlayer
                       video={{ uri: Config.BACKEND_URL + item.category }}
                       repeat={true}

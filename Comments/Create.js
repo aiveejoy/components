@@ -10,10 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faImages } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 import ImagePicker from 'react-native-image-crop-picker';
-import Config from 'src/config';
 import ImageModal from 'components/Modal/ImageModal.js';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import VideoPlayer from 'react-native-video-player';
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
 class Create extends Component {
@@ -369,7 +367,7 @@ class Create extends Component {
                         onLongPress={() => {
                           Alert.alert(
                             'Remove Photo',
-                            `Click 'Remove' to remove photo.`,
+                            `Click 'Remove' to remove video.`,
                             [
                               { text: 'Close', onPress: () => { return }, style: 'cancel' },
                               {
@@ -385,17 +383,9 @@ class Create extends Component {
                         }}
                         style={{
                           width: '100%',
-                          height: 200,
                           backgroundColor: Color.lightGray
                         }}>
-                        <VideoPlayer
-                          video={{ uri: `data:image/jpeg;base64,${item.file_base64}` }}
-                          thumbnail={{ uri: 'https://i.picsum.photos/id/866/1600/900.jpg' }}
-                          style={{
-                            width: '100%',
-                            height: '100%'
-                          }}
-                        />
+                        <Text>{item.file_url}</Text>
                       </TouchableOpacity>
                     )
                   })}

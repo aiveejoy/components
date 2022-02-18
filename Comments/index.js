@@ -34,8 +34,10 @@ class Comments extends Component {
   }
 
   componentDidMount() {
-    this.props.setComments([])
-    this.retrieve(false);
+    this.props.navigation.addListener('didFocus', () => {
+      this.props.setComments([])
+      this.retrieve(false);
+    })
   }
 
   retrieveByFilter = (by) => {
@@ -73,7 +75,20 @@ class Comments extends Component {
           created_at: selectedFilter === 'Date' ? 'desc' : 'asc'
         }
       }
-    } else {
+    } else if(this.props.account) {
+      parameter = {
+        condition: [{
+          clause: '=',
+          column: 'account_id',
+          value: this.props.account
+        }],
+        limit: this.state.limit,
+        offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
+        sort: {
+          created_at: selectedFilter === 'Date' ? 'desc' : 'asc'
+        }
+      }
+    }else {
       parameter = {
         condition: [{
           clause: '!=',
@@ -252,21 +267,30 @@ class Comments extends Component {
           }}>
             {
               user?.account_profile?.url ? (
-                <Image
+                <TouchableOpacity
+                onPress={() => {
+                  this.props.navigation.navigate('accountPostsStack', {data: user})
+                }}><Image
                   source={user?.account_profile?.url ? { uri: Config.BACKEND_URL + user.account_profile?.url } : require('assets/logo.png')}
                   style={[BasicStyles.profileImageSize, {
                     height: 30,
                     width: 30,
                     borderRadius: 100,
                     marginTop: 2
-                  }]} />
-              ) : <FontAwesomeIcon
+                  }]}
+                />
+                </TouchableOpacity>
+              ) : <TouchableOpacity
+              onPress={() => {
+                this.props.navigation.navigate('accountPostsStack', {data: user})
+              }}><FontAwesomeIcon
                 icon={faUserCircle}
                 size={30}
                 style={{
                   color: Color.darkGray
                 }}
               />
+              </TouchableOpacity>
             }
             <TouchableOpacity
               style={{
