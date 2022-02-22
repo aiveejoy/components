@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, Alert} from 'react-native';
 import { Color, BasicStyles, Helper } from 'common';
 import { navigationRef } from 'modules/generic/SecurityAlert';
 import {connect} from 'react-redux';
+import {NavigationActions, StackActions} from 'react-navigation';
 class Message extends Component{
   
   constructor(props){
@@ -12,6 +13,23 @@ class Message extends Component{
   redirect = (route) => {
     navigationRef.current?._navigation.navigate(route)
   };
+
+  navigateToScreen = (route) => {
+    const navigateAction = NavigationActions.navigate({
+      routeName: 'drawerStack',
+      action: StackActions.reset({
+        index: 0,
+        key: null,
+        actions: [
+            NavigationActions.navigate({routeName: route, params: {
+              initialRouteName: route,
+              index: 0
+            }}),
+          ]
+        })
+      });
+    navigationRef.current?._navigation.dispatch(navigateAction);
+  }
 
   validate = () => {
     Alert.alert(
@@ -57,7 +75,7 @@ class Message extends Component{
               {
                 (this.props.page != 'onNegotiation' && this.props.page != 'subscription') &&
                 (<TouchableOpacity
-                  onPress={() => {(Helper.checkStatus(user) < Helper.accountVerified) ?  this.validate() : this.redirect('createRequestStack')}}
+                  onPress={() => {(Helper.checkStatus(user) < Helper.accountVerified) ?  this.validate() : this.navigateToScreen('Dashboard')}}
                   style={{
                     top: '5%',
                     alignItems: 'center',
