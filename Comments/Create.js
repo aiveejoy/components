@@ -49,8 +49,8 @@ class Create extends Component {
     const { user } = this.props.state;
     let parameter = {
       account_id: user.id,
-      payload: this.props.payload ? 'page' : 'account_id',
-      payload_value: this.props.payload ? this.props.payload?.payload_value : user.id,
+      payload: this.props.payload ? 'page' : (user.sub_account ? 'merchant_id' : 'account_id'),
+      payload_value: this.props.payload ? this.props.payload?.payload_value : (user.sub_account?.id || user.id),
       text: this.state.status,
       to: user.id,
       from: user.id,
