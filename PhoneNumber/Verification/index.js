@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Dimensions, ScrollView, Text, Image, TextInput } from 'react-native';
+import { View, Dimensions, ScrollView, Text, Alert, Image, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import Api from 'services/api/index.js';
 import { Routes, BasicStyles } from 'common';
@@ -16,42 +16,11 @@ class Stack extends Component {
     super(props);
     this.state = {
       isLoading: false,
-      phoneNumber: '+639052108258',
+      // phoneNumber: '+639052108258',
+      phoneNumber: '09275273541',
       step: 0,
       code: null
     }
-  }
-
-  createPaymentIntent(){
-    const {params} = this.props.navigation.state;
-    const { user } = this.props.state;
-    if(params && params.data == null) return null
-    if(user == null) return null
-    this.setState({
-      isLoading: true
-    })
-    Api.request(Routes.createPaymentIntent, {
-      account_id: user.id,
-      amount: params.data.amount,
-      currency: params.data.currency,
-      charge: params.data.charge,
-      total: params.data.total,
-      email: user.email
-    }, response => {
-      this.setState({
-        isLoading: false
-      })
-      this.setState({
-        paymentIntent: response.data
-      })
-    }, error => {
-      this.setState({
-        isLoading: false
-      })
-      console.log({
-        error
-      })
-    })
   }
 
   navigate = () => {
@@ -69,6 +38,80 @@ class Stack extends Component {
       })
     });
     this.props.navigation.dispatch(navigateAction);
+  }
+
+  getPhoneCode(){
+    const { phoneNumber } = this.state;
+    if(phoneNumber.length != 11 || phoneNumber == ''){
+      Alert.alert(
+        "Error",
+        "Phone Number is required.",
+        [
+          {
+            text: "Ok", onPress: () => {
+              console.log('[log]')
+            }
+          }
+        ]
+      );
+      return false
+    }else if(phoneNumber !== '' && (phoneNumber.substr(0, 2) != '09')){
+      Alert.alert(
+        "Error",
+        "You have entered an invalid phone number.",
+        [
+          {
+            text: "Ok", onPress: () => {
+              console.log('[log]')
+            }
+          }
+        ]
+      );
+      return false
+    }
+    let parameter = {
+      cellular_phone: phoneNumber
+    }
+    Api.request(Routes.preVerifyNum, parameter, response => {
+      console.log('[response>>>>>>>>>>]', response)
+      if(response.data == null && response.error  != null){
+        Alert.alert(
+          "Error",
+          response.error,
+          [
+            {
+              text: "Ok", onPress: () => {
+                console.log('[error]')
+              }
+            }
+          ]
+        );
+      }else{
+        Alert.alert(
+          "Phone Code Notification",
+          "We sent a code to your phone number specified.",
+          [
+            {
+              text: "Ok", onPress: () => {
+                this.props.navigation.navigate('otpStack', {
+                  data: {
+                    payload: 'phone',
+                    data: phoneNumber
+                  }
+                });
+              }
+            }
+          ]
+        );
+      }
+      this.setState({
+        isLoading: false
+      })
+    }, error => {
+      this.setState({
+        isLoading: false
+      })
+    })
   }
 
 
@@ -182,14 +225,8 @@ class Stack extends Component {
                 bottom: 10
               }}
               title={'Get Code'}
-              onClick={() => {
-                this.props.navigation.navigate('otpStack', {
-                  data: {
-                    payload: 'phone',
-                    phoneNumber: this.state.phoneNumber
-                  }
-                })
-              }} />
+              onClick={() => this.getPhoneCode()}
+            />
 
             <TouchableHighlight style={{
               width: '100%',
