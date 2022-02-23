@@ -16,7 +16,7 @@ class Stack extends Component {
     super(props);
     this.state = {
       isLoading: false,
-      phoneNumber: null,
+      phoneNumber: '+639052108258',
       step: 0,
       code: null
     }
@@ -183,8 +183,11 @@ class Stack extends Component {
               }}
               title={'Get Code'}
               onClick={() => {
-                this.setState({
-                  step: 1
+                this.props.navigation.navigate('otpStack', {
+                  data: {
+                    payload: 'phone',
+                    phoneNumber: this.state.phoneNumber
+                  }
                 })
               }} />
 
