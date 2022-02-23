@@ -47,7 +47,7 @@ const Drawer = createStackNavigator({
    directCashInScreen: {
     screen: Stack,
     navigationOptions: ({navigation}) => ({
-      title: 'Phone Number Verification',
+      title: null,
       headerLeft: <HeaderOptionsConnect navigationProps={navigation} />,
       ...BasicStyles.headerDrawerStyle
     }),
