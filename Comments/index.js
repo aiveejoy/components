@@ -13,6 +13,8 @@ import _ from 'lodash';
 import Config from 'src/config';
 import ImageModal from 'components/Modal/ImageModalV2.js';
 import Style from './Style';
+import Geolocation from '@react-native-community/geolocation';
+import Geocoder from 'react-native-geocoding';
 
 class Comments extends Component {
   constructor(props) {
@@ -44,10 +46,11 @@ class Comments extends Component {
     const { selectedFilter } = this.state;
     let previousFilter = selectedFilter
     this.setState({
+      offset: 0,
       selectedFilter: by,
       showFilterOptions: false
     }, () => {
-      if(previousFilter !== by) {
+      if (previousFilter !== by) {
         this.props.setComments([])
         this.retrieve(false);
       }
@@ -56,6 +59,7 @@ class Comments extends Component {
 
   retrieve = (flag) => {
     const { setComments, withImages } = this.props;
+    const { user } = this.props.state;
     const { selectedFilter } = this.state;
     let parameter = null
     if (this.props.payload) {
@@ -71,11 +75,13 @@ class Comments extends Component {
         }],
         limit: this.state.limit,
         offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
+        account_id: user.id,
+        filter: selectedFilter,
         sort: {
-          created_at: selectedFilter === 'Date' ? 'desc' : 'asc'
+          created_at: 'desc'
         }
       }
-    } else if(this.props.account) {
+    } else if (this.props.account) {
       parameter = {
         condition: [{
           clause: '=',
@@ -84,11 +90,13 @@ class Comments extends Component {
         }],
         limit: this.state.limit,
         offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
+        account_id: user.id,
+        filter: selectedFilter,
         sort: {
-          created_at: selectedFilter === 'Date' ? 'desc' : 'asc'
+          created_at: 'desc'
         }
       }
-    }else {
+    } else {
       parameter = {
         condition: [{
           clause: '!=',
@@ -97,13 +105,24 @@ class Comments extends Component {
         }],
         limit: this.state.limit,
         offset: flag === true && this.state.offset > 0 ? (this.state.offset * this.state.limit) : this.state.offset,
+        account_id: user.id,
+        filter: selectedFilter,
         sort: {
-          created_at: selectedFilter === 'Date' ? 'desc' : 'asc'
+          created_at: 'desc'
         }
       }
     }
+    if (selectedFilter === 'Country') {
+      Geocoder.init('AIzaSyAxT8ShiwiI7AUlmRdmDp5Wg_QtaGMpTjg');
+      Geolocation.getCurrentPosition(info => {
+        Geocoder.from(info.coords.latitude, info.coords.longitude).then((json) => {
+          var details = json.results[0].formatted_address.split(', ');
+          parameter['country'] = details[details.length - 1];
+          console.log(parameter)
+        }).catch((error) => console.warn(error));
+      }, error => { console.log(error); });
+    }
     this.setState({ isLoading: true });
-    console.log(withImages ? Routes.commentsRetrieveWithImages : Routes.commentsRetrieve, parameter)
     Api.request(withImages ? Routes.commentsRetrieveWithImages : Routes.commentsRetrieve, parameter, response => {
       this.setState({ isLoading: false });
       if (response.data.length > 0) {
@@ -114,6 +133,9 @@ class Comments extends Component {
         this.setState({ offset: flag == false ? 0 : this.state.offset, })
         setComments(flag == false ? [] : this.props.state.comments);
       }
+    }, error => {
+      console.log(withImages, Routes.commentsRetrieveWithImages, parameter, '----', error)
+      this.setState({ isLoading: false });
     })
   }
 
@@ -205,8 +227,59 @@ class Comments extends Component {
     })
   }
 
+  filter = () => {
+    const { selectedFilter, showFilterOptions } = this.state;
+    return (
+      <View>
+        <View style={{
+          backgroundColor: 'white',
+          flexDirection: 'row',
+          padding: 10,
+          borderWidth: 1,
+          borderColor: Color.lightGray,
+          marginBottom: 10
+        }}>
+
+          <Text style={{
+            width: '50%'
+          }}>Filter Results By</Text>
+          <TouchableOpacity
+            style={{
+              width: '45%',
+              marginRight: 5
+            }}
+            onPress={() => {
+              this.setState({ showFilterOptions: !showFilterOptions })
+            }}
+          ><Text style={{
+            textAlign: 'right'
+          }}
+          >{selectedFilter || 'Date'}</Text></TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({ showFilterOptions: !showFilterOptions })
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faChevronDown}
+              style={{
+                marginTop: 2
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+        {showFilterOptions && <View style={Style.optionContainer}>
+          <TouchableOpacity onPress={() => { this.retrieveByFilter('Date') }}><Text style={Style.option}>Date</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => { this.retrieveByFilter('Followed Churches') }}><Text style={Style.option}>Followed Churches</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => { this.retrieveByFilter('Country') }}><Text style={Style.option}>Country</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => { this.retrieveByFilter('Followed Communities') }}><Text style={Style.option}>Followed Communities</Text></TouchableOpacity>
+        </View>}
+      </View>
+    )
+  }
+
   render() {
-    const { isLoading, createStatus, smallLoading, images, selectedFilter, showFilterOptions } = this.state;
+    const { isLoading, createStatus, smallLoading, images } = this.state;
     const { comments, user } = this.props.state;
     return (
       <View>
@@ -215,49 +288,7 @@ class Comments extends Component {
           paddingBottom: 10,
           paddingTop: 10
         }}>
-          <View style={{
-            backgroundColor: 'white',
-            flexDirection: 'row',
-            padding: 10,
-            borderWidth: 1,
-            borderColor: Color.lightGray,
-            marginBottom: 10
-          }}>
-            
-            <Text style={{
-              width: '50%'
-            }}>Filter Results By</Text>
-            <TouchableOpacity
-            style={{
-              width: '45%',
-              marginRight: 5
-            }}
-              onPress={() => {
-                this.setState({showFilterOptions: !showFilterOptions})
-              }}
-            ><Text style={{
-              textAlign: 'right'
-            }}
-            >{selectedFilter || 'Date'}</Text></TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState({showFilterOptions: !showFilterOptions})
-              }}
-            >
-              <FontAwesomeIcon
-              icon={faChevronDown}
-              style={{
-                marginTop: 2
-              }}
-            />
-            </TouchableOpacity>
-          </View>
-          {showFilterOptions && <View style={Style.optionContainer}>
-          <TouchableOpacity onPress={() => { this.retrieveByFilter('Date') }}><Text style={Style.option}>Date</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => { this.retrieveByFilter('Followed Churches') }}><Text style={Style.option}>Followed Churches</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => { this.retrieveByFilter('Country') }}><Text style={Style.option}>Country</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => { this.retrieveByFilter('Followed Communities') }}><Text style={Style.option}>Followed Communities</Text></TouchableOpacity>
-          </View>}
+          {this.props.account ? null : this.filter()}
           <View style={{
             backgroundColor: 'white',
             flexDirection: 'row',
@@ -268,28 +299,28 @@ class Comments extends Component {
             {
               user?.account_profile?.url ? (
                 <TouchableOpacity
-                onPress={() => {
-                  this.props.navigation.navigate('accountPostsStack', {data: user})
-                }}><Image
-                  source={user?.account_profile?.url ? { uri: Config.BACKEND_URL + user.account_profile?.url } : require('assets/logo.png')}
-                  style={[BasicStyles.profileImageSize, {
-                    height: 30,
-                    width: 30,
-                    borderRadius: 100,
-                    marginTop: 2
-                  }]}
-                />
+                  onPress={() => {
+                    this.props.navigation.navigate('accountPostsStack', { data: user })
+                  }}><Image
+                    source={user?.account_profile?.url ? { uri: Config.BACKEND_URL + user.account_profile?.url } : require('assets/logo.png')}
+                    style={[BasicStyles.profileImageSize, {
+                      height: 30,
+                      width: 30,
+                      borderRadius: 100,
+                      marginTop: 2
+                    }]}
+                  />
                 </TouchableOpacity>
               ) : <TouchableOpacity
-              onPress={() => {
-                this.props.navigation.navigate('accountPostsStack', {data: user})
-              }}><FontAwesomeIcon
-                icon={faUserCircle}
-                size={30}
-                style={{
-                  color: Color.darkGray
-                }}
-              />
+                onPress={() => {
+                  this.props.navigation.navigate('accountPostsStack', { data: user })
+                }}><FontAwesomeIcon
+                  icon={faUserCircle}
+                  size={30}
+                  style={{
+                    color: Color.darkGray
+                  }}
+                />
               </TouchableOpacity>
             }
             <TouchableOpacity

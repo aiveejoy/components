@@ -86,7 +86,8 @@ class Stripe extends Component {
       currency: params.data.currency,
       charge: params.data.charge,
       total: params.data.total,
-      amount: params.data.amount
+      amount: params.data.amount,
+      to: user.id
     }, response => {
       this.setState({
         isLoading: false

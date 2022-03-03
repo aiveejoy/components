@@ -20,7 +20,8 @@ const width = Math.round(Dimensions.get('window').width);
 const options = [
   { title: 'Edit', action: 'edit', icon: faPencilAlt },
   { title: 'Report', action: 'report', icon: faFileAlt },
-  { title: 'Delete', action: 'delete', icon: faTrashAlt }
+  { title: 'Delete', action: 'delete', icon: faTrashAlt },
+  { title: 'Hide', action: 'hide', icon: faPencilAlt },
 ]
 class PostCard extends Component {
   constructor(props) {
@@ -106,6 +107,10 @@ class PostCard extends Component {
     })
   }
 
+  clickHide = (id) => {
+    console.log('----', id)
+  }
+
   optionClick = (id, action) => {
     const { data } = this.props;
     this.setState({ options: false });
@@ -130,6 +135,9 @@ class PostCard extends Component {
         break;
       case 'report':
         this.clickReport();
+        break;
+      case 'hide':
+        this.clickHide(id);
         break;
       case 'delete':
         Alert.alert('Confirmation', 'Are you sure you want to delete this post?', [

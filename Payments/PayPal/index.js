@@ -91,13 +91,14 @@ class Stack extends Component {
   }
 
   handleChange = (e) => {
+    const { user } = this.props.state;
     console.log({
       change: e
     })
     if (e.url.includes('capture_order')) {
       let url = e.url.replace('token', 'paypal_token')
       const { token } = this.props.state;
-      url += '&token=' + token
+      url += '&token=' + token + '&to=' + user.id
       Api.getRequest(url, response => {
         this.setState({
           paypalUrl: null,

@@ -8,6 +8,7 @@ import Style from './CreateStyle';
 import { Spinner } from 'components';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import PostCard from './PostCard';
+import moment from 'moment';
 
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
@@ -61,7 +62,8 @@ class Share extends Component {
           text: data.text,
           to: user.id,
           from: user.id,
-          route: 'statusStack'
+          route: 'statusStack',
+          created_at: data.created_at
         }
         console.log(Routes.commentsCreate, par);
         Api.request(Routes.commentsCreate, par, res => {
