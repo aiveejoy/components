@@ -1,25 +1,30 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import { View, Dimensions, ScrollView, Text, Alert, Image, TextInput } from 'react-native';
 import { connect } from 'react-redux';
 import Api from 'services/api/index.js';
-import { Routes, BasicStyles } from 'common';
-import { Spinner } from 'components';
+import { Routes, BasicStyles, Color } from 'common';
+import PhoneInput from "react-native-phone-number-input";
 import {NavigationActions, StackActions} from 'react-navigation';
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
 import Button from 'components/Form/Button';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import RNLocalize from "react-native-localize";
 
 class Stack extends Component {
 
   constructor(props) {
     super(props);
+    this.phoneInput = new createRef();
     this.state = {
       isLoading: false,
       // phoneNumber: '+639052108258',
-      phoneNumber: '09275273541',
+      phoneNumber: null,
       step: 0,
-      code: null
+      code: null,
+      value: '',
+      formattedValue: '',
+      country: ['PH', 'US']
     }
   }
 
@@ -42,23 +47,11 @@ class Stack extends Component {
 
   getPhoneCode(){
     const { phoneNumber } = this.state;
-    if(phoneNumber.length != 11 || phoneNumber == ''){
+    const checkValid = this.phoneInput.current?.isValidNumber(phoneNumber);
+    if(checkValid === false){
       Alert.alert(
         "Error",
-        "Phone Number is required.",
-        [
-          {
-            text: "Ok", onPress: () => {
-              console.log('[log]')
-            }
-          }
-        ]
-      );
-      return false
-    }else if(phoneNumber !== '' && (phoneNumber.substr(0, 2) != '09')){
-      Alert.alert(
-        "Error",
-        "You have entered an invalid phone number.",
+        "Invalid phone number. Please try again.",
         [
           {
             text: "Ok", onPress: () => {
@@ -170,16 +163,27 @@ class Stack extends Component {
         width: '100%',
         marginTop: 25
       }}>
-        <TextInput
-            style={{
-              ...BasicStyles.standardFormControl,
-              marginBottom: 20,
-              borderRadius: 25,
-              textAlign: 'center'
+
+        <PhoneInput
+            ref={this.phoneInput}
+            defaultValue={this.state.phoneNumber}
+            defaultCode={RNLocalize.getCountry()}
+            layout="first"
+            onChangeText={(text) => {
+              this.setState({
+                phoneNumber: text
+              })
             }}
-            onChangeText={(phoneNumber) => this.setState({phoneNumber})}
-            value={this.state.phoneNumber}
-            placeholder={'912345678'}
+            onChangeFormattedText={(text) => {
+              this.setState({
+                formattedValue: text
+              })
+            }}
+            // withDarkTheme
+            withShadow
+            autoFocus
+            containerStyle={{width: '100%', borderRadius: 25, backgroundColor: '#d4d9d9', borderColor: 'gray' }}
+            textContainerStyle={{borderTopRightRadius: 25, borderBottomRightRadius: 25, borderColor: '#d4d9d9'}}
           />
       </View>
     );
@@ -231,7 +235,8 @@ class Stack extends Component {
             <TouchableHighlight style={{
               width: '100%',
               justifyContent: 'center'
-            }}>
+            }}
+            onPress={() => this.props.navigation.pop()}>
               <Text style={{
                 fontWeight: 'bold',
                 color: theme ? theme.secondary : Color.secondary
@@ -297,7 +302,7 @@ class Stack extends Component {
               }}>
       
                 {
-                  this.image(require('assets/Loading.gif'))
+                  this.image(require('assets/verify_number.png'))
                 }
                 {
                   this.label('Verify Your Phone Number', 'Please select your country and type your phone number.')
@@ -322,9 +327,8 @@ class Stack extends Component {
                 padding: 20,
                 width: '100%'
               }}>
-      
                 {
-                  this.image(require('assets/loading_christmas.gif'))
+                  this.image(require('assets/verify_number.png'))
                 }
                 {
                   this.label('Verification Code', 'Please enter the code sent to ' + this.state.phoneNumber)
