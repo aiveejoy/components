@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { StripeProvider, useGooglePay } from '@stripe/stripe-react-native';
 import { View, Text, Alert, Dimensions } from 'react-native'
 import Config from 'src/config.js';
-import Helper from 'common/Helper'
 import Color from 'common/Color';
 import Button from 'components/Form/Button';
 const height = Math.round(Dimensions.get('window').height);
@@ -29,7 +28,6 @@ export default function App(props) {
     } else {
       pay();
     }
-    setInitialized(true);
   }
 
   const pay = async () => {

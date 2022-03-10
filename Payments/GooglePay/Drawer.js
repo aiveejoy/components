@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
-import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {View, TouchableOpacity, StyleSheet} from 'react-native';
 import {createStackNavigator} from 'react-navigation-stack';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faArrowLeft, faChevronLeft} from '@fortawesome/free-solid-svg-icons';
+import {faChevronLeft} from '@fortawesome/free-solid-svg-icons';
 import {Color, BasicStyles} from 'common';
 import {connect} from 'react-redux';
 import Stack from './index.js';

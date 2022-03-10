@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { View, Dimensions, Text, Alert, ScrollView, Image } from 'react-native';
+import { View, Dimensions, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
-import Button from 'components/Form/Button';
 import Api from 'services/api/index.js';
-import { Color, Routes } from 'common';
 import { Spinner } from 'components';
 import StripeScreen from './screen'
 import {NavigationActions, StackActions} from 'react-navigation';
