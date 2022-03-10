@@ -45,6 +45,13 @@ class Stack extends Component {
     this.props.navigation.dispatch(navigateAction);
   }
 
+  logout = () => {
+    this.props.logout()
+    setTimeout(() => {
+      this.props.navigation.navigate('loginStack')
+    }, 100)
+  }
+
   getPhoneCode(){
     const { phoneNumber } = this.state;
     const checkValid = this.phoneInput.current?.isValidNumber(phoneNumber);
@@ -66,7 +73,6 @@ class Stack extends Component {
       cellular_phone: phoneNumber
     }
     Api.request(Routes.preVerifyNum, parameter, response => {
-      console.log('[response>>>>>>>>>>]', response)
       if(response.data == null && response.error  != null){
         Alert.alert(
           "Error",
@@ -212,6 +218,7 @@ class Stack extends Component {
 
   footer(){
     const { theme } = this.props.state;
+    const { cancel } = this.props.navigation.state.params;
       return(
         <View style={{
             width: '90%',
@@ -236,12 +243,12 @@ class Stack extends Component {
               width: '100%',
               justifyContent: 'center'
             }}
-            onPress={() => this.props.navigation.pop()}>
+            onPress={() => cancel ? this.props.navigation.pop() : this.logout()}>
               <Text style={{
                 fontWeight: 'bold',
-                color: theme ? theme.secondary : Color.secondary
+                color: Color.danger
               }}>
-                Skip
+                {cancel ? 'Cancel' : 'Logout'}
               </Text>
             </TouchableHighlight>
         </View>
@@ -350,7 +357,13 @@ class Stack extends Component {
 }
 
 const mapStateToProps = state => ({ state: state });
-
+const mapDispatchToProps = dispatch => {
+  const { actions } = require('@redux');
+  return {
+    logout: () => dispatch(actions.logout())
+  };
+};
 export default connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(Stack)
