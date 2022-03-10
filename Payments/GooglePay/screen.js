@@ -24,10 +24,9 @@ export default function App(props) {
       existingPaymentMethodRequired: false,
       isEmailRequired: true,
     });
-
     if (error) {
       Alert.alert(error.code, error.message);
-      return;
+      props.navigation.pop();
     } else {
       pay();
     }
