@@ -8,8 +8,7 @@ import Button from 'components/Form/Button';
 const height = Math.round(Dimensions.get('window').height);
 export default function App(props) {
   const { theme, params } = props;
-  const { isGooglePaySupported, initGooglePay } = useGooglePay();
-  const { createGooglePayPaymentMethod, presentGooglePay } = useGooglePay();
+  const { initGooglePay, presentGooglePay } = useGooglePay();
 
   const initializeGoogle = async () => {
     const { error } = await initGooglePay({
