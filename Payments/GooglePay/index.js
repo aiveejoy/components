@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Api from 'services/api/index.js';
 import { Spinner } from 'components';
 import StripeScreen from './screen'
+import { Routes } from 'common';
 import {NavigationActions, StackActions} from 'react-navigation';
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').height);
@@ -17,16 +18,7 @@ class Stripe extends Component {
       isLoading: false,
       paypalUrl: null,
       cardDetails: null,
-      paymentIntent: null,
-      logos: [
-        require('assets/VisaColored.png'),
-        require('assets/MastercardColored.jpg'),
-        require('assets/AmericanExpressColored.png'),
-        require('assets/dinersClub.png'),
-        require('assets/discoverColored.png'),
-        require('assets/jcb.png'),
-        require('assets/unionpay.png')
-      ]
+      paymentIntent: null
     };
   }
 
