@@ -70,6 +70,7 @@ class Stack extends Component {
       return false
     }
     let parameter = {
+      account_id: this.props.state.id,
       cellular_phone: phoneNumber
     }
     Api.request(Routes.preVerifyNum, parameter, response => {
