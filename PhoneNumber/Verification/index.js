@@ -10,7 +10,6 @@ const width = Math.round(Dimensions.get('window').width);
 import Button from 'components/Form/Button';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import RNLocalize from "react-native-localize";
-
 class Stack extends Component {
 
   constructor(props) {
@@ -187,8 +186,19 @@ class Stack extends Component {
               })
             }}
             autoFocus
-            containerStyle={{width: '100%', borderRadius: 25, backgroundColor: '#d4d9d9', borderColor: 'gray' }}
-            textContainerStyle={{borderTopRightRadius: 25, borderBottomRightRadius: 25, borderColor: '#d4d9d9'}}
+            containerStyle={{
+              width: '100%',
+              borderRadius: BasicStyles.standardBorderRadius,
+              borderColor: Color.gray,
+              borderWidth: 1,
+              height: 50
+            }}
+            textContainerStyle={{
+              borderTopRightRadius: BasicStyles.standardBorderRadius,
+              borderBottomRightRadius: BasicStyles.standardBorderRadius,
+              backgroundColor: Color.white,
+              borderColor: '#d4d9d9'
+            }}
           />
       </View>
     );
