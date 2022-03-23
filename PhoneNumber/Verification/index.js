@@ -196,8 +196,10 @@ class Stack extends Component {
             textContainerStyle={{
               borderTopRightRadius: 25,
               borderBottomRightRadius: 25,
-              backgroundColor: Color.white,
-              borderColor: '#d4d9d9'
+              backgroundColor: Color.white
+            }}
+            textInputStyle={{
+              height: 50
             }}
           />
       </View>
