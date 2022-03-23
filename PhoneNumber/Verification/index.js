@@ -188,14 +188,14 @@ class Stack extends Component {
             autoFocus
             containerStyle={{
               width: '100%',
-              borderRadius: BasicStyles.standardBorderRadius,
+              borderRadius: 25,
               borderColor: Color.gray,
               borderWidth: 1,
               height: 50
             }}
             textContainerStyle={{
-              borderTopRightRadius: BasicStyles.standardBorderRadius,
-              borderBottomRightRadius: BasicStyles.standardBorderRadius,
+              borderTopRightRadius: 25,
+              borderBottomRightRadius: 25,
               backgroundColor: Color.white,
               borderColor: '#d4d9d9'
             }}
