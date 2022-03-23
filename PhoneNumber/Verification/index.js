@@ -1,5 +1,5 @@
 import React, { Component, createRef } from 'react';
-import { View, Dimensions, ScrollView, Text, Alert, Image, TextInput } from 'react-native';
+import { View, Dimensions, ScrollView, Text, Alert, Image, TextInput, KeyboardAvoidingView } from 'react-native';
 import { connect } from 'react-redux';
 import Api from 'services/api/index.js';
 import { Routes, BasicStyles, Color } from 'common';
