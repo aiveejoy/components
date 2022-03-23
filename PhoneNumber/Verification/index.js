@@ -296,13 +296,13 @@ class Stack extends Component {
   render() {
     const { isLoading, step } = this.state;
     return (
-      <View style={{
-        height: '100%'
+      <KeyboardAvoidingView style={{
+        minHeight: height * 1.5
       }}>
         {
           step == 0 && (
             <View style={{
-              height: '100%'
+              minHeight: height * 1.5
               }}>
               <ScrollView style={{
                 padding: 20,
@@ -329,7 +329,7 @@ class Stack extends Component {
         {
           step == 1 && (
             <View style={{
-              height: '100%'
+              minHeight: height * 1.5
               }}>
               <ScrollView style={{
                 padding: 20,
@@ -352,7 +352,7 @@ class Stack extends Component {
           )
         }
        
-      </View>
+      </KeyboardAvoidingView>
     )
   }
 }
