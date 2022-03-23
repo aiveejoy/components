@@ -296,69 +296,68 @@ class Stack extends Component {
         style = {{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : null}
         >
-        {
-          step == 0 && (
-              <ScrollView style={{
-                padding: 20,
-                width: '100%'
-              }}>
-                <View style={{
-                  height: height * 1.5,
-                  justifyContent: 'space-between',
-                  display: 'flex'
-                }}>
-                  <View>
-                    {
-                      this.image(require('assets/verify_number.png'))
-                    }
-                    {
-                      this.label('Verify Your Phone Number', 'Please select your country and type your phone number.')
-                    }
-                    {
-                      this.input()
-                    }
-                  </View>
-                  <View>
-                  {
-                    this.footer()
-                  }
-                  </View>
-                </View>
-              </ScrollView>
-          )
-        }
+          
+        <ScrollView style={{
+          padding: 20,
+          width: '100%'
+        }}
+        showsVerticalScrollIndicator={false}
+        >
+            {
+              step == 0 && (
+                    <View style={{
+                      height: height * 1.5,
+                      justifyContent: 'space-between',
+                      display: 'flex'
+                    }}>
+                      <View>
+                        {
+                          this.image(require('assets/verify_number.png'))
+                        }
+                        {
+                          this.label('Verify Your Phone Number', 'Please select your country and type your phone number.')
+                        }
+                        {
+                          this.input()
+                        }
+                      </View>
+                      <View>
+                      {
+                        this.footer()
+                      }
+                      </View>
+                    </View>
+              )
+            }
 
-        {
-          step == 1 && (
-            <ScrollView style={{
-              padding: 20,
-              width: '100%'
-            }}>
-              <View style={{
-                  height: height * 1.5,
-                  justifyContent: 'space-between',
-                  display: 'flex'
-                }}>
-                  <View>
-                  {
-                    this.image(require('assets/verify_number.png'))
-                  }
-                  {
-                    this.label('Verification Code', 'Please enter the code sent to ' + this.state.phoneNumber)
-                  }
-                  {
-                    this.code()
-                  }
+            {
+              step == 1 && (
+                  <View style={{
+                      height: height * 1.5,
+                      justifyContent: 'space-between',
+                      display: 'flex'
+                    }}>
+                      <View>
+                      {
+                        this.image(require('assets/verify_number.png'))
+                      }
+                      {
+                        this.label('Verification Code', 'Please enter the code sent to ' + this.state.phoneNumber)
+                      }
+                      {
+                        this.code()
+                      }
+                      </View>
+                      <View>
+                      {
+                        this.footerStep2()
+                      }
+                      </View>
                   </View>
-                  <View>
-                  {
-                    this.footerStep2()
-                  }
-                  </View>
-              </View>
-            </ScrollView>
-          )
-        }
+              )
+            }
+        
+        </ScrollView>
 
       </KeyboardAvoidingView>
     )
