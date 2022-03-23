@@ -8,7 +8,7 @@ import {NavigationActions, StackActions} from 'react-navigation';
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
 import Button from 'components/Form/Button';
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
 import RNLocalize from "react-native-localize";
 class Stack extends Component {
 
@@ -248,7 +248,7 @@ class Stack extends Component {
               onClick={() => this.getPhoneCode()}
             />
 
-            <TouchableHighlight style={{
+            <TouchableOpacity style={{
               width: '100%',
               justifyContent: 'center'
             }}
@@ -259,7 +259,7 @@ class Stack extends Component {
               }}>
                 {cancel ? 'Cancel' : 'Logout'}
               </Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
       )
   }
