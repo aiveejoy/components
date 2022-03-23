@@ -186,8 +186,6 @@ class Stack extends Component {
                 formattedValue: text
               })
             }}
-            // withDarkTheme
-            withShadow
             autoFocus
             containerStyle={{width: '100%', borderRadius: 25, backgroundColor: '#d4d9d9', borderColor: 'gray' }}
             textContainerStyle={{borderTopRightRadius: 25, borderBottomRightRadius: 25, borderColor: '#d4d9d9'}}
