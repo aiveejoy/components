@@ -1,5 +1,5 @@
 import React, { Component, createRef } from 'react';
-import { View, Dimensions, ScrollView, Text, Alert, Image, TextInput, KeyboardAvoidingView } from 'react-native';
+import { View, Platform, Dimensions, ScrollView, Text, Alert, Image, TextInput, KeyboardAvoidingView } from 'react-native';
 import { connect } from 'react-redux';
 import Api from 'services/api/index.js';
 import { Routes, BasicStyles, Color } from 'common';
@@ -223,12 +223,10 @@ class Stack extends Component {
       return(
         <View style={{
             width: '90%',
-            bottom: 50,
-            left: 0,
-            position: "absolute",
             alignItems: 'center',
             marginLeft: '5%',
-            marginRight: '5%'
+            marginRight: '5%',
+            marginBottom: height * .65
           }}>
             <Button
               style={{
@@ -261,12 +259,10 @@ class Stack extends Component {
       return(
         <View style={{
             width: '90%',
-            bottom: 50,
-            left: 0,
-            position: "absolute",
             alignItems: 'center',
             marginLeft: '5%',
-            marginRight: '5%'
+            marginRight: '5%',
+            marginBottom: height * .65
           }}>
             <Button
               style={{
@@ -296,62 +292,74 @@ class Stack extends Component {
   render() {
     const { isLoading, step } = this.state;
     return (
-      <KeyboardAvoidingView style={{
-        minHeight: height * 1.5
-      }}>
+      <KeyboardAvoidingView
+        style = {{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : null}
+        >
         {
           step == 0 && (
-            <View style={{
-              minHeight: height * 1.5
-              }}>
               <ScrollView style={{
                 padding: 20,
                 width: '100%'
               }}>
-      
-                {
-                  this.image(require('assets/verify_number.png'))
-                }
-                {
-                  this.label('Verify Your Phone Number', 'Please select your country and type your phone number.')
-                }
-                {
-                  this.input()
-                }
+                <View style={{
+                  height: height * 1.5,
+                  justifyContent: 'space-between',
+                  display: 'flex'
+                }}>
+                  <View>
+                    {
+                      this.image(require('assets/verify_number.png'))
+                    }
+                    {
+                      this.label('Verify Your Phone Number', 'Please select your country and type your phone number.')
+                    }
+                    {
+                      this.input()
+                    }
+                  </View>
+                  <View>
+                  {
+                    this.footer()
+                  }
+                  </View>
+                </View>
               </ScrollView>
-            {
-              this.footer()
-            }
-            </View>
           )
         }
 
         {
           step == 1 && (
-            <View style={{
-              minHeight: height * 1.5
-              }}>
-              <ScrollView style={{
-                padding: 20,
-                width: '100%'
-              }}>
-                {
-                  this.image(require('assets/verify_number.png'))
-                }
-                {
-                  this.label('Verification Code', 'Please enter the code sent to ' + this.state.phoneNumber)
-                }
-                {
-                  this.code()
-                }
-              </ScrollView>
-            {
-              this.footerStep2()
-            }
-            </View>
+            <ScrollView style={{
+              padding: 20,
+              width: '100%'
+            }}>
+              <View style={{
+                  height: height * 1.5,
+                  justifyContent: 'space-between',
+                  display: 'flex'
+                }}>
+                  <View>
+                  {
+                    this.image(require('assets/verify_number.png'))
+                  }
+                  {
+                    this.label('Verification Code', 'Please enter the code sent to ' + this.state.phoneNumber)
+                  }
+                  {
+                    this.code()
+                  }
+                  </View>
+                  <View>
+                  {
+                    this.footerStep2()
+                  }
+                  </View>
+              </View>
+            </ScrollView>
           )
         }
-       
+
       </KeyboardAvoidingView>
     )
   }
