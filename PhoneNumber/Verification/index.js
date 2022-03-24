@@ -191,7 +191,7 @@ class Stack extends Component {
               borderRadius: 25,
               borderColor: Color.gray,
               borderWidth: 1,
-              height: 50
+              height: 60
             }}
             textContainerStyle={{
               borderTopRightRadius: 25,
