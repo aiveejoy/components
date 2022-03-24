@@ -1,5 +1,5 @@
 import React, { Component, createRef } from 'react';
-import { View, Dimensions, ScrollView, Text, Alert, Image, TextInput } from 'react-native';
+import { View, Platform, Dimensions, ScrollView, Text, Alert, Image, TextInput, KeyboardAvoidingView } from 'react-native';
 import { connect } from 'react-redux';
 import Api from 'services/api/index.js';
 import { Routes, BasicStyles, Color } from 'common';
@@ -8,9 +8,8 @@ import {NavigationActions, StackActions} from 'react-navigation';
 const height = Math.round(Dimensions.get('window').height);
 const width = Math.round(Dimensions.get('window').width);
 import Button from 'components/Form/Button';
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
 import RNLocalize from "react-native-localize";
-
 class Stack extends Component {
 
   constructor(props) {
@@ -186,11 +185,22 @@ class Stack extends Component {
                 formattedValue: text
               })
             }}
-            // withDarkTheme
-            withShadow
             autoFocus
-            containerStyle={{width: '100%', borderRadius: 25, backgroundColor: '#d4d9d9', borderColor: 'gray' }}
-            textContainerStyle={{borderTopRightRadius: 25, borderBottomRightRadius: 25, borderColor: '#d4d9d9'}}
+            containerStyle={{
+              width: '100%',
+              borderRadius: 25,
+              borderColor: Color.gray,
+              borderWidth: 1,
+              height: 60
+            }}
+            textContainerStyle={{
+              borderTopRightRadius: 25,
+              borderBottomRightRadius: 25,
+              backgroundColor: Color.white
+            }}
+            textInputStyle={{
+              height: 50
+            }}
           />
       </View>
     );
@@ -223,12 +233,10 @@ class Stack extends Component {
       return(
         <View style={{
             width: '90%',
-            bottom: 50,
-            left: 0,
-            position: "absolute",
             alignItems: 'center',
             marginLeft: '5%',
-            marginRight: '5%'
+            marginRight: '5%',
+            marginBottom: height * .65
           }}>
             <Button
               style={{
@@ -240,7 +248,7 @@ class Stack extends Component {
               onClick={() => this.getPhoneCode()}
             />
 
-            <TouchableHighlight style={{
+            <TouchableOpacity style={{
               width: '100%',
               justifyContent: 'center'
             }}
@@ -251,7 +259,7 @@ class Stack extends Component {
               }}>
                 {cancel ? 'Cancel' : 'Logout'}
               </Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
       )
   }
@@ -261,12 +269,10 @@ class Stack extends Component {
       return(
         <View style={{
             width: '90%',
-            bottom: 50,
-            left: 0,
-            position: "absolute",
             alignItems: 'center',
             marginLeft: '5%',
-            marginRight: '5%'
+            marginRight: '5%',
+            marginBottom: height * .65
           }}>
             <Button
               style={{
@@ -296,63 +302,74 @@ class Stack extends Component {
   render() {
     const { isLoading, step } = this.state;
     return (
-      <View style={{
-        height: '100%'
-      }}>
-        {
-          step == 0 && (
-            <View style={{
-              height: '100%'
-              }}>
-              <ScrollView style={{
-                padding: 20,
-                width: '100%'
-              }}>
-      
-                {
-                  this.image(require('assets/verify_number.png'))
-                }
-                {
-                  this.label('Verify Your Phone Number', 'Please select your country and type your phone number.')
-                }
-                {
-                  this.input()
-                }
-              </ScrollView>
+      <KeyboardAvoidingView
+        style = {{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : null}
+        >
+          
+        <ScrollView style={{
+          padding: 20,
+          width: '100%'
+        }}
+        showsVerticalScrollIndicator={false}
+        >
             {
-              this.footer()
+              step == 0 && (
+                    <View style={{
+                      height: height * 1.5,
+                      justifyContent: 'space-between',
+                      display: 'flex'
+                    }}>
+                      <View>
+                        {
+                          this.image(require('assets/verify_number.png'))
+                        }
+                        {
+                          this.label('Verify Your Phone Number', 'Please select your country and type your phone number.')
+                        }
+                        {
+                          this.input()
+                        }
+                      </View>
+                      <View>
+                      {
+                        this.footer()
+                      }
+                      </View>
+                    </View>
+              )
             }
-            </View>
-          )
-        }
 
-        {
-          step == 1 && (
-            <View style={{
-              height: '100%'
-              }}>
-              <ScrollView style={{
-                padding: 20,
-                width: '100%'
-              }}>
-                {
-                  this.image(require('assets/verify_number.png'))
-                }
-                {
-                  this.label('Verification Code', 'Please enter the code sent to ' + this.state.phoneNumber)
-                }
-                {
-                  this.code()
-                }
-              </ScrollView>
             {
-              this.footerStep2()
+              step == 1 && (
+                  <View style={{
+                      height: height * 1.5,
+                      justifyContent: 'space-between',
+                      display: 'flex'
+                    }}>
+                      <View>
+                      {
+                        this.image(require('assets/verify_number.png'))
+                      }
+                      {
+                        this.label('Verification Code', 'Please enter the code sent to ' + this.state.phoneNumber)
+                      }
+                      {
+                        this.code()
+                      }
+                      </View>
+                      <View>
+                      {
+                        this.footerStep2()
+                      }
+                      </View>
+                  </View>
+              )
             }
-            </View>
-          )
-        }
-       
-      </View>
+        
+        </ScrollView>
+
+      </KeyboardAvoidingView>
     )
   }
 }
