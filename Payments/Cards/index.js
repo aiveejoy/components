@@ -128,8 +128,10 @@ class Stack extends Component {
                 borderBottomWidth: 1,
               }}>
                 <Text style={{
-                  fontWeight: 'bold'
-                }}>PREFERRED METHODS: </Text>
+                  fontWeight: 'bold',
+                  color: Color.darkGray,
+                  fontStyle: 'italic'
+                }}>PREFERRED METHODS </Text>
               </View>
               {
                 preffered.length > 0 && preffered.map((item, index) => {
