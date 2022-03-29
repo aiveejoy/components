@@ -27,18 +27,18 @@ class Stack extends Component {
           amount: 4
         }
       }, {
-        title: 'VISA DIRECT',
-        description: 'Accepts Credit / Debit Card',
-        fees: 'Zero Fees',
-        logo: require('assets/visa.png'),
-        color: '#1A1F71',
-        code: 'VISA',
-        type: 'bank',
-        currency: 'USD',
+        title: 'PayPal',
+        description: 'PayPal Authorized',
+        fees: '3% Fee',
+        logo: require('assets/paypal.png'),
+        color: Color.gray,
+        code: 'PAYPAL',
+        type: 'ewallet',
         country: 'International',
+        currency: 'USD',
         feeConfiguration: {
           type: 'percentage',
-          amount: 2
+          amount: 4
         }
       }]
     }
