@@ -12,7 +12,35 @@ class Stack extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: []
+      data: [],
+      preffered: [{
+        title: 'Stripe CC / DC',
+        description: '0000-0000-0000-0000',
+        fees: '3% Fee',
+        logo: require('assets/stripe.png'),
+        color: Color.primary,
+        code: 'STRIPE',
+        type: 'bank',
+        currency: 'USD',
+        feeConfiguration: {
+          type: 'percentage',
+          amount: 4
+        }
+      }, {
+        title: 'VISA DIRECT',
+        description: 'Accepts Credit / Debit Card',
+        fees: 'Zero Fees',
+        logo: require('assets/visa.png'),
+        color: '#1A1F71',
+        code: 'VISA',
+        type: 'bank',
+        currency: 'USD',
+        country: 'International',
+        feeConfiguration: {
+          type: 'percentage',
+          amount: 2
+        }
+      }]
     }
   }
 
@@ -28,7 +56,7 @@ class Stack extends Component {
 
   render() {
     const { theme } = this.props.state;
-    const { buttons, selected, data } = this.state;
+    const { buttons, selected, data, preffered } = this.state;
     return (
 
       <View style={{
@@ -88,28 +116,74 @@ class Stack extends Component {
                             fontSize: 12
                           }}>{item.fees}</Text>
                         </View>
-                        {/*<View style={{
-                            flexDirection: 'row',
-                            marginTop: 20,
-                            alignItems: 'center',
-                            justifyContent: 'space-between'
-                          }}>
-                            <Image 
-                              source={item.logo}
-                              style={{
-                                height: 30,
-                                width: width / 3,
-                                resizeMode: 'stretch',
-                              }}
-                              />
-                          </View>*/}
                       </View>
 
                     </TouchableHighlight>
                   )
                 })
               }
+              <View style={{
+                padding: 20,
+                borderBottomColor: Color.lightGray,
+                borderBottomWidth: 1,
+              }}>
+                <Text style={{
+                  fontWeight: 'bold'
+                }}>PREFERRED METHODS: </Text>
+              </View>
+              {
+                preffered.length > 0 && preffered.map((item, index) => {
+                  return (
+                    <TouchableHighlight
+                      onPress={() => {
+                        if (this.props.press == false) return
+                        this.props.navigation?.state?.params?.setPaymentMethod(item);
+                        this.props.navigation.navigate('directCashInStack', { paymentMethod: item });
+                      }}
+                      style={{
+                        width: '100%',
+                        borderRadius: 15,
+                        marginBottom: 20,
+                        borderBottomColor: Color.lightGray,
+                        borderBottomWidth: 1,
+                        padding: 20
+                      }}
+                      underlayColor={Color.white}
+                    >
+                      <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center'
+                      }}>
+                        <View style={{
+                          borderWidth: 1,
+                          borderColor: Color.lightGray,
+                          borderRadius: 5,
+                          height: 50,
+                          width: 50,
+                        }}>
+                          <Image source={item.logo} style={{
+                            height: '100%',
+                            width: '100%',
+                            resizeMode: 'contain'
+                          }} />
+                        </View>
+                        <View style={{
+                          padding: 10
+                        }}>
+                          <Text style={{
+                            fontWeight: 'bold',
+                            fontSize: BasicStyles.standardTitleFontSize
+                          }}>{item.title}</Text>
+                          <Text style={{
+                            fontSize: 12
+                          }}>{item.fees}</Text>
+                        </View>
+                      </View>
 
+                    </TouchableHighlight>
+                  )
+                })
+              }
             </View>
           </View>
 

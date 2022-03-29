@@ -40,7 +40,10 @@ class Stack extends Component {
   managePayment = (item) => {
     let temp = [];
     temp.push(item);
-    this.setState({ selected: temp })
+    this.setState({
+      selected: temp,
+      currency: item.currency
+    })
     this.manageCharges(item)
   }
 
