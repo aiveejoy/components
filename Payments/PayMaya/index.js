@@ -102,7 +102,7 @@ class Stack extends Component {
     })
     console.log(e.url.includes('paymaya/callback'), 'this is authorized access')
     if(e.url.includes('paymaya/callback')){
-      let newUrl = e.url + '?token=' + token
+      let newUrl = e.url
       console.log(newUrl,'newUrl')
       this.setState({
         isLoading: true,
