@@ -26,7 +26,13 @@ export default function App(props) {
       // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
       //methods that complete payment after a delay, like SEPA Debit and Sofort.
       allowsDelayedPaymentMethods: true,
-      merchantDisplayName: Helper.APP_NAME_BASIC
+      merchantDisplayName: Helper.APP_NAME_BASIC,
+      applePay: true,
+      merchantCountryCode: 'US',
+      style: 'automatic',
+      googlePay: true,
+      testEnv: true,
+      primaryButtonColor: '#635BFF'
     });
     if (!error) {
       console.log('opening...');
